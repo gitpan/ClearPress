@@ -1,0 +1,15 @@
+cgi-bin/application
+Changes
+data/config.ini
+lib/ClearPress/controller.pm
+lib/ClearPress/decorator.pm
+lib/ClearPress/model.pm
+lib/ClearPress/util.pm
+lib/ClearPress/view.pm
+lib/ClearPress.pm
+Makefile.PL
+MANIFEST
+README
+t/00-critic.t
+t/00-distribution.t
+t/00-pod.t

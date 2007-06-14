@@ -1,0 +1,15 @@
+ClearPress MVC Framework
+========================
+
+ClearPress is a basic, light, but easily extensible MVC framework
+written in Perl.  It was built on a need to be dependency-light and
+integrate closely with code used to drive existing websites the author
+had been involved with in the past.
+
+ClearPress is still very new and under active development though quite
+stable in production. This release represents the first product
+increment following a three-week code sprint starting in the middle of
+May 2007.
+
+I plan to release more complete documentation with the current or next
+code sprint.
