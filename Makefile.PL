@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2007/06/14 14:42:42 $ $Author: zerojinx $
-# Id:            $Id: Makefile.PL,v 1.2 2007/06/14 14:42:42 zerojinx Exp $
+# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $ $Author: zerojinx $
+# Id:            $Id: Makefile.PL 4 2007-06-20 22:06:30Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/Makefile.PL,v $
 # $HeadURL$
 #

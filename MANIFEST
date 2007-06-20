@@ -1,6 +1,7 @@
 cgi-bin/application
 Changes
 data/config.ini
+data/schema.txt
 lib/ClearPress/controller.pm
 lib/ClearPress/decorator.pm
 lib/ClearPress/model.pm
@@ -13,3 +14,4 @@ README
 t/00-critic.t
 t/00-distribution.t
 t/00-pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

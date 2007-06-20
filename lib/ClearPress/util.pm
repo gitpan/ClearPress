@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2007/06/14 14:42:42 $
+# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm,v 1.2 2007/06/14 14:42:42 zerojinx Exp $
+# Id:            $Id: util.pm 4 2007-06-20 22:06:30Z zerojinx $
 # $HeadURL$
 #
 package ClearPress::util;
@@ -14,7 +14,7 @@ use DBI;
 use Config::IniFiles;
 use Carp;
 
-our $VERSION   = do { my ($r) = q$LastChangedRevision: 67 $ =~ /(\d+)/mx; $r; };
+our $VERSION   = do { my ($r) = q$LastChangedRevision: 4 $ =~ /(\d+)/mx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -54,7 +54,6 @@ sub config {
     if($dtconfigpath ne $configpath) {
       croak qq(Failed to detaint configpath: '$configpath');
     }
-
     $self->{'_config'} ||= Config::IniFiles->new(
 						 -file => $dtconfigpath,
 						);
@@ -63,6 +62,7 @@ sub config {
   if(!$self->{'_config'}) {
     croak q(No configuration available);
   }
+
   return $self->{'_config'};
 }
 
@@ -79,11 +79,23 @@ sub dbh {
 			   $config->val($section, 'dbname') || q(),
 			   $config->val($section, 'dbhost') || q();
 
-  $self->{'dbh'} ||= DBI->connect_cached($self->{'dsn'},
+  if(!$self->{'dbh'}) {
+    $self->{'dbh'} = DBI->connect($self->{'dsn'},
 					 $config->val($section, 'dbuser') || q(),
 					 $config->val($section, 'dbpass') || q(),
 					 {RaiseError => 1,
 					  AutoCommit => 0});
+    #########
+    # rollback any junk left behind if this is a cached handle
+    #
+    $self->{'dbh'}->rollback();
+
+    #########
+    # make our transactions as clean as can be
+    #
+#    $self->{'dbh'}->do(q(SET TRANSACTION ISOLATION LEVEL SERIALIZABLE));
+  }
+
   return $self->{'dbh'};
 }
 
@@ -127,7 +139,13 @@ sub profiler {
 
 sub DESTROY {
   my $self = shift;
-  $self->{'dbh'} and $self->{'dbh'}->disconnect();
+  if($self->{'dbh'}) {
+    #########
+    # flush down any uncommitted transactions & locks
+    #
+    $self->{'dbh'}->rollback();
+    $self->{'dbh'}->disconnect();
+  }
   return;
 }
 
@@ -141,7 +159,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 67 $
+$LastChangedRevision: 4 $
 
 =head1 SYNOPSIS
 

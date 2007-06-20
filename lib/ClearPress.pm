@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2007/06/14 14:34:36 $ $Author: zerojinx $
-# Id:            $Id: ClearPress.pm,v 1.1.1.1 2007/06/14 14:34:36 zerojinx Exp $
+# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $ $Author: zerojinx $
+# Id:            $Id: ClearPress.pm 4 2007-06-20 22:06:30Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress.pm,v $
 # $HeadURL$
 #

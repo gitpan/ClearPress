@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2007/06/14 14:42:42 $
-# Id:            $Id: model.pm,v 1.2 2007/06/14 14:42:42 zerojinx Exp $
+# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $
+# Id:            $Id: model.pm 4 2007-06-20 22:06:30Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
 # $HeadURL$
 #
@@ -15,7 +15,7 @@ use ClearPress::util;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 41 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 4 $ =~ /(\d+)/mx; $r; };
 
 sub fields { return (); }
 
@@ -215,11 +215,15 @@ sub update {
     croak q(No table defined);
   }
 
+  my @fields = grep { $_ ne $pk } $self->fields();
   my $query = qq(UPDATE @{[$self->table()]}
-                 SET    @{[join q(, ), map { qq($_ = ?) } $self->fields()]}
+                 SET    @{[join q(, ),
+                                map  { qq($_ = ?) }
+                                @fields]}
                  WHERE  $pk=@{[$self->$pk()]});
+
   eval {
-    $dbh->do($query, {}, map { $self->$_() || q() } $self->fields());
+    $dbh->do($query, {}, map { $self->$_() || q() } @fields);
   };
 
   if($EVAL_ERROR) { 
@@ -235,7 +239,7 @@ sub update {
       croak $EVAL_ERROR;
     }
   }
-    
+
   return 1;
 }
 
@@ -285,7 +289,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 41 $
+$LastChangedRevision: 4 $
 
 =head1 SYNOPSIS
 

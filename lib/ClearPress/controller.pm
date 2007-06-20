@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2007/06/14 14:42:42 $
-# Id:            $Id: controller.pm,v 1.2 2007/06/14 14:42:42 zerojinx Exp $
+# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $
+# Id:            $Id: controller.pm 4 2007-06-20 22:06:30Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL$
 #
@@ -14,13 +14,13 @@ use English qw(-no_match_vars);
 use Carp;
 use ClearPress::decorator;
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 67 $ =~ /(\d+)/mx; $r; };
-our $CRUD           = {
-		       'POST'   => 'create',
-		       'GET'    => 'read',
-		       'PUT'    => 'update',
-		       'DELETE' => 'destroy',
-		      };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 4 $ =~ /(\d+)/mx; $r; };
+our $CRUD    = {
+		'POST'   => 'create',
+		'GET'    => 'read',
+		'PUT'    => 'update',
+		'DELETE' => 'destroy',
+	       };
 
 sub process_uri {
   my ($self, $util) = @_;
@@ -39,17 +39,21 @@ sub process_uri {
   return ($action, $entity, $aspect, $id);
 }
 
-sub handler {
+sub decorator {
   my ($self, $util) = @_;
   my $appname       = $util->config->val('application', 'name') || 'Application';
   my $decorator     = ClearPress::decorator->new({
-						'title'  => (sprintf q(%s v%s (%s database)),
-							     $appname,
-							     $VERSION,
-							     uc $util->dbsection(),),
-						'stylesheet' => [$util->config->val('application','stylesheet')],
-					       });
+						  'title'  => (sprintf q(%s v%s),
+							       $appname,
+							       $VERSION,),
+						  'stylesheet' => [$util->config->val('application','stylesheet')],
+						 });
+  return $decorator;
+}
 
+sub handler {
+  my ($self, $util) = @_;
+  my $decorator     = $self->decorator($util);
   my $error_pkg     = sprintf q(%s::view::error), $util->config->val('application', 'namespace');
   my $cgi           = $decorator->cgi();
 
@@ -62,6 +66,7 @@ sub handler {
 				    'util'   => $util,
 				    'entity' => $entity,
 				    'aspect' => $aspect,
+				    'action' => $action,
 				    'id'     => $id,
 				   });
 
@@ -164,13 +169,19 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 67 $
+$LastChangedRevision: 4 $
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
 =head1 SUBROUTINES/METHODS
+
+=head2 decorator - get/set accessor for a page decorator implementing the ClearPress::decorator interface
+
+  $oController->decorator($oDecorator);
+
+  my $oDecorator = $oController->decorator();
 
 =head2 process_uri - extract useful things from %ENV relating to our URI
 
@@ -192,11 +203,11 @@ $LastChangedRevision: 67 $
 
 =head1 AUTHOR
 
-Roger Pettett, E<lt>rmp@sanger.ac.ukE<gt>
+Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 GRL, by Roger Pettett
+Copyright (C) 2007 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

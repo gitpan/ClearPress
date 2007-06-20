@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2007/06/14 14:42:42 $
-# Id:            $Id: view.pm,v 1.2 2007/06/14 14:42:42 zerojinx Exp $
+# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $
+# Id:            $Id: view.pm 4 2007-06-20 22:06:30Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL$
 #
@@ -15,7 +15,7 @@ use ClearPress::util;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 67 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 4 $ =~ /(\d+)/mx; $r; };
 
 sub new {
   my ($class, $self)    = @_;
@@ -88,7 +88,7 @@ sub method_name {
   my $self   = shift;
   my $aspect = $self->aspect();
   my $action = $self->action();
-  my $method = $aspect || $action;
+  my $method = $aspect || $action ;
   my $model  = $self->model();
   my $pk     = $model->primary_key();
 
@@ -191,7 +191,10 @@ sub update {
   #
   $model->read();
   for my $field ($model->fields()) {
-    $model->$field($cgi->escapeHTML($cgi->param($field)));
+    my $v = $cgi->escapeHTML($cgi->param($field) || q());
+    if($v) {
+      $model->$field($v);
+    }
   }
 
   $model->update() or croak qq(Failed to update entity: $EVAL_ERROR);
@@ -210,7 +213,10 @@ sub create {
   #
   $model->read();
   for my $field ($model->fields()) {
-    $model->$field($cgi->escapeHTML($cgi->param($field)));
+    my $v = $cgi->escapeHTML($cgi->param($field) || q());
+    if($v) {
+      $model->$field($v);
+    }
   }
 
   $model->create() or croak qq(Failed to create entity: $EVAL_ERROR);
@@ -297,7 +303,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 67 $
+$LastChangedRevision: 4 $
 
 =head1 SYNOPSIS
 
@@ -411,8 +417,6 @@ View superclass for the DocRep MVC application
 
 Template
 ClearPress::util
-ClearPress::model::user
-ClearPress::model::usergroup
 Carp
 English
 
