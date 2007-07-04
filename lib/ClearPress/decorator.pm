@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $
-# Id:            $Id: decorator.pm 4 2007-06-20 22:06:30Z zerojinx $
+# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $
+# Id:            $Id: decorator.pm 12 2007-06-25 08:35:19Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
 # $HeadURL: svn+ssh://cvs.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/ClearPress-tracking/lib/ClearPress/controller.pm $
 #
@@ -13,8 +13,22 @@ use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 4 $ =~ /(\d+)/mx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
+our $DEFAULTS = {
+		 'meta_content_type' => 'text/html',
+		 'meta_version'      => $VERSION,
+		 'meta_description'  => q(),
+		 'meta_author'       => q$Author: zerojinx $,
+		 'meta_keywords'     => q(clearpress),
+		};
 
+our $ARRAY_FIELDS = {
+		     'jsfile'     => 1,
+		     'rss'        => 1,
+		     'atom'       => 1,
+		     'stylesheet' => 1,
+		     'script'     => 1,
+		    };
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 
 sub fields {
@@ -22,6 +36,22 @@ sub fields {
             meta_keywords meta_description meta_author meta_version
             meta_refresh meta_cookie meta_content_type meta_expires
             onload onunload onresize)
+}
+
+sub get {
+  my ($self, $field) = @_;
+
+  if($ARRAY_FIELDS->{$field}) {
+    return @{$self->{$field} || $DEFAULTS->{$field} || []};
+
+  } else {
+    return $self->{$field} || $DEFAULTS->{$field};
+  }
+}
+
+sub defaults {
+  my ($self, $key) = @_;
+  return $DEFAULTS->{$key};
 }
 
 sub new {
@@ -57,16 +87,16 @@ sub http_header {
                  map {
                    "Set-Cookie: $_";
                  } @cookies);
-  return join qq(\n), @headers, "\n";
+  return join "\n", @headers, "\n";
 }
 
 sub site_header {
   my ($self) = @_;
   my $cgi    = $self->cgi();
 
-  my $ss = join qq(\n), map {
+  my $ss = qq(@{[map {
     qq(    <link rel="stylesheet" type="text/css" href="$_" />);
-  } grep { $_ } $self->stylesheet();
+  } grep { $_ } $self->stylesheet()]});
 
   if($self->style()) {
     $ss .= q(<style type="text/css">). $self->style() .q(</style>);
@@ -88,18 +118,18 @@ sub site_header {
     qq(    <script type="text/javascript">$_</script>\n);
   } grep { $_ } $self->script()]});
 
-  my $onload   = (scalar $self->onload())   ? qq( onload="@{[  join q(;), $self->onload()]}")     : q();
+  my $onload   = (scalar $self->onload())   ? qq( onload="@{[  join q(;), $self->onload()]}")   : q();
   my $onunload = (scalar $self->onunload()) ? qq( onunload="@{[join q(;), $self->onunload()]}") : q();
   my $onresize = (scalar $self->onresize()) ? qq( onresize="@{[join q(;), $self->onresize()]}") : q();
   return qq(<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb">
   <head>
-    <meta http-equiv="Content-Type" content="@{[$self->meta_content_type()]}" />
-@{[(scalar $self->meta_cookie())?(map { qq( <meta http-equiv="Set-Cookie" content="$_" />\n) } $self->meta_cookie()):q()]}@{[$self->meta_refresh()?qq(<meta http-equiv="Refresh" content="@{[$self->meta_refresh()]}" />):q()]}@{[$self->meta_expires()?qq(<meta http-equiv="Expires" content="@{[$self->meta_expires()]}" />):q()]} <meta name="author"      content="@{[$self->meta_author() || $self->defaults('meta_author')]}" />
-    <meta name="version"     content="@{[$self->meta_version()     || $self->defaults('meta_version')]}"     />
+    <meta http-equiv="Content-Type" content="@{[$self->meta_content_type() || $self->defaults('meta_content_type')]}" />
+@{[(scalar $self->meta_cookie())?(map { qq( <meta http-equiv="Set-Cookie" content="$_" />\n) } $self->meta_cookie()):q()]}@{[$self->meta_refresh()?qq(<meta http-equiv="Refresh" content="@{[$self->meta_refresh()]}" />):q()]}@{[$self->meta_expires()?qq(<meta http-equiv="Expires" content="@{[$self->meta_expires()]}" />):q()]}    <meta name="author"      content="@{[$self->meta_author()      || $self->defaults('meta_author')]}" />
+    <meta name="version"     content="@{[$self->meta_version()     || $self->defaults('meta_version')]}" />
     <meta name="description" content="@{[$self->meta_description() || $self->defaults('meta_description')]}" />
-    <meta name="keywords"    content="@{[$self->meta_keywords()    || $self->defaults('meta_keywords')]}"    />
+    <meta name="keywords"    content="@{[$self->meta_keywords()    || $self->defaults('meta_keywords')]}" />
     <title>@{[$self->title()]}</title>
 $ss$rss$atom$js$script  </head>
   <body$onload$onunload$onresize>\n);
@@ -149,6 +179,10 @@ $LastChangeRevision$
 =head1 SUBROUTINES/METHODS
 
 =head2 new
+
+=head2 defaults - Accessor for default settings used in HTML headers
+
+  my $sValue = $oDecorator->defaults($sKey);
 
 =head2 fields - All generic get/set accessors for this object
 
@@ -201,17 +235,20 @@ i.e. </body></html> by default
 
 =head1 DEPENDENCIES
 
+CGI
+Class::Accessor
+
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
 
 =head1 AUTHOR
 
-Roger Pettett, E<lt>rmp@sanger.ac.ukE<gt>
+Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 GRL, by Roger Pettett
+Copyright (C) 2007 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

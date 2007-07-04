@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $
+# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 4 2007-06-20 22:06:30Z zerojinx $
+# Id:            $Id: util.pm 12 2007-06-25 08:35:19Z zerojinx $
 # $HeadURL$
 #
 package ClearPress::util;
@@ -14,7 +14,7 @@ use DBI;
 use Config::IniFiles;
 use Carp;
 
-our $VERSION   = do { my ($r) = q$LastChangedRevision: 4 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -29,7 +29,7 @@ sub new {
 }
 
 sub data_path {
-  return q(.);
+  return q(data);
 }
 
 sub configpath {
@@ -54,13 +54,18 @@ sub config {
     if($dtconfigpath ne $configpath) {
       croak qq(Failed to detaint configpath: '$configpath');
     }
+
+    if(!-e $dtconfigpath) {
+      croak qq(No such file: $dtconfigpath);
+    }
+
     $self->{'_config'} ||= Config::IniFiles->new(
 						 -file => $dtconfigpath,
 						);
   }
 
   if(!$self->{'_config'}) {
-    croak q(No configuration available);
+    croak qq(No configuration available:\n). join q(, ), @Config::IniFiles::errors; ## no critic
   }
 
   return $self->{'_config'};
@@ -159,7 +164,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 4 $
+$LastChangedRevision: 12 $
 
 =head1 SYNOPSIS
 
@@ -237,7 +242,8 @@ $LastChangedRevision: 4 $
 
 =head1 DEPENDENCIES
 
-DBI, Config::IniFiles
+DBI
+Config::IniFiles
 
 =head1 INCOMPATIBILITIES
 
@@ -245,11 +251,11 @@ DBI, Config::IniFiles
 
 =head1 AUTHOR
 
-Roger Pettett, E<lt>rmp@sanger.ac.ukE<gt>
+Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 GRL, by Roger Pettett
+Copyright (C) 2007 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

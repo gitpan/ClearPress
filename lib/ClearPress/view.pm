@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $
-# Id:            $Id: view.pm 4 2007-06-20 22:06:30Z zerojinx $
+# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $
+# Id:            $Id: view.pm 12 2007-06-25 08:35:19Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL$
 #
@@ -15,7 +15,7 @@ use ClearPress::util;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 4 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
 
 sub new {
   my ($class, $self)    = @_;
@@ -164,10 +164,34 @@ sub render {
   return $warnings . $actions . $content || q(No data);
 }
 
+sub _populate_from_cgi {
+  my $self  = shift;
+  my $util  = $self->util();
+  my $model = $self->model();
+  my $cgi   = $util->cgi();
+
+  #########
+  # Populate model object with parameters posted into CGI
+  # by default (in controller.pm) model will only have util & its primary_key.
+  #
+  $model->read();
+  for my $field ($model->fields()) {
+    my $v = $cgi->escapeHTML($cgi->param($field) || q());
+    if($v) {
+      $model->$field($v);
+    }
+  }
+  return;
+}
+
 sub add {
+  my $self = shift;
+  return $self->_populate_from_cgi();
 }
 
 sub edit {
+  my $self = shift;
+  return $self->_populate_from_cgi();
 }
 
 sub list {
@@ -303,7 +327,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 4 $
+$LastChangedRevision: 12 $
 
 =head1 SYNOPSIS
 
@@ -311,17 +335,17 @@ $LastChangedRevision: 4 $
   $oView->model($oModel);
 
   print $oView->decor()?
-    $sw->header()
+    $oDecorator->header()
     :
     q(Content-type: ).$oView->content_type()."\n\n";
 
   print $oView->render();
 
-  print $oView->decor()?$sw->footer():q();
+  print $oView->decor()?$oDecorator->footer():q();
 
 =head1 DESCRIPTION
 
-View superclass for the DocRep MVC application
+View superclass for the ClearPress framework
 
 =head1 SUBROUTINES/METHODS
 
@@ -426,11 +450,11 @@ English
 
 =head1 AUTHOR
 
-Roger Pettett, E<lt>rmp@sanger.ac.ukE<gt>
+Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 GRL, by Roger Pettett
+Copyright (C) 2007 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

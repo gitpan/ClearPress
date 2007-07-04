@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                ClearPress
-version:             4
+version:             12
 abstract:            ~
 license:             ~
 generated_by:        ExtUtils::MakeMaker version 6.32
@@ -9,6 +9,7 @@ requires:
     Carp:                          1.02
     DBI:                           1.51
     English:                       1.01
+    Lingua::EN::Inflect:           1.89
     Template:                      2.19
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.2.html

@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $
-# Id:            $Id: model.pm 4 2007-06-20 22:06:30Z zerojinx $
+# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $
+# Id:            $Id: model.pm 12 2007-06-25 08:35:19Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
 # $HeadURL$
 #
@@ -15,7 +15,7 @@ use ClearPress::util;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 4 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
 
 sub fields { return (); }
 
@@ -115,6 +115,18 @@ sub gen_getall {
                                 ORDER BY @{[$class->primary_key()]}));
 }
 
+sub gen_getobj {
+  my ($self, $class)   = @_;
+  $class             ||= ref $self;
+  my $pk               = $class->primary_key();
+  my ($cachekey)       = $class =~ /([^:]+)$/mx;
+  $self->{$cachekey} ||= $class->new({
+				      'util' => $self->util(),
+				      $pk    => $self->$pk(),
+				     });
+  return $self->{$cachekey};
+}
+
 sub create {
   my $self     = shift;
   my $util     = $self->util();
@@ -129,8 +141,9 @@ sub create {
 
   my $query = qq(INSERT INTO $table (@{[join q(, ), $self->fields()]})
                  VALUES (@{[join q(, ), map { q(?) } $self->fields()]}));
+  my @args = map { $self->{$_} || q() } $self->fields();
   eval {
-    $dbh->do($query, {}, map { $self->{$_} || q() } $self->fields());
+    $dbh->do($query, {}, @args);
 
     #########
     # add 'sequence' support here for Oracle
@@ -141,6 +154,7 @@ sub create {
 
   if($EVAL_ERROR) {
     $tr_state and $dbh->rollback();
+    carp $query.join q(, ), @args;
     croak $EVAL_ERROR;
   }
 
@@ -216,17 +230,17 @@ sub update {
   }
 
   my @fields = grep { $_ ne $pk } $self->fields();
-  my $query = qq(UPDATE @{[$self->table()]}
-                 SET    @{[join q(, ),
-                                map  { qq($_ = ?) }
-                                @fields]}
-                 WHERE  $pk=@{[$self->$pk()]});
+  my $query   = qq(UPDATE @{[$self->table()]}
+                   SET    @{[join q(, ),
+                                  map  { qq($_ = ?) }
+                                  @fields]}
+                   WHERE  $pk=@{[$self->$pk()]});
 
   eval {
     $dbh->do($query, {}, map { $self->$_() || q() } @fields);
   };
 
-  if($EVAL_ERROR) { 
+  if($EVAL_ERROR) {
     $dbh->rollback();
     croak $EVAL_ERROR.$query;
   }
@@ -289,7 +303,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 4 $
+$LastChangedRevision: 12 $
 
 =head1 SYNOPSIS
 
@@ -347,6 +361,12 @@ $LastChangedRevision: 4 $
   my $arObjects = $self->gen_getall();
   my $arObjects = $self->gen_getall('ClearPress::otherclass');
 
+=head2 gen_getobj - An object of a given class based on the value of
+the primary key in that class equalling the value in the same
+field-name in this object.
+
+  my $oObj = $self->gen_getobj('application::model::name');
+
 =head2 create - Generic INSERT into database
 
   $oSelf->create();
@@ -373,17 +393,22 @@ $LastChangedRevision: 4 $
 
 =head1 DEPENDENCIES
 
+Class::Accessor
+ClearPress::util
+English
+Carp
+
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
 
 =head1 AUTHOR
 
-Roger Pettett, E<lt>rmp@sanger.ac.ukE<gt>
+Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 GRL, by Roger Pettett
+Copyright (C) 2007 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

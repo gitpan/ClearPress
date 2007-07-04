@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2007-06-20 23:06:30 +0100 (Wed, 20 Jun 2007) $ $Author: zerojinx $
-# Id:            $Id: Makefile.PL 4 2007-06-20 22:06:30Z zerojinx $
+# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $ $Author: zerojinx $
+# Id:            $Id: Makefile.PL 12 2007-06-25 08:35:19Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/Makefile.PL,v $
 # $HeadURL$
 #
@@ -20,10 +20,11 @@ WriteMakefile(
 	      'VERSION_FROM'  => 'lib/ClearPress/controller.pm',
 	      'DISTNAME'      => 'ClearPress',
 	      'PREREQ_PM'     => {
-				  'DBI'      => 1.51,
-				  'English'  => 1.01,
-				  'Carp'     => 1.02,
-				  'Template' => 2.19,
+				  'DBI'                 => 1.51,
+				  'English'             => 1.01,
+				  'Carp'                => 1.02,
+				  'Template'            => 2.19,
+				  'Lingua::EN::Inflect' => 1.89,
 				 },
 	      'dist'          => { COMPRESS => 'gzip', SUFFIX => 'gz', },
 	     );
