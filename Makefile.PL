@@ -17,15 +17,17 @@ our $VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/mxg); sprintf '%d.'.'%03d
 WriteMakefile(
 	      'NAME'          => 'ClearPress',
 	      'AUTHOR'        => q(Roger Pettett <rmp@sanger.ac.uk>),
-	      'VERSION_FROM'  => 'lib/ClearPress/controller.pm',
+	      'VERSION_FROM'  => 'lib/ClearPress.pm',
 	      'DISTNAME'      => 'ClearPress',
 	      'PREREQ_PM'     => {
+				  'CGI'                 => 3.20,
 				  'DBI'                 => 1.51,
 				  'English'             => 1.01,
 				  'Carp'                => 1.02,
 				  'Template'            => 2.19,
 				  'Lingua::EN::Inflect' => 1.89,
 				 },
+	      'LICENSE'       => 'perl',
 	      'dist'          => { COMPRESS => 'gzip', SUFFIX => 'gz', },
 	     );
 

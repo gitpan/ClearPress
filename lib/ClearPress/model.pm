@@ -14,6 +14,7 @@ use base qw(Class::Accessor);
 use ClearPress::util;
 use English qw(-no_match_vars);
 use Carp;
+use Lingua::EN::Inflect qw(PL);
 
 our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
 
@@ -107,12 +108,22 @@ sub gen_getarray {
 }
 
 sub gen_getall {
-  my ($self, $class) = @_;
+  my ($self, $class, $cachekey) = @_;
   $class ||= ref $self;
-  return $self->gen_getarray($class,
-			     qq(SELECT   @{[join q(, ), $class->fields()]}
-                                FROM     @{[$class->table()]}
-                                ORDER BY @{[$class->primary_key()]}));
+
+  if(!$cachekey) {
+    ($cachekey) = $class =~ /([^:]+)$/mx;
+    $cachekey   = PL($cachekey);
+  }
+
+  if(!$self->{$cachekey}) {
+    my $query = qq(SELECT   @{[join q(, ), $class->fields()]}
+                   FROM     @{[$class->table()]}
+                   ORDER BY @{[$class->primary_key()]});
+    $self->{$cachekey} = $self->gen_getarray($class, $query);
+  }
+
+  return $self->{$cachekey};
 }
 
 sub gen_getobj {

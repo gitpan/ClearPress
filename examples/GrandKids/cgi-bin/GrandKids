@@ -1,0 +1,24 @@
+#!/usr/bin/perl -T
+
+use warnings;
+use strict;
+use lib qw(lib);
+use ClearPress::util;
+use ClearPress::controller;
+
+
+use GrandKids::view::family;
+use GrandKids::model::family;
+use GrandKids::view::child;
+use GrandKids::model::child;
+our $VERSION = do { my ($r) = q$LastChangedRevision$ =~ /(\d+)/mx; $r; };
+
+main();
+0;
+
+sub main {
+  my $util = GrandKids::util->new();
+  GrandKids::controller->handler($util);
+}
+
+ 

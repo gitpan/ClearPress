@@ -1,0 +1,567 @@
+#!/usr/bin/perl -T
+#########
+# Author:        rpettett@cpan.org
+# Created:       2007-06-21
+# Last Modified: $Date$
+# Id:            $Id$
+# $HeadURL$
+#
+use strict;
+use warnings;
+use Getopt::Long;
+use English qw(-no_match_vars);
+use Carp;
+use Template;
+use Lingua::EN::Inflect qw(PL);
+use lib qw(blib/lib lib);
+use ClearPress;
+
+our $VERSION = do { my ($r) = q$LastChangedRevision: 7 $ =~ /(\d+)/mx; $r; };
+our $ASPECTS = [qw(read list add create edit update)];
+
+$ENV{'PATH'} = join q(:), qw(/bin /usr/bin /usr/local/bin);
+
+main();
+0;
+
+
+sub main {
+  my $opts      = {};
+  my @argvcopy = @ARGV;
+
+  GetOptions($opts,
+	     'new=s',
+	     'driver=s',
+	     'yes',
+	     'help',
+	     'version',
+	    );
+
+  if($opts->{'help'}) {
+    print qq(Usage Example:
+  $0 --new GrandKids 'child->family child(name,birthday:date) family(name,address,city,state,zip)'\n);
+    return;
+  }
+
+  if($opts->{'version'}) {
+    print q(ClearPress v).ClearPress->VERSION.qq(\n);
+    return;
+  }
+
+  $opts->{'driver'} ||= 'mysql';
+
+  if(!$opts->{'new'}) {
+    croak q(Please specify --new <application-name>);
+  }
+
+  my ($app) = $opts->{'new'} =~ /^([a-z][a-z\d_]+)$/mxi;
+  $app    ||= q();
+
+  if($app ne $opts->{'new'}) {
+    croak q(Invalid characters in application name, only /[a-z][a-z\\d_]+/i allowed.);
+  }
+
+  my $all_structure = shift @ARGV;
+
+  my $schema = {};
+  for my $structure (split /\s+/mx, $all_structure) {
+    if($structure =~ /\S+\(\S+\)/mx) {
+      #########
+      # table definition
+      #
+      my ($table, $columns) = $structure =~ /(\S+)\((\S+)\)/mx;
+      
+      for my $column (split /,/mx, $columns) {
+	my ($name, $type) = split /:/mx, $column;
+	$name           ||= $column;
+	$type           ||= 'char(128)';
+	$schema->{$table}->{'fields'}->{$name} = $type;
+
+	print {*STDERR} qq($table has $name of type $type\n);
+      }
+
+    } elsif($structure =~ /\S+\->\S+/mx) {
+      #########
+      # relationship
+      #
+      my ($one, $many) = $structure =~ /(\S+)\->(\S+)/mx;
+      push @{$schema->{$one}->{'has_a'}},     $many;
+      push @{$schema->{$many}->{'has_many'}}, $one;
+      print {*STDERR} qq($one has a $many\n$many has many @{[PL($one)]}\n);
+    }
+  }
+
+  my $template_cache = {};
+  read_templates($template_cache);
+
+  create_application({
+		      'template_cache' => $template_cache,
+		      'application'    => $app,
+		      'views'          => [keys %{$schema}],
+		      'yes'            => exists $opts->{'yes'},
+		      'driver'         => $opts->{'driver'},
+		      'schema'         => $schema,
+		     });
+
+  my $cfg = qq($app/config.layout);
+  open my $fh, q(>), $cfg or croak qq(Error opening $cfg: $ERRNO);
+  print $fh $0, (map { qq( '$_') } @argvcopy), qq(\n);
+  close $fh or croak qq(Error closing $cfg: $ERRNO);
+
+  print qq(
+You now need to configure your database.
+1. Check and/or modify $app/data/config.ini
+2. If necessary create a database, something like this:
+  mysql -uroot
+  create database $app;
+  <Ctrl-D>
+3. mysql -uroot < $app/data/schema/*.mysql
+Note you may need to create your new schema in order, depending on your foreign key constraints.
+);
+  return;
+}
+
+sub read_templates {
+  my $cache = shift;
+  local $RS = "\n-- \n";
+
+  if(!scalar keys %{$cache}) {
+    for my $field (qw(config schema application_sa application_cgi model view),
+		   (map { "aspect_$_" } @{$ASPECTS}),
+		   qw(actions stylesheet)) {
+      my $str          = <DATA>;
+      $str             =~ s/$RS//smx;
+      $cache->{$field} = \$str;
+      print qq(Read @{[length($str)]} bytes for $field\n);
+    }
+  }
+  return;
+}
+
+sub create_application {
+  my $opts   = shift;
+  my $app    = $opts->{'application'};
+  my $cache  = $opts->{'template_cache'};
+  my $schema = $opts->{'schema'};
+  my $tt     = Template->new({
+			     EVAL_PERL => 1,
+			     TAG_STYLE => 'asp',
+			    });
+
+  for my $view (@{$opts->{'views'}}) {
+    $opts->{'name'}     = $view;
+    $opts->{'fields'}   = [map { {'name'=>$_, 'type'=>$schema->{$view}->{'fields'}->{$_}}; } sort keys %{$schema->{$view}->{'fields'}}];
+    $opts->{'has_many'} = $schema->{$view}->{'has_many'} || [];
+    $opts->{'has_a'}    = $schema->{$view}->{'has_a'}    || [];
+
+    process_template($opts, $tt, $cache->{'schema'}, "$app/data/schema",    "$view.$opts->{'driver'}");
+    process_template($opts, $tt, $cache->{'model'},  "$app/lib/$app/model", "$view.pm");
+    process_template($opts, $tt, $cache->{'view'},   "$app/lib/$app/view",  "$view.pm");
+
+    for my $aspect (@{$ASPECTS}) {
+      process_template($opts, $tt, $cache->{"aspect_$aspect"}, "$app/data/templates", "${view}_$aspect.tt2");
+    }
+  }
+
+  process_template($opts, $tt, $cache->{'config'},          "$app/data",           'config.ini');
+  process_template($opts, $tt, $cache->{'application_cgi'}, "$app/cgi-bin",        $app);
+  process_template($opts, $tt, $cache->{'application_sa'},  "$app/bin",            $app);
+  process_template($opts, $tt, $cache->{'stylesheet'},      "$app/htdocs",         "$app.css");
+  process_template($opts, $tt, $cache->{'actions'},         "$app/data/templates", 'actions.tt2');
+  return;
+}
+
+sub _yn {
+  my ($default) = @_;
+  local $RS     = "\n";
+  my $response  = <>;
+  $response   ||= $default;
+  chomp $response;
+  return (uc $response eq uc $default)
+}
+
+sub process_template {
+  my ($opts, $tt, $tmpl, $path, $fn) = @_;
+
+  $fn = "$path/$fn";
+
+  if(!$opts->{'yes'} && -e $fn) {
+    print "$fn exists. Overwrite? [y/N] ";
+    _yn('N') and return;
+  }
+
+  system qw(mkdir -p), $path;
+  open my $fh, q(>), $fn or croak "Opening $fn: $ERRNO";
+  $tt->process($tmpl, $opts, $fh) or croak "Template error building $fn: ".$tt->error(). "\nTemplate was:\n".${$tmpl}."\n";
+  close $fh or croak "Closing $fn: $ERRNO";
+  return;
+}
+
+__END__
+
+[application]
+name=<% application %>
+views=<% PERL %>print join q(,), @{$stash->get('views')}<% END %>
+stylesheet=/<% application %>.css
+dbhost=localhost
+dbname=<% application %>
+dbuser=root
+
+-- 
+<%# mysql table schema %>
+DROP TABLE IF EXISTS <% name %>;
+CREATE TABLE `<% name %>` (
+  `id_<% name %>` bigint(20) unsigned NOT NULL auto_increment,
+<% FOREACH field = fields %>  `<% field.name %>` <% field.type %> NOT NULL,
+<% END %><% FOREACH rel = has_a %>
+  `id_<% rel %>` bigint(20) unsigned NOT NULL,
+  KEY `<% name %>_<% rel %>` (`id_<% rel %>`),
+  CONSTRAINT `<% name %>_<% rel %>` FOREIGN KEY (`id_<% rel %>`) REFERENCES `<% rel %>` (`id_<% rel %>`),
+<% END %>
+  PRIMARY KEY  (`id_<% name %>`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- 
+#!/usr/bin/perl -T
+<%# standalone application %>
+use warnings;
+use strict;
+use lib qw(lib);
+
+BEGIN {
+  $ENV{'DOCUMENT_ROOT'} = './htdocs';
+}
+
+use ClearPress::util;
+use ClearPress::controller;
+<% FOREACH view = views %>
+use <% application %>::view::<% view %>;
+use <% application %>::model::<% view %>;<% END %>
+
+our $VERSION = do { my ($r) = q$LastChangedRevision$ =~ /(\d+)/mx; $r; };
+
+<% application %>::sa->new->run();
+
+0;
+
+package <% application %>::sa;
+use base qw(HTTP::Server::Simple::CGI);
+use strict;
+use warnings;
+use Data::Dumper;
+use Carp;
+use English qw(-no_match_vars);
+
+sub handle_request {
+  my ($self, $cgi) = @_;
+
+#  print {*STDERR} Dumper($cgi);
+#  print {*STDERR} Dumper(%ENV);
+  my $EXTN = {
+	      'css'  => 'text/css',
+	      'xml'  => 'text/xml',
+	      'gif'  => 'image/gif',
+	      'png'  => 'image/png',
+	      'jpg'  => 'image/jpeg',
+	      'txt'  => 'text/plain',
+	      'html' => 'text/html',
+	     };
+
+  my $util = ClearPress::util->new({
+				    'cgi' => $cgi,
+				   });
+  print "HTTP/1.0 200 OK\n";
+
+  my ($fn) = "htdocs$ENV{'REQUEST_URI'}" =~ m|([a-z\d_/\.%]+)|mix;
+  $fn      =~ s|\.\./||mxg;
+
+  if(-f $fn) {
+    my ($ext) = $fn =~ /\.([^\.]+)$/mx;
+
+    my $type  = $EXTN->{lc $ext} || 'application/octet-stream';
+    print qq(Content-type: $type\n\n);
+    carp qq(Serving static file $fn as $ext / $type);
+    open my $fh, $fn or croak "Opening $fn: $ERRNO";
+    while(<$fh>) {
+      print;
+    }
+    close $fh or croak "Closing $fn: $ERRNO";
+  } else {
+    ClearPress::controller->handler($util);
+  }
+
+  return;
+}
+
+sub print_banner {
+  my $self = shift;
+  print q(ClearPress development server up and running at http://localhost:).$self->port()."/\n";
+  return;
+}
+ 
+1;
+-- 
+#!/usr/bin/perl -T
+<%# CGI or ModPerl::Registry application %>
+use warnings;
+use strict;
+use lib qw(lib);
+use ClearPress::util;
+use ClearPress::controller;
+
+<% FOREACH view = views %>
+use <% application %>::view::<% view %>;
+use <% application %>::model::<% view %>;<% END %>
+our $VERSION = do { my ($r) = q$LastChangedRevision$ =~ /(\d+)/mx; $r; };
+
+main();
+0;
+
+sub main {
+  my $util = <% application %>::util->new();
+  <% application %>::controller->handler($util);
+}
+
+-- 
+<%# template:model %>
+package <% application %>::model::<% name %>;
+use strict;
+use warnings;
+use base qw(ClearPress::model);
+
+__PACKAGE__->mk_accessors(__PACKAGE__->fields());
+
+sub fields {
+  return qw(id_<% name %>
+	    <% FOREACH rel = has_a %>id_<% rel %> <% END %>
+	    <% FOREACH field = fields %><% field.name %> <% END %>);
+}
+
+sub <% PERL %>print Lingua::EN::Inflect::PL("<% name %>");<% END %> {
+  my $self = shift;
+  return $self->gen_getall();
+}
+
+<% FOREACH supentity = has_a %>
+sub <% supentity %> {
+  my $self  = shift;
+  my $pkg   = '<% application %>::model::<% supentity %>';
+  return $pkg->new({
+		    'util' => $self->util(),
+		    'id_<% supentity %>' => $self->id_<% supentity %>(),
+		   });
+}
+<% END %>
+
+<% FOREACH subentity = has_many %>
+sub <% PERL %>print Lingua::EN::Inflect::PL("<% subentity %>");<% END %> {
+  my $self  = shift;
+  my $pkg   = '<% application %>::model::<% subentity %>';
+  my $query = qq(SELECT @{[join q(, ), $pkg->fields()]}
+                 FROM   @{[$pkg->table()]}
+                 WHERE  id_<% name %> = ?);
+  return $self->gen_getarray($pkg, $query, $self->id_<% name %>());
+}
+<% END %>
+
+1;
+
+-- 
+<%# template:view %>
+package <% application %>::view::<% name %>;
+use strict;
+use warnings;
+use base qw(ClearPress::view);
+
+1;
+
+-- 
+<%# template:read - single entity %>
+[<a href="[% model.id_<% name %> %];edit">Edit</a>]
+<h2><% name %> <% aspect %></h2>
+<table><% FOREACH field = fields %>
+  <tr><th><% field.name %></th><td>[% model.<% field.name %> %]</td></tr><% END %>
+
+<% FOREACH subentity = has_a %>
+  <tr>
+    <th><% subentity %></th>
+    <td>[<a href="[% SCRIPT_NAME %]/<% subentity %>/[% model.id_<% subentity %> %]">details</a>]</td>
+  </tr>
+<% END %>
+</table>
+
+
+<% FOREACH subentity = has_many %>
+  [% PROCESS <% subentity %>_list.tt2 %]
+<% END %>
+
+<% FOREACH subentity = has_many %>
+ [<a href="[% SCRIPT_NAME %]/<% subentity %>/;add?id_<% name %>=[% model.id_<% name %> %]">Add <% subentity %></a>]
+<% END %>
+
+-- 
+<%# template:list - multiple entities %>
+<h2><% PERL %>print Lingua::EN::Inflect::PL("<% name %>");<% END %> <% aspect %></h2>
+<table id="<% name %>_list">
+  <caption><% name %> list</caption>
+  <thead>
+    <tr><% FOREACH field = fields %><th><% field.name %></th><% END %></tr>
+  </thead>
+  <tbody>
+[% FOREACH <% name %> = model.<% PERL %>print Lingua::EN::Inflect::PL("<% name %>");<% END %> %]
+<tr>
+  <% FOREACH field = fields %><td>[% <% name %>.<% field.name %> %]</td><% END %>
+  <td>[<a href="[% SCRIPT_NAME %]/<% name %>/[% <% name %>.id_<% name %> %]">details</a>]</td>
+</tr>
+[% END %]
+  </tbody>
+</table>
+
+-- 
+<%# template:add form %>
+<h2><% name %> <% aspect %></h2>
+<form method="post" action="[% SCRIPT_NAME %]/<% name %>/">
+  <ul>
+<% FOREACH rel = has_a %>
+  <li>
+    <label for="id_<% rel %>">id_<% rel %></label>
+    <input type="hidden" id="[% model.id_<% rel %> %]" name="id_<% rel %>" value="[% model.id_<% rel %> %]" />[% model.id_<% rel %> %]
+  </li>
+<% END %>
+<% FOREACH field = fields %>
+    <li>
+      <label for="<% field.name %>"><% field.name %></label>
+      <input type="text" id="<% field.name %>" name="<% field.name %>" value="[% model.<% field.name %> %]" />
+    </li><% END %>
+  </ul>
+  <input type="submit" value="Add" />
+</form>
+
+-- 
+<%# template:create - add submission action %>
+<h2><% name %> <% aspect %></h2>
+
+<% name %> saved ok. Click <a href="[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]">here</a> to continue.
+
+<script type="text/javascript">
+  document.location.href = "[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]";
+</script>
+
+-- 
+<%# template:edit form %>
+<h2><% name %> <% aspect %></h2>
+<form method="post" action="[% model.id_<% name %> %];update">
+  <ul>
+<% FOREACH field = fields %>
+    <li>
+      <label for="<% field.name %>"><% field.name %></label>
+      <input type="text" id="<% field.name %>" name="<% field.name %>" value="[% model.<% field.name %> %]" />
+    </li><% END %>
+  </ul>
+  <input type="submit" value="Update" />
+</form>
+
+-- 
+<%# template:update - edit submission action %>
+<h2><% name %> <% aspect %></h2>
+
+<% name %> updated ok. Click <a href="[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]">here</a> to continue.
+
+<script type="text/javascript">
+  document.location.href = "[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]";
+</script>
+
+-- 
+<%# template:actions %>
+<h1><% application %></h1>
+<ul id="actions">
+<% FOREACH view = views %>
+  <li>[<a href="[% SCRIPT_NAME %]/<% view %>/">List <% PERL %>print Lingua::EN::Inflect::PL("<% view %>")<% END %></a>]</li><% END %>
+<% FOREACH view = views %>
+  <li>[<a href="[% SCRIPT_NAME %]/<% view %>/;add">Add <% view %></a>]</li><% END %>
+</ul>
+-- 
+<%# css %><%# colour suite courtesy of colourblender.com %>
+<% SET one   = '#C57167' %><% SET two   = '#78443E' %><% SET three = '#C49F66' %>
+<% SET four  = '#78613E' %><% SET five  = '#3B3B3B' %><% SET six   = '#C4C4C4' %>
+html { background: <% five %>; padding: 0 20px 0 20px; }
+body { background: <% six %>; padding: 20px 10px 0 10px; font-family: helvetica, arial, sans-serif; }
+h1, h2, h3, h4, h5 { color: <% two %>; font-family: garamond, times, serif; font-style: italic; }
+a { color: <% two %>; padding: 2px;}
+a:hover { background: <% two %>; color: <% six %>; }
+thead tr { background: <% five %>; }
+thead th { color: <% six %>; }
+tbody tr.tabrow1 { background: <% three %>; }
+tbody tr.tabrow2 { background: <% four %>; }
+table caption { font-size: smaller; text-transform: capitalize; }
+table tr { padding: 0; margin: 0; }
+table td, table th { margin: 0; padding: 2px; }
+table th { text-align: left; text-transform: capitalize; }
+form li label { display: block; float: left; width: 120px; }
+form li input { float: left; }
+form li { clear: both; }
+form ul { list-style-type: none; }
+ul#actions { list-style-type: none; padding: 0; }
+ul#actions li { margin: 0; display: inline; }
+-- 
+=head1 NAME
+
+clearpress - A utility for initialising applications built with the
+ClearPress framework.
+
+=head1 USAGE
+
+ scripts/clearpress -new <application-name> 'ent1->ent2 ent1(field1:type,field2,field3:type) ent2(field1,field2,field3)'
+
+=head1 DESCRIPTION
+
+ This script initialises an application hierarchy using the ClearPress framework.
+
+=head1 REQUIRED ARGUMENTS
+
+=head1 OPTIONS
+
+ -new <application-name>
+   Call my application 'application-name'.
+
+ -yes
+   Don't prompt for overwriting files.
+
+ -driver <mysql>
+   No effect (yet). Will determine what sort of database schema and
+   automatic-id-allocation plan to use
+
+=head1 DIAGNOSTICS
+
+=head1 EXIT STATUS
+
+ 0 on success
+
+=head1 CONFIGURATION
+
+ All via command-line options.
+
+=head1 DEPENDENCIES
+
+Getopt::Long
+English
+Carp
+Template
+Lingua::EN::Inflect
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2007 Roger Pettett
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

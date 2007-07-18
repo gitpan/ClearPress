@@ -1,12 +1,13 @@
 --- #YAML:1.0
 name:                ClearPress
-version:             12
+version:             39
 abstract:            ~
-license:             ~
+license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.32
 distribution_type:   module
 requires:     
     Carp:                          1.02
+    CGI:                           3.2
     DBI:                           1.51
     English:                       1.01
     Lingua::EN::Inflect:           1.89
