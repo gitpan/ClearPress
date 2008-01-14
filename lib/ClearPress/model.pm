@@ -15,6 +15,7 @@ use ClearPress::util;
 use English qw(-no_match_vars);
 use Carp;
 use Lingua::EN::Inflect qw(PL);
+use POSIX qw(strftime);
 
 our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
 
@@ -305,6 +306,22 @@ sub save {
   return $self->create();
 }
 
+sub zdate {
+  my $self = shift;
+  my $date = q();
+
+  if(grep { $_ eq 'date' } $self->fields()) {
+    $date = $self->date();
+    $date =~ s/\ /T/mx;
+    $date .='Z';
+
+  } else {
+    $date = strftime q(%Y-%m-%dT%H:%M:%SZ), gmtime;
+  }
+
+  return $date;
+}
+
 1;
 __END__
 
@@ -397,6 +414,10 @@ field-name in this object.
 =head2 save - Generic save object to database
 
   $oSelf->save();
+
+=head2 zdate - Generic Zulu-date based on object's date() method or gmtime
+
+  my $sZuluTime = $oInstance->zdate();
 
 =head1 DIAGNOSTICS
 

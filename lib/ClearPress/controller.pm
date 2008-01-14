@@ -14,6 +14,7 @@ use English qw(-no_match_vars);
 use Carp;
 use ClearPress::decorator;
 use ClearPress::view::error;
+use CGI;
 
 our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
 our $CRUD    = {
@@ -29,13 +30,27 @@ sub process_uri {
   my $action        = $CRUD->{uc $method};
   my $pi            = $ENV{'PATH_INFO'}    || q();
   my $qs            = $ENV{'QUERY_STRING'} || q();
-  my ($entity)      = $pi =~ m|^/([^/;]+)|mx;
-  my ($id)          = $pi =~ m|^/[^/]+/([a-z\-\d]+)|mix;
-  my ($aspect)      = $pi =~ m|;(\S+)|mx;
+  my ($entity)      = $pi =~ m|^/([^/;\.]+)|mx;
+  $entity         ||= q();
+  my ($id)          = $pi =~ m|^/$entity/([a-z\-_\d%\+\ ]+)|mix;
+  my ($aspect);
+
+  if($pi =~ /\.xml$/mx) {
+    if($id) {
+#      $action = 'read';
+      $aspect = 'read_xml';
+    } else {
+#      $action = 'list';
+      $aspect = 'list_xml';
+    }
+  } else {
+    ($aspect) = $pi =~ m|;(\S+)|mx;
+  }
 
   $entity         ||= $util->config->val('application','default_view');
   $aspect         ||= q();
   $id             ||= q(0);
+  $id               = CGI->unescape($id);
 
   if(!$entity) {
     my $views = $util->config->val('application', 'views');
@@ -66,6 +81,7 @@ sub handler {
   my ($action, $entity, $aspect, $id) = $self->process_uri($util);
 
   $util->username($decorator->username());
+  $util->session($decorator->session());
   $util->cgi($cgi);
 
   my $viewobject = $self->dispatch({
@@ -82,34 +98,43 @@ sub handler {
     $decorator->save_session();
   }
 
-  my $content = q();
   if($decor) {
-    $content .= $decorator->header();
+    $viewobject->output_buffer($decorator->header());
   }
 
   eval {
-    $content .= $viewobject->render();
+    $viewobject->output_buffer($viewobject->render());
   };
   if($EVAL_ERROR) {
     $viewobject = ClearPress::view::error->new({
 						'util'   => $util,
+						'action' => 'error',
 						'errstr' => $EVAL_ERROR,
 					       });
     #########
     # reset headers before printing an error
     #
-    $content  = $decorator->header();
+    $viewobject->output_buffer($decorator->header());
     $decor    = 1;
-    $content .= $viewobject->render();
+    $viewobject->output_buffer($viewobject->render());
   }
 
-  if($decor) {
-    $content .= $decorator->footer();
+  #########
+  # re-test decor in case it's changed by render()
+  #
+  if($viewobject->decor()) {
+    #########
+    # assume it's safe to re-open the output stream (Eesh!)
+    #
+    $viewobject->output_finished(0);
+    $viewobject->output_buffer($decorator->footer());
 
   } else {
-    print q(Content-type: ), $viewobject->content_type(), "\n\n";
+    $viewobject->output_buffer(q(Content-type: ), $viewobject->content_type(), "\n\n");
   }
-  print $content;
+
+  $viewobject->output_end();
+
   return;
 }
 

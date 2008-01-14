@@ -33,7 +33,7 @@ sub render {
   }
 
   $errstr    =~ s|\S+(npg.*?)$|$1|smgx;
-  return q(<h2>An Error Occurred</h2>) .  $self->actions() . q(<p>) . $errstr . q(</p>);
+  return q(<div id="main"><h2>An Error Occurred</h2>) .  $self->actions() . q(<p>) . $errstr . q(</p></div>);
 }
 
 1;

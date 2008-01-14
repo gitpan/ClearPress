@@ -14,28 +14,60 @@ use Template;
 use ClearPress::util;
 use Carp;
 use English qw(-no_match_vars);
+use POSIX qw(strftime);
 
 our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
+our $DEBUG_OUTPUT = 0;
 
 sub new {
   my ($class, $self)    = @_;
   $self               ||= {};
-  $self->{'warnings'} ||= [];
   bless $self, $class;
 
-  my $util                      = $self->util();
-  my $username                  = $util->username();
-  $self->{'requestor_username'} = $username;
-  $self->{'logged_in'}          = $username?1:0;
-  my $aspect                    = $self->aspect() || q();
-  $self->{'content_type'}     ||= ($aspect =~ /(rss|atom|ajax)$/mx)?'text/xml':'text/html';
+  my $util                    = $self->util();
+  my $username                = $util->username();
+  $self->{requestor_username} = $username;
+  $self->{logged_in}          = $username?1:0;
+  $self->{output_buffer}      = [];
+  $self->{output_complete}    = 0;
 
+  $self->determine_aspect();
+  my $aspect = $self->aspect();
+
+  $self->{content_type} ||= ($aspect =~ /(rss|atom|ajax|xml)$/mx)?'text/xml':'text/html';
+
+  $self->init();
   return $self;
+}
+
+sub determine_aspect {
+  my $self   = shift;
+  my $action = $self->action()   || q();
+  my $aspect = $self->aspect()   || q();
+  my $accept = $ENV{HTTP_ACCEPT} || q();
+
+  #########
+  # If the client accepts text/xml, default to sending text/xml back (REST-style)
+  #
+  if($accept =~ m|text/xml|mx  &&
+     $accept !~ m|text/html|mx &&
+     $aspect !~ /xml$/mx) {
+    $aspect ||= $action;
+    $aspect .= '_xml';
+  }
+
+  $self->aspect($aspect);
+  return;
+}
+
+sub init {
+  return;
 }
 
 sub add_warning {
   my ($self, $warning) = @_;
-  push @{$self->{'warnings'}}, $warning;
+  $self->{warnings}  ||= [];
+  push @{$self->{warnings}}, $warning;
   return;
 }
 
@@ -53,8 +85,9 @@ sub authorised {
   }
 
   if($action =~ /^list/mx ||
-     ($action eq 'read' &&
-      $aspect !~ /^add/mx)) {
+     ($action eq 'read'   &&
+      $aspect !~ /^add/mx &&
+      $aspect !~ /^delete/mx)) {
     #########
     # by default assume public read access for 'read' actions
     #
@@ -88,7 +121,7 @@ sub method_name {
   my $self   = shift;
   my $aspect = $self->aspect();
   my $action = $self->action();
-  my $method = $aspect || $action ;
+  my $method = $aspect || $action;
   my $model  = $self->model();
   my $pk     = $model->primary_key();
 
@@ -141,7 +174,7 @@ sub render {
   my $model   = $self->model();
   my $actions = my $warnings = q();
 
-  if(!($aspect =~ /(rss|atom|ajax)$/mx)) {
+  if(!($aspect =~ /(rss|atom|ajax|xml)$/mx)) {
     $actions  = $self->actions();
     $self->tt->process('warnings.tt2', {
 					'requestor' => $requestor,
@@ -154,12 +187,17 @@ sub render {
     $model->{$copy} ||= $self->{$copy};
   }
 
+  my $cfg     = $util->config();
   my $content = q();
   $self->tt->process("$tmpl.tt2", {
-				   'requestor'   => $requestor,
-				   'model'       => $model,
-				   'SCRIPT_NAME' => $ENV{'SCRIPT_NAME'},
-				   'HTTP_HOST'   => $ENV{'HTTP_HOST'},
+				   requestor   => $requestor,
+				   model       => $model,
+				   SCRIPT_NAME => $ENV{SCRIPT_NAME},
+				   HTTP_HOST   => $ENV{HTTP_HOST},
+				   now         => (strftime '%Y-%m-%dT%H:%M:%S', localtime),
+				   (map {
+				     $_ => $cfg->val('globals',$_)
+				   } $cfg->Parameters('globals')),
 				  }, \$content) or croak $self->tt->error();
   return $warnings . $actions . $content || q(No data);
 }
@@ -201,6 +239,10 @@ sub read { ## no critic
 }
 
 sub delete { ## no critic
+  my $self  = shift;
+  my $model = $self->model();
+  $model->delete() or croak qq(Failed to delete entity: $EVAL_ERROR);
+  return;
 }
 
 sub update {
@@ -252,17 +294,17 @@ sub tt {
   my $util = $self->util();
 
   if($tt) {
-    $util->{'tt'} = $tt;
+    $util->{tt} = $tt;
   }
 
-  if(!$util->{'tt'}) {
-    $util->{'tt'} = Template->new({
-				   'RECURSION'    => 1,
-				   'INCLUDE_PATH' => (sprintf q(%s/templates), $util->data_path()),
-				   'EVAL_PERL'    => 1,
-				  }) or croak $Template::ERROR;
+  if(!$util->{tt}) {
+    $util->{tt} = Template->new({
+				 RECURSION    => 1,
+				 INCLUDE_PATH => (sprintf q(%s/templates), $util->data_path()),
+				 EVAL_PERL    => 1,
+				}) or croak $Template::ERROR;
   }
-  return $util->{'tt'};
+  return $util->{tt};
 }
 
 sub _accessor {
@@ -302,21 +344,92 @@ sub decor {
   my $self = shift;
   my $aspect = $self->aspect() || q();
 
-  if($aspect =~ /(rss|atom|ajax)$/mx) {
+  if($aspect =~ /(rss|atom|ajax|xml)$/mx) {
     return 0;
   }
   return 1;
 }
 
+sub output_flush {
+  my $self = shift;
+  $DEBUG_OUTPUT and carp "output_flush: @{[scalar @{$self->{output_buffer}}]} blobs in queue";
+  print @{$self->{output_buffer}} or croak "Error flushing output: $ERRNO";
+  $self->output_reset();
+  return;
+}
+
+sub output_buffer {
+  my ($self, @args) = @_;
+  if(!$self->output_finished()) {
+    push @{$self->{output_buffer}}, @args;
+    $DEBUG_OUTPUT and carp "output_buffer added (@{[scalar @args]} blobs)";
+  }
+  return;
+}
+
+sub output_finished {
+  my ($self, $val) = @_;
+  if(defined $val) {
+    $self->{output_finished} = $val;
+    $DEBUG_OUTPUT and carp "output_finished = $val";
+  }
+  return $self->{output_finished};
+}
+
+sub output_end {
+  my $self = shift;
+  $DEBUG_OUTPUT and carp "output_end: $self";
+  $self->output_finished(1);
+  return $self->output_flush();
+}
+
+sub output_reset {
+  my $self = shift;
+  $self->{output_buffer} = [];
+  $DEBUG_OUTPUT and carp "output_reset";
+  return;
+}
+
 sub actions {
-  my $self    = shift;
-  my $content = q();
-  $self->{'requestor'}   = $self->util->requestor();
-  $self->{'SCRIPT_NAME'} = $ENV{'SCRIPT_NAME'};
-  $self->{'HTTP_HOST'}   = $ENV{'HTTP_HOST'};
+  my $self             = shift;
+  my $content          = q();
+  $self->{requestor}   = $self->util->requestor();
+  $self->{now}       ||= strftime '%Y-%m-%dT%H:%M:%S', localtime;
+
+  for my $var (qw(SCRIPT_NAME
+                  HTTP_HOST)) {
+    $self->{$var} = $ENV{$var};
+  }
+
   $self->tt->process('actions.tt2', $self, \$content);
   return $content;
 }
+
+sub list_xml {
+  my $self = shift;
+  return $self->list();
+}
+
+sub read_xml {
+  my $self = shift;
+  return $self->read();
+}
+
+sub create_xml {
+  my $self = shift;
+  return $self->create();
+}
+
+sub update_xml {
+  my $self = shift;
+  return $self->update();
+}
+
+sub delete_xml {
+  my $self = shift;
+  return $self->delete();
+}
+
 
 1;
 __END__
@@ -331,7 +444,7 @@ $LastChangedRevision: 12 $
 
 =head1 SYNOPSIS
 
-  my $oView = ClearPress::view::<subclass>->new({'util' => $oUtil});
+  my $oView = ClearPress::view::<subclass>->new({util => $oUtil});
   $oView->model($oModel);
 
   print $oView->decor()?
@@ -351,7 +464,15 @@ View superclass for the ClearPress framework
 
 =head2 new - constructor
 
-  my $oView = ClearPress::view::<subclass>->new({'util' => $oUtil, ...});
+  my $oView = ClearPress::view::<subclass>->new({util => $oUtil, ...});
+
+=head2 init - additional post-constructor hook
+
+=head2 determine_aspect - URI processing
+
+ sets the aspect based on the HTTP Accept: header
+
+ - useful for API access setting Accept: text/xml
 
 =head2 template_name - the name of the template to load, based on view class and method_name()
 
@@ -432,6 +553,44 @@ View superclass for the ClearPress framework
 =head2 actions - templated output for available actions
 
   my $sActionOutput = $oView->actions();
+
+=head2 list_xml - default passthrough to list() for xml service
+
+=head2 read_xml - default passthrough to read() for xml service
+
+=head2 create_xml - default passthrough to create() for xml service
+
+=head2 update_xml - default passthrough to update() for xml service
+
+=head2 delete_xml - default passthrough to delete() for xml service
+
+=head2 determine_aspect - calculate requested aspect of view
+
+  Based on HTTP headers, environment variables and URL components.
+
+=head2 init - post-constructor initialisation hook for subclasses
+
+=head2 output_buffer - queue a string for output
+
+  $oView->output_buffer("my string");
+  $oView->output_buffer(@aStrings);
+
+=head2 output_end - flag no more output and flush buffer
+
+  $oView->output_end();
+
+=head2 output_finished - flag whether to output any more data
+
+  $oView->output_finished(1);
+  $oViwe->output_finished(0);
+
+=head2 output_flush - flush output buffer to STDOUT
+
+  $oView->output_flush();
+
+=head2 output_reset - clear data pending output
+
+  $oView->output_reset();
 
 =head1 DIAGNOSTICS
 

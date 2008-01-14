@@ -34,7 +34,7 @@ sub data_path {
 
 sub configpath {
   my $self = shift;
- 
+
   if(@_) {
     $self->{'configpath'} = shift;
   }
@@ -72,19 +72,20 @@ sub config {
 }
 
 sub dbh {
-  my $self    = shift;
-  my $config  = $self->config();
-  my $section = 'application';
-
-  if(!$section) {
-    croak q(Unable to determine config set to use);
-  }
-
-  $self->{'dsn'} = sprintf q(DBI:mysql:database=%s;host=%s),
-			   $config->val($section, 'dbname') || q(),
-			   $config->val($section, 'dbhost') || q();
+  my $self = shift;
 
   if(!$self->{'dbh'}) {
+    my $config  = $self->config();
+    my $section = 'application';
+
+    if(!$section) {
+      croak q(Unable to determine config set to use);
+    }
+
+    $self->{'dsn'} = sprintf q(DBI:mysql:database=%s;host=%s),
+			     $config->val($section, 'dbname') || q(),
+			     $config->val($section, 'dbhost') || q();
+
     $self->{'dbh'} = DBI->connect($self->{'dsn'},
 					 $config->val($section, 'dbuser') || q(),
 					 $config->val($section, 'dbpass') || q(),
@@ -140,6 +141,11 @@ sub requestor {
 sub profiler {
   my $self = shift;
   return $self->_accessor('profiler', @_);
+}
+
+sub session {
+  my $self = shift;
+  return $self->_accessor('session', @_);
 }
 
 sub DESTROY {
@@ -224,6 +230,11 @@ $LastChangedRevision: 12 $
 
   $oUtil->cgi($oCGI);
   my $oCGI = $oUtil->cgi();
+
+=head2 session - Placeholder for a session hashref
+
+  $oUtil->session($hrSession);
+  my $hrSession = $oUtil->session();
 
 =head2 profiler - Placeholder for a Website::Utilities::Profiler object
 

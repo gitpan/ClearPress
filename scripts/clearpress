@@ -198,7 +198,6 @@ sub process_template {
 }
 
 __END__
-
 [application]
 name=<% application %>
 views=<% PERL %>print join q(,), @{$stash->get('views')}<% END %>
@@ -206,7 +205,6 @@ stylesheet=/<% application %>.css
 dbhost=localhost
 dbname=<% application %>
 dbuser=root
-
 -- 
 <%# mysql table schema %>
 DROP TABLE IF EXISTS <% name %>;
@@ -320,7 +318,6 @@ sub main {
   my $util = <% application %>::util->new();
   <% application %>::controller->handler($util);
 }
-
 -- 
 <%# template:model %>
 package <% application %>::model::<% name %>;
@@ -364,7 +361,6 @@ sub <% PERL %>print Lingua::EN::Inflect::PL("<% subentity %>");<% END %> {
 <% END %>
 
 1;
-
 -- 
 <%# template:view %>
 package <% application %>::view::<% name %>;
@@ -373,31 +369,24 @@ use warnings;
 use base qw(ClearPress::view);
 
 1;
-
 -- 
 <%# template:read - single entity %>
 [<a href="[% model.id_<% name %> %];edit">Edit</a>]
 <h2><% name %> <% aspect %></h2>
 <table><% FOREACH field = fields %>
-  <tr><th><% field.name %></th><td>[% model.<% field.name %> %]</td></tr><% END %>
-
-<% FOREACH subentity = has_a %>
-  <tr>
-    <th><% subentity %></th>
-    <td>[<a href="[% SCRIPT_NAME %]/<% subentity %>/[% model.id_<% subentity %> %]">details</a>]</td>
-  </tr>
-<% END %>
+ <tr><th><% field.name %></th><td>[% model.<% field.name %> %]</td></tr><% END %>
+<% FOREACH subentity = has_a %> <tr>
+  <th><% subentity %></th>
+  <td>[<a href="[% SCRIPT_NAME %]/<% subentity %>/[% model.id_<% subentity %> %]">details</a>]</td>
+ </tr><% END %>
 </table>
-
-
 <% FOREACH subentity = has_many %>
-  [% PROCESS <% subentity %>_list.tt2 %]
+[% PROCESS <% subentity %>_list.tt2 %]
 <% END %>
 
 <% FOREACH subentity = has_many %>
  [<a href="[% SCRIPT_NAME %]/<% subentity %>/;add?id_<% name %>=[% model.id_<% name %> %]">Add <% subentity %></a>]
 <% END %>
-
 -- 
 <%# template:list - multiple entities %>
 <h2><% PERL %>print Lingua::EN::Inflect::PL("<% name %>");<% END %> <% aspect %></h2>
@@ -420,88 +409,72 @@ use base qw(ClearPress::view);
 <%# template:add form %>
 <h2><% name %> <% aspect %></h2>
 <form method="post" action="[% SCRIPT_NAME %]/<% name %>/">
-  <ul>
-<% FOREACH rel = has_a %>
+ <ul><% FOREACH rel = has_a %>
   <li>
-    <label for="id_<% rel %>">id_<% rel %></label>
-    <input type="hidden" id="[% model.id_<% rel %> %]" name="id_<% rel %>" value="[% model.id_<% rel %> %]" />[% model.id_<% rel %> %]
+   <label for="id_<% rel %>">id_<% rel %></label>
+   <input type="hidden" id="[% model.id_<% rel %> %]" name="id_<% rel %>" value="[% model.id_<% rel %> %]" />[% model.id_<% rel %> %]
   </li>
-<% END %>
-<% FOREACH field = fields %>
-    <li>
-      <label for="<% field.name %>"><% field.name %></label>
-      <input type="text" id="<% field.name %>" name="<% field.name %>" value="[% model.<% field.name %> %]" />
-    </li><% END %>
-  </ul>
-  <input type="submit" value="Add" />
+<% END %><% FOREACH field = fields %>  <li>
+   <label for="<% field.name %>"><% field.name %></label>
+   <input type="text" id="<% field.name %>" name="<% field.name %>" value="[% model.<% field.name %> %]" />
+  </li><% END %>
+ </ul>
+ <input type="submit" value="Add" />
 </form>
-
 -- 
 <%# template:create - add submission action %>
 <h2><% name %> <% aspect %></h2>
-
 <% name %> saved ok. Click <a href="[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]">here</a> to continue.
-
 <script type="text/javascript">
-  document.location.href = "[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]";
+ document.location.href="[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]";
 </script>
-
 -- 
 <%# template:edit form %>
 <h2><% name %> <% aspect %></h2>
 <form method="post" action="[% model.id_<% name %> %];update">
-  <ul>
-<% FOREACH field = fields %>
-    <li>
-      <label for="<% field.name %>"><% field.name %></label>
-      <input type="text" id="<% field.name %>" name="<% field.name %>" value="[% model.<% field.name %> %]" />
-    </li><% END %>
-  </ul>
-  <input type="submit" value="Update" />
+ <ul>
+<% FOREACH field = fields %>  <li>
+   <label for="<% field.name %>"><% field.name %></label>
+   <input type="text" id="<% field.name %>" name="<% field.name %>" value="[% model.<% field.name %> %]" />
+  </li><% END %>
+ </ul>
+ <input type="submit" value="Update" />
 </form>
-
 -- 
 <%# template:update - edit submission action %>
 <h2><% name %> <% aspect %></h2>
-
 <% name %> updated ok. Click <a href="[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]">here</a> to continue.
-
 <script type="text/javascript">
-  document.location.href = "[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]";
+ document.location.href="[% SCRIPT_NAME %]/<% name %>/[% model.id_<% name %> %]";
 </script>
-
 -- 
 <%# template:actions %>
 <h1><% application %></h1>
 <ul id="actions">
-<% FOREACH view = views %>
-  <li>[<a href="[% SCRIPT_NAME %]/<% view %>/">List <% PERL %>print Lingua::EN::Inflect::PL("<% view %>")<% END %></a>]</li><% END %>
-<% FOREACH view = views %>
-  <li>[<a href="[% SCRIPT_NAME %]/<% view %>/;add">Add <% view %></a>]</li><% END %>
+<% FOREACH view = views %> <li>[<a href="[% SCRIPT_NAME %]/<% view %>/">List <% PERL %>print Lingua::EN::Inflect::PL("<% view %>")<% END %></a>]</li><% END %>
+<% FOREACH view = views %> <li>[<a href="[% SCRIPT_NAME %]/<% view %>/;add">Add <% view %></a>]</li><% END %>
 </ul>
 -- 
-<%# css %><%# colour suite courtesy of colourblender.com %>
-<% SET one   = '#C57167' %><% SET two   = '#78443E' %><% SET three = '#C49F66' %>
-<% SET four  = '#78613E' %><% SET five  = '#3B3B3B' %><% SET six   = '#C4C4C4' %>
-html { background: <% five %>; padding: 0 20px 0 20px; }
-body { background: <% six %>; padding: 20px 10px 0 10px; font-family: helvetica, arial, sans-serif; }
-h1, h2, h3, h4, h5 { color: <% two %>; font-family: garamond, times, serif; font-style: italic; }
-a { color: <% two %>; padding: 2px;}
-a:hover { background: <% two %>; color: <% six %>; }
-thead tr { background: <% five %>; }
-thead th { color: <% six %>; }
-tbody tr.tabrow1 { background: <% three %>; }
-tbody tr.tabrow2 { background: <% four %>; }
-table caption { font-size: smaller; text-transform: capitalize; }
-table tr { padding: 0; margin: 0; }
-table td, table th { margin: 0; padding: 2px; }
-table th { text-align: left; text-transform: capitalize; }
-form li label { display: block; float: left; width: 120px; }
-form li input { float: left; }
-form li { clear: both; }
-form ul { list-style-type: none; }
-ul#actions { list-style-type: none; padding: 0; }
-ul#actions li { margin: 0; display: inline; }
+<%# css %><%# colour suite courtesy of colourblender.com %><% SET one   = '#C57167' %><% SET two   = '#78443E' %><% SET three = '#C49F66' %><% SET four  = '#78613E' %><% SET five  = '#3B3B3B' %><% SET six   = '#C4C4C4' %>
+html{background:<% five %>;padding:0 20px 0 20px}
+body{background:<% six %>;padding:20px 10px 0 10px;font-family:helvetica,arial,sans-serif}
+h1,h2,h3,h4,h5{color:<% two %>;font-family:garamond,times,serif;font-style:italic}
+a{color:<% two %>;padding:2px}
+a:hover{background:<% two %>;color:<% six %>}
+thead tr{background:<% five %>}
+thead th{color:<% six %>}
+tbody tr.tabrow1{background:<% three %>}
+tbody tr.tabrow2{background:<% four %>}
+table caption{font-size:smaller;text-transform:capitalize}
+table tr{padding:0;margin:0}
+table td,table th{margin:0;padding:2px}
+table th{text-align:left;text-transform:capitalize}
+form li label{display:block;float:left;width:120px}
+form li input{float:left}
+form li{clear:both}
+form ul{list-style-type:none}
+ul#actions{list-style-type:none;padding:0}
+ul#actions li{margin:0;display:inline}
 -- 
 =head1 NAME
 

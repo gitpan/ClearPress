@@ -80,9 +80,8 @@ sub cookie {
 }
 
 sub http_header {
-  my $self     = shift;
+  my $self    = shift;
   my @cookies = grep { $_ } ($self->cookie());
-  my $sn       = $ENV{'SCRIPT_NAME'} || $ENV{'REQUEST_URI'} || q();
   my @headers = (q(Content-type: text/html; charset=iso8859-1),
                  map {
                    "Set-Cookie: $_";
@@ -157,6 +156,10 @@ sub cgi {
   return $self->{'cgi'};
 }
 
+sub session {
+  return {};
+}
+
 sub save_session {
   return;
 }
@@ -227,7 +230,15 @@ i.e. </body></html> by default
 
   my $oCGI = $oDecorator->cgi();
 
-=head2 save_session
+=head2 session - Placeholder for a session hashref
+
+  my $hrSession = $oUtil->session();
+
+ This will not do any session handling until subclassed and overridden for a specific environment/service.
+
+=head2 save_session - Placeholder for session saving
+
+ This will not do any session handling until subclassed and overridden for a specific environment/service.
 
 =head1 DIAGNOSTICS
 
