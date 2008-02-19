@@ -34,7 +34,8 @@ sub new {
   $self->determine_aspect();
   my $aspect = $self->aspect();
 
-  $self->{content_type} ||= ($aspect =~ /(rss|atom|ajax|xml)$/mx)?'text/xml':'text/html';
+  $self->{content_type} ||= ($aspect =~ /(rss|atom|ajax|xml)$/mx)?'text/xml':q();
+  $self->{content_type} ||= ($aspect =~ /(js|json)$/mx)?'text/plain':'text/html';
 
   $self->init();
   return $self;
@@ -47,10 +48,20 @@ sub determine_aspect {
   my $accept = $ENV{HTTP_ACCEPT} || q();
 
   #########
+  # If the client accepts application/json, default to sending application/json back (REST-style)
+  #
+  if($accept =~ m{application/json}mx &&
+     $accept !~ m{text/html}mx &&
+     $aspect !~ /(json|js)$/mx) {
+    $aspect ||= $action;
+    $aspect .= '_json';
+  }
+
+  #########
   # If the client accepts text/xml, default to sending text/xml back (REST-style)
   #
-  if($accept =~ m|text/xml|mx  &&
-     $accept !~ m|text/html|mx &&
+  if($accept =~ m{text/xml}mx  &&
+     $accept !~ m{text/html}mx &&
      $aspect !~ /xml$/mx) {
     $aspect ||= $action;
     $aspect .= '_xml';
@@ -85,9 +96,8 @@ sub authorised {
   }
 
   if($action =~ /^list/mx ||
-     ($action eq 'read'   &&
-      $aspect !~ /^add/mx &&
-      $aspect !~ /^delete/mx)) {
+     ($action eq 'read' &&
+      $aspect !~ /^(add|delete|update|create)/mx)) {
     #########
     # by default assume public read access for 'read' actions
     #
@@ -125,7 +135,8 @@ sub method_name {
   my $model  = $self->model();
   my $pk     = $model->primary_key();
 
-  if($method eq 'read' &&
+  if($pk               &&
+     $method eq 'read' &&
      !$model->$pk()) {
     $method = 'list';
   }
@@ -174,7 +185,7 @@ sub render {
   my $model   = $self->model();
   my $actions = my $warnings = q();
 
-  if(!($aspect =~ /(rss|atom|ajax|xml)$/mx)) {
+  if(!($aspect =~ /(rss|atom|ajax|xml|json)$/mx)) {
     $actions  = $self->actions();
     $self->tt->process('warnings.tt2', {
 					'requestor' => $requestor,
@@ -316,35 +327,35 @@ sub _accessor {
 }
 
 sub util {
-  my $self = shift;
-  return $self->_accessor('util', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('util', @args);
 }
 
 sub model {
-  my $self = shift;
-  return $self->_accessor('model', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('model', @args);
 }
 
 sub action {
-  my $self = shift;
-  return $self->_accessor('action', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('action', @args);
 }
 
 sub aspect {
-  my $self = shift;
-  return $self->_accessor('aspect', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('aspect', @args);
 }
 
 sub content_type {
-  my $self = shift;
-  return $self->_accessor('content_type', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('content_type', @args);
 }
 
 sub decor {
   my $self = shift;
   my $aspect = $self->aspect() || q();
 
-  if($aspect =~ /(rss|atom|ajax|xml)$/mx) {
+  if($aspect =~ /(rss|atom|ajax|xml|json)$/mx) {
     return 0;
   }
   return 1;
@@ -386,7 +397,7 @@ sub output_end {
 sub output_reset {
   my $self = shift;
   $self->{output_buffer} = [];
-  $DEBUG_OUTPUT and carp "output_reset";
+  $DEBUG_OUTPUT and carp 'output_reset';
   return;
 }
 
@@ -430,6 +441,15 @@ sub delete_xml {
   return $self->delete();
 }
 
+sub list_json {
+  my $self = shift;
+  return $self->list();
+}
+
+sub read_json {
+  my $self = shift;
+  return $self->read();
+}
 
 1;
 __END__
@@ -563,6 +583,10 @@ View superclass for the ClearPress framework
 =head2 update_xml - default passthrough to update() for xml service
 
 =head2 delete_xml - default passthrough to delete() for xml service
+
+=head2 list_json - default passthrough to list() for json service
+
+=head2 read_json - default passthrough to read() for json service
 
 =head2 determine_aspect - calculate requested aspect of view
 

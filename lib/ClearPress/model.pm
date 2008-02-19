@@ -72,15 +72,13 @@ sub get {
 }
 
 sub gen_getarray {
-  my $self  = shift;
-  my $class = shift;
-  my $query = shift;
+  my ($self, $class, $query, @args) = @_;
 
   if(!ref $self) {
     $self = $self->new();
   }
 
-  my @res = ();
+  my $res = [];
   my $sth;
 
   eval {
@@ -90,22 +88,22 @@ sub gen_getarray {
     } else {
       $sth = $self->util->dbh->prepare($query);
     }
-    $sth->execute(@_);
+    $sth->execute(@args);
   };
 
   if($EVAL_ERROR) {
     carp $EVAL_ERROR . 'caller = '. caller;
     $query =~ s/\s+/\ /smxg;
     local $LIST_SEPARATOR = q(, );
-    carp qq(Query was:\n$query\n\nParams: @_);
+    carp qq(Query was:\n$query\n\nParams: @args);
     return;
   }
 
   while(my $ref = $sth->fetchrow_hashref()) {
     $ref->{'util'} = $self->util();
-    push @res, $class->new($ref);
+    push @{$res}, $class->new($ref);
   }
-  return \@res;
+  return $res;
 }
 
 sub gen_getall {
@@ -310,7 +308,7 @@ sub zdate {
   my $self = shift;
   my $date = q();
 
-  if(grep { $_ eq 'date' } $self->fields()) {
+  if(scalar grep { $_ eq 'date' } $self->fields()) {
     $date = $self->date();
     $date =~ s/\ /T/mx;
     $date .='Z';

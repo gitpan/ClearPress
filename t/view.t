@@ -12,6 +12,8 @@ use t::user::basic;
 
 use_ok('ClearPress::view');
 
+$ClearPress::view::DEBUG_OUTPUT = 0;
+
 my $mock = {};
 my $dbh  = t::dbh->new({mock=>$mock});
 my $util = t::util->new({dbh=>$dbh});

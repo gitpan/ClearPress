@@ -24,7 +24,9 @@ use_ok('ClearPress::decorator');
   is($dec->get('junk'), undef, 'returns undef on non-existent attribute fetch');
   is(scalar $dec->get('jsfile'), 0, 'returns empty array on jsfile fetch');
   my $ref = ['/foo.js'];
-  $ClearPress::decorator::DEFAULTS->{'jsfile'} = $ref;
+  if($ClearPress::decorator::DEFAULTS) {
+    $ClearPress::decorator::DEFAULTS->{'jsfile'} = $ref;
+  }
   is(scalar $dec->jsfile(), 1, 'returns default array for jsfile()');
 
   $dec->jsfile($ref);

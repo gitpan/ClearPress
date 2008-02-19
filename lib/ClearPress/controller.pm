@@ -30,21 +30,25 @@ sub process_uri {
   my $action        = $CRUD->{uc $method};
   my $pi            = $ENV{'PATH_INFO'}    || q();
   my $qs            = $ENV{'QUERY_STRING'} || q();
-  my ($entity)      = $pi =~ m|^/([^/;\.]+)|mx;
+  my ($entity)      = $pi =~ m{^/([^/;\.]+)}mx;
   $entity         ||= q();
-  my ($id)          = $pi =~ m|^/$entity/([a-z\-_\d%\+\ ]+)|mix;
+  my ($id)          = $pi =~ m{^/$entity/([a-z\-_\d%\+\ ]+)}mix;
   my ($aspect);
 
   if($pi =~ /\.xml$/mx) {
     if($id) {
-#      $action = 'read';
       $aspect = 'read_xml';
     } else {
-#      $action = 'list';
       $aspect = 'list_xml';
     }
+  } elsif($pi =~ /\.(js|json)$/mx) {
+    if($id) {
+      $aspect = 'read_json';
+    } else {
+      $aspect = 'list_json';
+    }
   } else {
-    ($aspect) = $pi =~ m|;(\S+)|mx;
+    ($aspect) = $pi =~ m{;(\S+)}mx;
   }
 
   $entity         ||= $util->config->val('application','default_view');
@@ -130,7 +134,10 @@ sub handler {
     $viewobject->output_buffer($decorator->footer());
 
   } else {
-    $viewobject->output_buffer(q(Content-type: ), $viewobject->content_type(), "\n\n");
+    #########
+    # prepend content-type to output buffer
+    #
+    print q(Content-type: ), $viewobject->content_type(), "\n\n" or croak q(Failed to print output);
   }
 
   $viewobject->output_end();
@@ -150,7 +157,7 @@ sub dispatch {
 
   eval {
     my @entities = split /[,\s]+/mx, $util->config->val('application','views');
-    if(!grep { $_ eq $entity } @entities) {
+    if(!scalar grep { $_ eq $entity } @entities) {
       croak qq(No such view ($entity));
     }
 

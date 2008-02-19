@@ -16,8 +16,8 @@ use Template;
 our $VERSION = do { my ($r) = q$LastChangedRevision: 113 $ =~ /(\d+)/mx; $r; };
 
 sub errstr {
-  my $self = shift;
-  return $self->_accessor('errstr', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('errstr', @args);
 }
 
 sub render {
@@ -32,7 +32,7 @@ sub render {
     $errstr .= q(Eval Error: ) . $EVAL_ERROR;
   }
 
-  $errstr    =~ s|\S+(npg.*?)$|$1|smgx;
+  $errstr    =~ s{\S+(npg.*?)$}{$1}smgx;
   return q(<div id="main"><h2>An Error Occurred</h2>) .  $self->actions() . q(<p>) . $errstr . q(</p></div>);
 }
 

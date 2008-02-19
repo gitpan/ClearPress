@@ -33,9 +33,9 @@ sub data_path {
 }
 
 sub configpath {
-  my $self = shift;
+  my ($self, @args) = @_;
 
-  if(@_) {
+  if(scalar @args) {
     $self->{'configpath'} = shift;
   }
 
@@ -48,7 +48,7 @@ sub config {
   my $dtconfigpath;
 
   if(!$self->{'_config'}) {
-    ($dtconfigpath) = $configpath =~ m|([a-z\d_/\.\-]+)|mix;
+    ($dtconfigpath) = $configpath =~ m{([a-z\d_/\.\-]+)}mix;
     $dtconfigpath ||= q();
 
     if($dtconfigpath ne $configpath) {
@@ -119,33 +119,33 @@ sub _accessor {
 }
 
 sub transactions {
-  my $self = shift;
-  return $self->_accessor('transactions', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('transactions', @args);
 }
 
 sub username {
-  my $self = shift;
-  return $self->_accessor('username', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('username', @args);
 }
 
 sub cgi {
-  my $self = shift;
-  return $self->_accessor('cgi', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('cgi', @args);
 }
 
 sub requestor {
-  my $self = shift;
-  return $self->_accessor('requestor', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('requestor', @args);
 }
 
 sub profiler {
-  my $self = shift;
-  return $self->_accessor('profiler', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('profiler', @args);
 }
 
 sub session {
-  my $self = shift;
-  return $self->_accessor('session', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('session', @args);
 }
 
 sub DESTROY {
