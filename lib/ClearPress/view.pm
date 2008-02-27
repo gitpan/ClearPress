@@ -31,44 +31,15 @@ sub new {
   $self->{output_buffer}      = [];
   $self->{output_complete}    = 0;
 
-  $self->determine_aspect();
-  my $aspect = $self->aspect();
+  my $aspect = $self->aspect() || q();
 
   $self->{content_type} ||= ($aspect =~ /(rss|atom|ajax|xml)$/mx)?'text/xml':q();
-  $self->{content_type} ||= ($aspect =~ /(js|json)$/mx)?'text/plain':'text/html';
+  $self->{content_type} ||= ($aspect =~ /(js|json)$/mx)?'application/javascript':q();
+  $self->{content_type} ||= ($aspect =~ /_(png)$/mx)?'image/png':q();
+  $self->{content_type} ||= 'text/html';
 
   $self->init();
   return $self;
-}
-
-sub determine_aspect {
-  my $self   = shift;
-  my $action = $self->action()   || q();
-  my $aspect = $self->aspect()   || q();
-  my $accept = $ENV{HTTP_ACCEPT} || q();
-
-  #########
-  # If the client accepts application/json, default to sending application/json back (REST-style)
-  #
-  if($accept =~ m{application/json}mx &&
-     $accept !~ m{text/html}mx &&
-     $aspect !~ /(json|js)$/mx) {
-    $aspect ||= $action;
-    $aspect .= '_json';
-  }
-
-  #########
-  # If the client accepts text/xml, default to sending text/xml back (REST-style)
-  #
-  if($accept =~ m{text/xml}mx  &&
-     $accept !~ m{text/html}mx &&
-     $aspect !~ /xml$/mx) {
-    $aspect ||= $action;
-    $aspect .= '_xml';
-  }
-
-  $self->aspect($aspect);
-  return;
 }
 
 sub init {
@@ -355,7 +326,7 @@ sub decor {
   my $self = shift;
   my $aspect = $self->aspect() || q();
 
-  if($aspect =~ /(rss|atom|ajax|xml|json)$/mx) {
+  if($aspect =~ /(rss|atom|ajax|xml|json|_png)$/mx) {
     return 0;
   }
   return 1;

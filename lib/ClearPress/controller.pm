@@ -17,6 +17,7 @@ use ClearPress::view::error;
 use CGI;
 
 our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
+our $DEBUG   = 0;
 our $CRUD    = {
 		'POST'   => 'create',
 		'GET'    => 'read',
@@ -24,37 +25,66 @@ our $CRUD    = {
 		'DELETE' => 'destroy',
 	       };
 
+sub accept_extensions {
+  return [
+	  {'.html' => q()},
+	  {'.xml'  => '_xml'},
+	  {'.png'  => q(_png)},
+	  {'.rss'  => q(_rss)},
+	  {'.atom' => q(_atom)},
+	  {'.js'   => q(_json)},
+	  {'.json' => q(_json)},
+	  {'.ical' => q(_ical)},
+	 ];
+}
+
+sub accept_headers {
+  return [
+#	  {'text/html'        => q()},
+	  {'application/json' => q(_json)},
+	  {'text/xml'         => q(_xml)},
+	 ];
+}
+
 sub process_uri {
+  my ($self, @args) = @_;
+  carp q(process_uri is deprecated. Use process_request());
+  return $self->process_request(@args);
+}
+
+sub process_request {
   my ($self, $util) = @_;
-  my $method        = $ENV{'REQUEST_METHOD'} || 'GET';
+  my $method        = $ENV{REQUEST_METHOD} || 'GET';
   my $action        = $CRUD->{uc $method};
-  my $pi            = $ENV{'PATH_INFO'}    || q();
-  my $qs            = $ENV{'QUERY_STRING'} || q();
+  my $pi            = $ENV{PATH_INFO}      || q();
+  my $accept        = $ENV{HTTP_ACCEPT}    || q();
+  my $qs            = $ENV{QUERY_STRING}   || q();
   my ($entity)      = $pi =~ m{^/([^/;\.]+)}mx;
   $entity         ||= q();
-  my ($id)          = $pi =~ m{^/$entity/([a-z\-_\d%\+\ ]+)}mix;
-  my ($aspect);
+  my ($id)          = $pi =~ m{^/$entity/([a-z\-_\d%\@\.\+\ ]+)}mix;
+  my ($aspect)      = $pi =~ m{;(\S+)}mx;
 
-  if($pi =~ /\.xml$/mx) {
-    if($id) {
-      $aspect = 'read_xml';
-    } else {
-      $aspect = 'list_xml';
-    }
-  } elsif($pi =~ /\.(js|json)$/mx) {
-    if($id) {
-      $aspect = 'read_json';
-    } else {
-      $aspect = 'list_json';
-    }
-  } else {
-    ($aspect) = $pi =~ m{;(\S+)}mx;
+  if($action eq 'read' && !$id && !$aspect) {
+    $aspect = 'list';
   }
 
-  $entity         ||= $util->config->val('application','default_view');
-  $aspect         ||= q();
-  $id             ||= q(0);
-  $id               = CGI->unescape($id);
+  if($action eq 'create' && $id && !$aspect) {
+    $aspect = 'update';
+  }
+  $aspect ||= q();
+
+  $DEBUG and carp qq(aspect=@{[$aspect||'undef']});
+
+  my $uriaspect = $self->_process_request_extensions(\$pi, $aspect, $action) || q();
+  if($uriaspect ne $aspect) {
+    $aspect = $uriaspect;
+    ($id)   = $pi =~ m{^/$entity/([a-z\-_\d%\@\.\+\ ]+)}mix;
+  }
+
+  $aspect   = $self->_process_request_headers(\$accept, $aspect, $action);
+  $entity ||= $util->config->val('application','default_view');
+  $aspect ||= q();
+  $id       = CGI->unescape($id||'0');
 
   if(!$entity) {
     my $views = $util->config->val('application', 'views');
@@ -62,6 +92,44 @@ sub process_uri {
   }
 
   return ($action, $entity, $aspect, $id);
+}
+
+sub _process_request_extensions {
+  my ($self, $pi, $aspect, $action) = @_;
+
+  $DEBUG and carp qq(pi=$pi);
+  for my $pair (@{$self->accept_extensions}) {
+    my ($ext, $meth) = %{$pair};
+    $ext =~ s/\./\\./mxg;
+    if(${$pi} =~ s/$ext$//mx) {
+      $aspect ||= $action;
+      $aspect  =~ s/$meth$//mx;
+      $aspect .= $meth;
+      last;
+    }
+  }
+
+  $DEBUG and carp qq(aspect=@{[$aspect||'undef']});
+  return $aspect;
+}
+
+sub _process_request_headers {
+  my ($self, $accept, $aspect, $action) = @_;
+
+  $DEBUG and carp qq(accept=$accept);
+
+  for my $pair (@{$self->accept_headers()}) {
+    my ($header, $meth) = %{$pair};
+    if(${$accept} =~ /$header$/mx) {
+      $aspect ||= $action;
+      $aspect  =~ s/$meth$//mx;
+      $aspect .= $meth;
+      last;
+    }
+  }
+
+  $DEBUG and carp qq(aspect=@{[$aspect||'undef']});
+  return $aspect;
 }
 
 sub decorator {
@@ -82,7 +150,7 @@ sub handler {
   my $namespace     = $util->config->val('application', 'namespace') || $util->config->val('application', 'name');
   my $cgi           = $decorator->cgi();
 
-  my ($action, $entity, $aspect, $id) = $self->process_uri($util);
+  my ($action, $entity, $aspect, $id) = $self->process_request($util);
 
   $util->username($decorator->username());
   $util->session($decorator->session());
@@ -220,9 +288,29 @@ $LastChangedRevision: 12 $
 
   my $oDecorator = $oController->decorator();
 
-=head2 process_uri - extract useful things from %ENV relating to our URI
+=head2 accept_extensions - data structure of file-extensions-to-aspect mappings  (e.g. '.xml', '.js') in precedence order
 
-  my ($sAction, $sEntity, $sAspect, $sId) = $oCtrl->process_uri($oUtil);
+ my $arAcceptedExtensions = $oController->accept_extensions();
+
+ [
+  {'.ext' => '_aspect'},
+  {'.js'  => '_json'},
+ ]
+
+=head2 accept_headers - data structure of accept_header-to-aspect mappings  (e.g. 'text/xml', 'application/javascript') in precedence order
+
+ my $arAcceptedHeaders = $oController->accept_headers();
+
+ [
+  {'text/mytype'            => '_aspect'},
+  {'application/javascript' => '_json'},
+ ]
+
+=head2 process_uri - deprecated. use process_request()
+
+=head2 process_request - extract useful things from %ENV relating to our URI
+
+  my ($sAction, $sEntity, $sAspect, $sId) = $oCtrl->process_request($oUtil);
 
 =head2 handler - run the controller
 

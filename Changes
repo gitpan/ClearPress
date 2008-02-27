@@ -1,3 +1,6 @@
+99 - reworked url/file-extension & HTTP Accept header handling
+     deprecated controller::process_uri in favour of process_request
+
 87 - JSON response support
 
 71 - Buffered output handling, better test coverage
