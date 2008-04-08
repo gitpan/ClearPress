@@ -64,13 +64,28 @@ sub process_request {
   my ($id)          = $pi =~ m{^/$entity/([a-z\-_\d%\@\.\+\ ]+)}mix;
   my ($aspect)      = $pi =~ m{;(\S+)}mx;
 
+  # method id action  aspect  result CRUD
+  # =====================================
+  # POST   n  create  -       create    *
+  # POST   y  create  update  update    *
+  # POST   y  create  delete  delete    *
+  # GET    n  read    -       list
+  # GET    n  read    add     add/new
+  # GET    y  read    -       read      *
+  # GET    y  read    edit    edit
+
   if($action eq 'read' && !$id && !$aspect) {
     $aspect = 'list';
   }
 
-  if($action eq 'create' && $id && !$aspect) {
-    $aspect = 'update';
+  if($action eq 'create' && $id && (!$aspect || $aspect eq 'update')) {
+    $action = 'update';
   }
+
+  if($action eq 'create' && $id && $aspect eq 'delete') {
+    $action = 'delete';
+  }
+
   $aspect ||= q();
 
   $DEBUG and carp qq(aspect=@{[$aspect||'undef']});
@@ -91,6 +106,25 @@ sub process_request {
     $entity   = (split /[\s,]+/mx, $views)[0];
   }
 
+  return $self->_check_sanity($action, $entity, $aspect, $id);
+}
+
+sub _check_sanity {
+  my ($self, $action, $entity, $aspect, $id) = @_;
+
+  #########
+  # sanity checks
+  #
+  if($action eq $aspect) {
+    $aspect = q();
+  }
+
+  if(scalar grep { $_ eq $aspect } values %{$CRUD}) {
+    carp qq(Discarding aspect $aspect - should it be an action?);
+    $aspect = q();
+  }
+
+  $DEBUG and carp qq(_check_sanity: action=$action, entity=$entity, aspect=$aspect, id=$id);
   return ($action, $entity, $aspect, $id);
 }
 

@@ -125,6 +125,27 @@ sub gen_getall {
   return $self->{$cachekey};
 }
 
+sub gen_getfriends {
+  my ($self, $class, $cachekey) = @_;
+  $class ||= ref $self;
+
+  if(!$cachekey) {
+    ($cachekey) = $class =~ /([^:]+)$/mx;
+    $cachekey   = PL($cachekey) . '_friends';
+  }
+
+  if(!$self->{$cachekey}) {
+    my $link  = $self->primary_key();
+    my $query = qq(SELECT   @{[join q(, ), $class->fields()]}
+                   FROM     @{[$class->table()]}
+                   WHERE    $link=?
+                   ORDER BY $link);
+    $self->{$cachekey} = $self->gen_getarray($class, $query, $self->$link());
+  }
+
+  return $self->{$cachekey};
+}
+
 sub gen_getobj {
   my ($self, $class)   = @_;
   $class             ||= ref $self;
@@ -135,6 +156,89 @@ sub gen_getobj {
 				      $pk    => $self->$pk(),
 				     });
   return $self->{$cachekey};
+}
+
+sub belongs_to {
+  my ($class, @args) = @_;
+  return $class->hasa(@args);
+}
+
+sub has_a {
+  my ($class, @args) = @_;
+  return $class->hasa(@args);
+}
+
+sub hasa {
+  my ($class, $attr) = @_;
+  no strict 'refs'; ## no critic
+
+  if(ref $attr ne 'ARRAY') {
+    $attr = [$attr];
+  }
+
+  for my $single (@{$attr}) {
+    my $pkg = $single;
+
+    if(ref $single eq 'HASH') {
+      ($pkg)    = values %{$single};
+      ($single) = keys %{$single};
+    }
+
+    my $namespace = "${class}::$pkg";
+    my $yield     = $class;
+    $yield        =~ s/([^:]+)$/$pkg/mx;
+
+    if (defined &{$namespace}) {
+      next;
+    }
+
+    *{$namespace} = sub {
+      my $self = shift;
+      return $self->gen_getobj($yield);
+    };
+  }
+
+  return;
+}
+
+sub has_many {
+  my ($class, @args) = @_;
+  return $class->hasmany(@args);
+}
+
+sub hasmany {
+  my ($class, $attr) = @_;
+  no strict 'refs'; ## no critic
+
+  if(ref $attr ne 'ARRAY') {
+    $attr = [$attr];
+  }
+
+  for my $single (@{$attr}) {
+    my $pkg    = $single;
+
+    if(ref $single eq 'HASH') {
+      ($pkg)    = values %{$single};
+      ($single) = keys %{$single};
+    }
+
+    my $plural    = PL($single);
+    my $namespace = "${class}::$plural";
+    my $yield     = $class;
+    $yield        =~ s/([^:]+)$/$pkg/mx;
+
+    if (defined &{$namespace}) {
+      next;
+    }
+
+    *{$namespace} = sub {
+      my $self = shift;
+
+      return $self->gen_getfriends($yield);
+    };
+  }
+
+  return;
 }
 
 sub create {
@@ -151,7 +255,7 @@ sub create {
 
   my $query = qq(INSERT INTO $table (@{[join q(, ), $self->fields()]})
                  VALUES (@{[join q(, ), map { q(?) } $self->fields()]}));
-  my @args = map { $self->{$_} || q() } $self->fields();
+  my @args = map { $self->{$_} } $self->fields();
   eval {
     $dbh->do($query, {}, @args);
 
@@ -297,7 +401,7 @@ sub save {
   my $self = shift;
   my $pk   = $self->primary_key();
 
-  if($pk && exists $self->{$pk}) {
+  if($pk && defined $self->{$pk}) {
     return $self->update();
   }
 
@@ -347,16 +451,16 @@ $LastChangedRevision: 12 $
 
 =head2 fields
 
-  my @aFields = $oSelf->fields();
+  my @aFields = $oModel->fields();
   my @aFields = __PACKAGE__->fields();
 
 =head2 primary_key - usually the first element of fields();
 
-  my $sPrimaryKey = $oSelf->fields();
+  my $sPrimaryKey = $oModel->fields();
 
 =head2 table - database table name this class represents
 
-  my $sTableName = $oSelf->table();
+  my $sTableName = $oModel->table();
 
 =head2 init - post-constructor hook, called by new();
 
@@ -374,18 +478,18 @@ $LastChangedRevision: 12 $
 
  Invokes $self->read() if necessary.
 
- my $sFieldValue = $oSelf->get($sFieldName);
+ my $sFieldValue = $oModel->get($sFieldName);
 
 =head2 gen_getarray - Arrayref of objects of a given type for a given database query
 
-  my $arObjects = $oInstance->gen_getarray('ClearPress::model::subclass',
-                                           q(SELECT a,b,c FROM x,y WHERE x.d=? AND y.e=?),
-                                           @bind_params);
+  my $arObjects = $oModel->gen_getarray('ClearPress::model::subclass',
+                                        q(SELECT a,b,c FROM x,y WHERE x.d=? AND y.e=?),
+                                        @bind_params);
 
 =head2 gen_getall - Arrayref of all objects of type (ref $self) or a given class
 
-  my $arObjects = $self->gen_getall();
-  my $arObjects = $self->gen_getall('ClearPress::otherclass');
+  my $arObjects = $oModel->gen_getall();
+  my $arObjects = $oModel->gen_getall('ClearPress::otherclass');
 
 =head2 gen_getobj - An object of a given class based on the value of
 the primary key in that class equalling the value in the same
@@ -393,29 +497,78 @@ field-name in this object.
 
   my $oObj = $self->gen_getobj('application::model::name');
 
+=head2 gen_getfriends - arrayref of relatives related by this model's primary key
+
+  my $arObjects = $oModel->gen_getfriends($sClass, $sQuery, $sCacheKey);
+
+=head2 hasa - one:one package relationship
+
+  __PACKAGE__->hasa('my::pkg');
+  __PACKAGE__->hasa(['my::pkg1', 'my::pkg2']);
+  __PACKAGE__->hasa({method => 'my::fieldpkg'});
+  __PACKAGE__->hasa([{method_one => 'my::pkg1'},
+                     {method_two => 'my::pkg2'});
+
+=head2 hasmany - one:many package relationship
+
+  __PACKAGE__->hasmany('my::pkg');
+
+ If my::pkg has a table of "package" then this creates a method "sub
+ packages" in $self, yielding an arrayref of my::pkg objects related
+ by the primary_key of $self.
+
+  __PACKAGE__->hasmany(['my::pkg1', 'my::pkg2']);
+
+ Define multiple relationships together.
+
+
+  __PACKAGE__->hasmany({method => 'my::fieldpkg'});
+
+ Defines a method "sub methods" in $self yielding an arrayref of
+ my::fieldpkg objects related by the primary_key of $self.
+
+  __PACKAGE__->hasmany([{method_one => 'my::pkg1'},
+                        {method_two => 'my::pkg2'});
+
+ Defines multiple relationships with overridden method names.
+
+=head2 has_a - synonym for hasa()
+
+=head2 belongs_to - synonym for hasa()
+
+=head2 has_many - synonym for hasmany()
+
 =head2 create - Generic INSERT into database
 
-  $oSelf->create();
+  $oModel->create();
 
 =head2 read - Generic lazy-load from the database
 
-  $oSelf->load();
+  $oModel->load();
 
 =head2 update - Generic UPDATE into database against primary_key
 
-  $oSelf->update();
+  $oModel->update();
 
 =head2 delete - Generic delete from database
 
-  $oSelf->delete();
+  $oModel->delete();
 
 =head2 save - Generic save object to database
 
-  $oSelf->save();
+  $oModel->save();
 
 =head2 zdate - Generic Zulu-date based on object's date() method or gmtime
 
-  my $sZuluTime = $oInstance->zdate();
+  my $sZuluTime = $oModel->zdate();
+
+=head2 as_json - JSON representation of this object
+
+  my $sJSON = $oModel->as_json();
+
+=head2 as_xml - XML representation of this object
+
+  my $oXML = $oModel->as_xml();
 
 =head1 DIAGNOSTICS
 

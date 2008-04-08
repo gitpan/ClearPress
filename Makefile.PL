@@ -27,6 +27,7 @@ WriteMakefile(
 				  'Template'            => 2.19,
 				  'Lingua::EN::Inflect' => 1.89,
 				  'IO::Scalar'          => 2.110,
+				  'POSIX'               => 1.09,
 				 },
 	      'LICENSE'       => 'perl',
 	      'dist'          => { COMPRESS => 'gzip', SUFFIX => 'gz', },

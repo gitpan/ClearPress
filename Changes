@@ -1,3 +1,9 @@
+118- Update now only saves fields which 'exist' in the object, meaning
+     you don't have to force $object->load() before updating.
+   - New hasa() and hasmany() for easier relationship definitions.
+   - Models can now render ->as_xml() and as_json()
+   - Tweaked route processing (action & aspect) to be safer and more consistent
+
 99 - reworked url/file-extension & HTTP Accept header handling
      deprecated controller::process_uri in favour of process_request
 

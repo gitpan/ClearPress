@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                ClearPress
-version:             99
+version:             121
 abstract:            ~
 license:             perl
 author:              
@@ -14,6 +14,7 @@ requires:
     English:                       1.01
     IO::Scalar:                    2.11
     Lingua::EN::Inflect:           1.89
+    POSIX:                         1.09
     Template:                      2.19
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.3.html

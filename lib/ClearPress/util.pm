@@ -13,6 +13,8 @@ use warnings;
 use DBI;
 use Config::IniFiles;
 use Carp;
+use POSIX qw(strftime);
+use English qw(-no_match_vars);
 
 our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
 
@@ -160,6 +162,12 @@ sub DESTROY {
   return;
 }
 
+sub log { ## no critic
+  my ($self, @args) = @_;
+  print {*STDERR} map { (strftime '[%Y-%m-%dT%H:%M:%S] ', localtime). $_ } @args or croak $ERRNO;
+  return;
+}
+
 1;
 
 __END__
@@ -247,14 +255,23 @@ $LastChangedRevision: 12 $
 
   my $oRequestingUser = $oUtil->requestor();
 
+=head2 log - Formatted debugging output to STDERR
+
+  $oUtil->log(@aMessages);
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 DEPENDENCIES
 
+strict
+warnings
 DBI
 Config::IniFiles
+Carp
+English
+POSIX
 
 =head1 INCOMPATIBILITIES
 
