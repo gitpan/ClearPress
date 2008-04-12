@@ -164,7 +164,7 @@ sub DESTROY {
 
 sub log { ## no critic
   my ($self, @args) = @_;
-  print {*STDERR} map { (strftime '[%Y-%m-%dT%H:%M:%S] ', localtime). $_ } @args or croak $ERRNO;
+  print {*STDERR} map { (strftime '[%Y-%m-%dT%H:%M:%S] ', localtime). "$_\n" } @args or croak $ERRNO;
   return;
 }
 

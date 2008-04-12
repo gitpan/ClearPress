@@ -239,7 +239,10 @@ sub handler {
     #########
     # prepend content-type to output buffer
     #
-    print q(Content-type: ), $viewobject->content_type(), "\n\n" or croak q(Failed to print output);
+    if(!$viewobject->output_finished()) {
+      print qq(X-Generated-By: ClearPress\n);
+      print q(Content-type: ), $viewobject->content_type(), "\n\n" or croak q(Failed to print output);
+    }
   }
 
   $viewobject->output_end();

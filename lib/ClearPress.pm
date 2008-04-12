@@ -13,7 +13,7 @@ use ClearPress::view;
 use ClearPress::controller;
 use ClearPress::util;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 121 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 132 $ =~ /(\d+)/mx; $r; };
 
 1;
 __END__
@@ -24,7 +24,7 @@ ClearPress - Simple, fresh & fruity MVC framework
 
 =head1 VERSION
 
-$LastChangedRevision: 121 $
+$LastChangedRevision: 132 $
 
 =head1 SYNOPSIS
 
@@ -61,6 +61,8 @@ ClearPress::view
 ClearPress::controller
 ClearPress::util
 
+strict
+warnings
 CGI
 POSIX
 Template
@@ -71,8 +73,9 @@ HTTP::Server::Simple::CGI
 
 =head1 BUGS AND LIMITATIONS
 
-ClearPress is not an implementation of the classic MVC pattern so if
-you're expecting that, you may be disappointed. Having said that it
+ClearPress is not an implementation of the classic MVC pattern, in
+particular ClearPress views are more like classic MVC controllers, so
+if you're expecting that, you may be disappointed. Having said that it
 has been used extremely effectively in rapid development of a number
 of production applications.
 

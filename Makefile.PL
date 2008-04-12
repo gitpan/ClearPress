@@ -29,7 +29,7 @@ WriteMakefile(
 				  'IO::Scalar'          => 2.110,
 				  'POSIX'               => 1.09,
 				 },
-	      'LICENSE'       => 'perl',
+#	      'LICENSE'       => 'perl',
 	      'dist'          => { COMPRESS => 'gzip', SUFFIX => 'gz', },
 	     );
 

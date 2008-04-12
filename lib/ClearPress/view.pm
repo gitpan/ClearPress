@@ -29,7 +29,7 @@ sub new {
   $self->{requestor_username} = $username;
   $self->{logged_in}          = $username?1:0;
   $self->{output_buffer}      = [];
-  $self->{output_complete}    = 0;
+  $self->{output_finished}    = 0;
 
   my $aspect = $self->aspect() || q();
 
@@ -158,10 +158,7 @@ sub render {
 
   if(!($aspect =~ /(rss|atom|ajax|xml|json)$/mx)) {
     $actions  = $self->actions();
-    $self->tt->process('warnings.tt2', {
-					'requestor' => $requestor,
-					'view'      => $self,
-				       }, \$warnings);
+    $self->process_template('warnings.tt2', {}, \$warnings);
   }
   my $tmpl = $self->template_name();
 
@@ -171,17 +168,37 @@ sub render {
 
   my $cfg     = $util->config();
   my $content = q();
-  $self->tt->process("$tmpl.tt2", {
-				   requestor   => $requestor,
-				   model       => $model,
-				   SCRIPT_NAME => $ENV{SCRIPT_NAME},
-				   HTTP_HOST   => $ENV{HTTP_HOST},
-				   now         => (strftime '%Y-%m-%dT%H:%M:%S', localtime),
-				   (map {
-				     $_ => $cfg->val('globals',$_)
-				   } $cfg->Parameters('globals')),
-				  }, \$content) or croak $self->tt->error();
+
+  $self->process_template("$tmpl.tt2", {}, \$content);
+
   return $warnings . $actions . $content || q(No data);
+}
+
+sub process_template {
+  my ($self, $template, $extra_params, $where_to_ref) = @_;
+  my $util   = $self->util();
+  my $cfg    = $util->config();
+  my $params = {
+		requestor   => $util->requestor,
+		model       => $self->model(),
+		view        => $self,
+		SCRIPT_NAME => $ENV{SCRIPT_NAME},
+		HTTP_HOST   => $ENV{HTTP_HOST},
+		now         => (strftime '%Y-%m-%dT%H:%M:%S', localtime),
+		(map {
+		  $_ => $cfg->val('globals',$_)
+		} $cfg->Parameters('globals')),
+		%{$extra_params||{}},
+	       };
+
+  if($where_to_ref) {
+    $self->tt->process($template, $params, $where_to_ref) or croak $self->tt->error();
+
+  } else {
+    $self->tt->process($template, $params) or croak $self->tt->error();
+  }
+
+  return;
 }
 
 sub _populate_from_cgi {
@@ -564,6 +581,24 @@ View superclass for the ClearPress framework
   Based on HTTP headers, environment variables and URL components.
 
 =head2 init - post-constructor initialisation hook for subclasses
+
+=head2 process_template - process a template with standard parameters
+
+  Process template.tt2 with standard parameters, output to stdout.
+
+  $oView->process_template('template.tt2');
+
+
+  Process template.tt2 with standard parameters plus extras, output to
+  stdout.
+
+  $oView->process_template('template.tt2', {extra=>'params'});
+
+
+  Process template.tt2 with standard plus extra parameters and output
+  into $to_scalar.
+
+  $oView->process_template('template.tt2', {extra=>'params'}, $to_scalar);
 
 =head2 output_buffer - queue a string for output
 

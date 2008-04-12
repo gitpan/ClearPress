@@ -146,6 +146,31 @@ sub gen_getfriends {
   return $self->{$cachekey};
 }
 
+sub gen_getfriends_through {
+  my ($self, $class, $through, $cachekey) = @_;
+  $class ||= ref $self;
+
+  if(!$cachekey) {
+    ($cachekey) = $class =~ /([^:]+)$/mx;
+    $cachekey   = PL($cachekey) . '_friends_through';
+  }
+
+  if(!$self->{$cachekey}) {
+    my $through_key = $self->primary_key();
+carp qq(through_key = $through_key);
+    my $friend_key  = $class->primary_key();
+carp qq(friend_key = $friend_key);
+    my $query = qq(SELECT @{[join q(, ), map { "f.$_" } $class->fields()]}
+                   FROM   @{[$class->table()]} f,
+                          $through            t
+                   WHERE  t.$through_key = ?
+                   AND    t.$friend_key  = f.$friend_key);
+    $self->{$cachekey} = $self->gen_getarray($class, $query, $self->$through_key());
+  }
+
+  return $self->{$cachekey};
+}
+
 sub gen_getobj {
   my ($self, $class)   = @_;
   $class             ||= ref $self;
@@ -215,7 +240,7 @@ sub hasmany {
   }
 
   for my $single (@{$attr}) {
-    my $pkg    = $single;
+    my $pkg = $single;
 
     if(ref $single eq 'HASH') {
       ($pkg)    = values %{$single};
@@ -235,6 +260,49 @@ sub hasmany {
       my $self = shift;
 
       return $self->gen_getfriends($yield);
+    };
+  }
+
+  return;
+}
+
+sub has_many_through {
+  my ($class, $attr) = @_;
+  no strict 'refs'; ## no critic
+
+  if(ref $attr ne 'ARRAY') {
+    $attr = [$attr];
+  }
+
+  for my $single (@{$attr}) {
+    my $pkg = $single;
+
+    if(ref $single eq 'HASH') {
+      ($pkg)    = values %{$single};
+      ($single) = keys %{$single};
+    }
+    $pkg =~ s/\|.*//mx;
+
+    my $through;
+    ($single, $through) = split /\|/mx, $single;
+
+    if(!$through) {
+      croak qq(Cannot build has_many_through for $single);
+    }
+
+    my $plural    = PL($single);
+    my $namespace = "${class}::$plural";
+    my $yield     = $class;
+    $yield        =~ s/([^:]+)$/$pkg/mx;
+
+    if (defined &{$namespace}) {
+      next;
+    }
+
+    *{$namespace} = sub {
+      my $self = shift;
+
+      return $self->gen_getfriends_through($yield, $through);
     };
   }
 
@@ -495,11 +563,15 @@ $LastChangedRevision: 12 $
 the primary key in that class equalling the value in the same
 field-name in this object.
 
-  my $oObj = $self->gen_getobj('application::model::name');
+  my $oObj = $self->gen_getobj($sClass);
 
 =head2 gen_getfriends - arrayref of relatives related by this model's primary key
 
-  my $arObjects = $oModel->gen_getfriends($sClass, $sQuery, $sCacheKey);
+  my $arObjects = $oModel->gen_getfriends($sClass, $sCacheKey);
+
+=head2 gen_getfriends_through - arrayref of relatives related by this model's primary key through an additional join table
+
+  my $arObjects = $oModel->gen_getfriends($sClass, $sJoinTable, $sCacheKey);
 
 =head2 hasa - one:one package relationship
 
@@ -537,6 +609,17 @@ field-name in this object.
 =head2 belongs_to - synonym for hasa()
 
 =head2 has_many - synonym for hasmany()
+
+=head2 has_many_through - arrayref of related entities through a join table
+
+  Define a 'users' method in this class which fetches users like so:
+
+    SELECT u.id_user, u.foo, u.bar
+    FROM   user f, centre_user t
+    WHERE  t.id_this = ?           # the primary_key for $self's class
+    AND    t.id_user = f.id_user   # the primary_key for friend 'user'
+
+  __PACKAGE__->has_many_through(['user|centre_user']);
 
 =head2 create - Generic INSERT into database
 
