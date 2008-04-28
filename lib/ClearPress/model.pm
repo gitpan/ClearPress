@@ -131,7 +131,7 @@ sub gen_getfriends {
 
   if(!$cachekey) {
     ($cachekey) = $class =~ /([^:]+)$/mx;
-    $cachekey   = PL($cachekey) . '_friends';
+    $cachekey   = PL($cachekey);
   }
 
   if(!$self->{$cachekey}) {
@@ -152,14 +152,14 @@ sub gen_getfriends_through {
 
   if(!$cachekey) {
     ($cachekey) = $class =~ /([^:]+)$/mx;
-    $cachekey   = PL($cachekey) . '_friends_through';
+    $cachekey   = PL($cachekey); # . '_friends_through';
   }
 
   if(!$self->{$cachekey}) {
     my $through_key = $self->primary_key();
-carp qq(through_key = $through_key);
+#carp qq(through_key = $through_key);
     my $friend_key  = $class->primary_key();
-carp qq(friend_key = $friend_key);
+#carp qq(friend_key = $friend_key);
     my $query = qq(SELECT @{[join q(, ), map { "f.$_" } $class->fields()]}
                    FROM   @{[$class->table()]} f,
                           $through            t
@@ -180,6 +180,31 @@ sub gen_getobj {
 				      'util' => $self->util(),
 				      $pk    => $self->$pk(),
 				     });
+  return $self->{$cachekey};
+}
+
+sub gen_getobj_through {
+  my ($self, $class, $through, $cachekey) = @_;
+  $class ||= ref $self;
+
+  if(!$cachekey) {
+    ($cachekey) = $class =~ /([^:]+)$/mx;
+  }
+
+  if(!$self->{$cachekey}) {
+    # todo: use $through class to determine $through_key
+    #       - but $through class may not always be implemented
+    my $through_key = q(id_).$through;
+    my $friend_key  = $class->primary_key();
+    my $query = qq(SELECT @{[join q(, ), map { "f.$_" } $class->fields()]}
+                   FROM   @{[$class->table()]} f,
+                          $through            t
+                   WHERE  t.$through_key = ?
+                   AND    t.$friend_key  = f.$friend_key
+                   LIMIT 1); # there should only ever be one of these
+    $self->{$cachekey} = $self->gen_getarray($class, $query, $self->$through_key())->[0];
+  }
+
   return $self->{$cachekey};
 }
 
@@ -211,7 +236,7 @@ sub hasa {
 
     my $namespace = "${class}::$pkg";
     my $yield     = $class;
-    $yield        =~ s/([^:]+)$/$pkg/mx;
+    $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
 
     if (defined &{$namespace}) {
       next;
@@ -250,7 +275,7 @@ sub hasmany {
     my $plural    = PL($single);
     my $namespace = "${class}::$plural";
     my $yield     = $class;
-    $yield        =~ s/([^:]+)$/$pkg/mx;
+    $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
 
     if (defined &{$namespace}) {
       next;
@@ -259,7 +284,48 @@ sub hasmany {
     *{$namespace} = sub {
       my $self = shift;
 
-      return $self->gen_getfriends($yield);
+      return $self->gen_getfriends($yield, $plural);
+    };
+  }
+
+  return;
+}
+
+sub belongs_to_through {
+  my ($class, $attr) = @_;
+  no strict 'refs'; ## no critic
+
+  if(ref $attr ne 'ARRAY') {
+    $attr = [$attr];
+  }
+
+  for my $single (@{$attr}) {
+    my $pkg = $single;
+
+    if(ref $single eq 'HASH') {
+      ($pkg)    = values %{$single};
+      ($single) = keys %{$single};
+    }
+    $pkg =~ s/\|.*//mx;
+
+    my $through;
+    ($single, $through) = split /\|/mx, $single;
+
+    if(!$through) {
+      croak qq(Cannot build belongs_to_through for $single);
+    }
+
+    my $namespace = "${class}::$pkg";
+    my $yield     = $class;
+    $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
+
+    if (defined &{$namespace}) {
+      next;
+    }
+
+    *{$namespace} = sub {
+      my $self = shift;
+      return $self->gen_getobj_through($yield, $through);
     };
   }
 
@@ -293,16 +359,16 @@ sub has_many_through {
     my $plural    = PL($single);
     my $namespace = "${class}::$plural";
     my $yield     = $class;
-    $yield        =~ s/([^:]+)$/$pkg/mx;
+    $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
 
     if (defined &{$namespace}) {
       next;
     }
-
+#carp qq(ns=$namespace, yield $yield through $through);
     *{$namespace} = sub {
       my $self = shift;
 
-      return $self->gen_getfriends_through($yield, $through);
+      return $self->gen_getfriends_through($yield, $through, $plural);
     };
   }
 
@@ -567,11 +633,18 @@ field-name in this object.
 
 =head2 gen_getfriends - arrayref of relatives related by this model's primary key
 
+  my $arObjects = $oModel->gen_getfriends($sClass);
   my $arObjects = $oModel->gen_getfriends($sClass, $sCacheKey);
 
 =head2 gen_getfriends_through - arrayref of relatives related by this model's primary key through an additional join table
 
+  my $arObjects = $oModel->gen_getfriends($sClass, $sJoinTable);
   my $arObjects = $oModel->gen_getfriends($sClass, $sJoinTable, $sCacheKey);
+
+=head2 gen_getobj_through - fetch a relative through a join table
+
+  my $oRelative = $oModel->gen_getobj_through($sClass, $sJoinTable);
+  my $oRelative = $oModel->gen_getobj_through($sClass, $sJoinTable, $sCacheKey);
 
 =head2 hasa - one:one package relationship
 
@@ -620,6 +693,10 @@ field-name in this object.
     AND    t.id_user = f.id_user   # the primary_key for friend 'user'
 
   __PACKAGE__->has_many_through(['user|centre_user']);
+
+=head2 belongs_to_through - a one-to-one relationship, like belongs_to, but through a join table
+
+  __PACKAGE__->belongs_to_through(['user|friend', 'user|enemy']);
 
 =head2 create - Generic INSERT into database
 

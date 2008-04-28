@@ -55,8 +55,8 @@ sub add_warning {
 
 sub authorised {
   my $self   = shift;
-  my $action = $self->action();
-  my $aspect = $self->aspect();
+  my $action = $self->action() || q();
+  my $aspect = $self->aspect() || q();
   my $util   = $self->util();
 
   if(!$util->requestor()) {
@@ -178,10 +178,12 @@ sub process_template {
   my ($self, $template, $extra_params, $where_to_ref) = @_;
   my $util   = $self->util();
   my $cfg    = $util->config();
+  my ($entity) = (ref $self) =~ /([^:]+)$/mx;
   my $params = {
 		requestor   => $util->requestor,
 		model       => $self->model(),
 		view        => $self,
+		entity      => $entity,
 		SCRIPT_NAME => $ENV{SCRIPT_NAME},
 		HTTP_HOST   => $ENV{HTTP_HOST},
 		now         => (strftime '%Y-%m-%dT%H:%M:%S', localtime),
@@ -390,17 +392,10 @@ sub output_reset {
 }
 
 sub actions {
-  my $self             = shift;
-  my $content          = q();
-  $self->{requestor}   = $self->util->requestor();
-  $self->{now}       ||= strftime '%Y-%m-%dT%H:%M:%S', localtime;
+  my $self    = shift;
+  my $content = q();
 
-  for my $var (qw(SCRIPT_NAME
-                  HTTP_HOST)) {
-    $self->{$var} = $ENV{$var};
-  }
-
-  $self->tt->process('actions.tt2', $self, \$content);
+  $self->process_template('actions.tt2', {}, \$content);
   return $content;
 }
 

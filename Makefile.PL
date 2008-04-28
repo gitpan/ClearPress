@@ -20,6 +20,7 @@ WriteMakefile(
 	      'VERSION_FROM'  => 'lib/ClearPress.pm',
 	      'DISTNAME'      => 'ClearPress',
 	      'PREREQ_PM'     => {
+		                  'Config::IniFiles'    => 2.38,
 				  'CGI'                 => 3.20,
 				  'DBI'                 => 1.51,
 				  'English'             => 1.01,

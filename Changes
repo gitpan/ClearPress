@@ -1,14 +1,22 @@
-118- Update now only saves fields which 'exist' in the object, meaning
-     you don't have to force $object->load() before updating.
-   - New hasa() and hasmany() for easier relationship definitions.
-   - Models can now render ->as_xml() and as_json()
-   - Tweaked route processing (action & aspect) to be safer and more consistent
+135 - belongs_to_through now supported in the data model
+    - Added missing Config::IniFiles dependency. Hopefully more CPAN
+      tests will now pass
 
-99 - reworked url/file-extension & HTTP Accept header handling
-     deprecated controller::process_uri in favour of process_request
+132 - has_many_through and belongs_to now supported.
+    - Easier access to template subsystem for streamed-output responses.
 
-87 - JSON response support
+118 - Update now only saves fields which 'exist' in the object, meaning
+      you don't have to force $object->load() before updating.
+    - New hasa() and hasmany() for easier relationship definitions.
+    - Models can now render ->as_xml() and as_json()
+    - Tweaked route processing (action & aspect) to be safer and more
+      consistent
 
-71 - Buffered output handling, better test coverage
+99  - reworked url/file-extension & HTTP Accept header handling
+      deprecated controller::process_uri in favour of process_request
 
-12 - Added application builder in scripts/clearpress
+87  - JSON response support
+
+71  - Buffered output handling, better test coverage
+
+12  - Added application builder in scripts/clearpress

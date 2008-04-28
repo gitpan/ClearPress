@@ -7,6 +7,16 @@
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL$
 #
+# method id action  aspect  result CRUD
+# =====================================
+# POST   n  create  -       create    *
+# POST   y  create  update  update    *
+# POST   y  create  delete  delete    *
+# GET    n  read    -       list
+# GET    n  read    add     add/new
+# GET    y  read    -       read      *
+# GET    y  read    edit    edit
+
 package ClearPress::controller;
 use strict;
 use warnings;
@@ -52,7 +62,7 @@ sub process_uri {
   return $self->process_request(@args);
 }
 
-sub process_request {
+sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my ($self, $util) = @_;
   my $method        = $ENV{REQUEST_METHOD} || 'GET';
   my $action        = $CRUD->{uc $method};
@@ -61,39 +71,28 @@ sub process_request {
   my $qs            = $ENV{QUERY_STRING}   || q();
   my ($entity)      = $pi =~ m{^/([^/;\.]+)}mx;
   $entity         ||= q();
-  my ($id)          = $pi =~ m{^/$entity/([a-z\-_\d%\@\.\+\ ]+)}mix;
+  my ($id)          = $pi =~ m{^/$entity/([a-z:,\-_\d%\@\.\+\ ]+)}mix;
   my ($aspect)      = $pi =~ m{;(\S+)}mx;
-
-  # method id action  aspect  result CRUD
-  # =====================================
-  # POST   n  create  -       create    *
-  # POST   y  create  update  update    *
-  # POST   y  create  delete  delete    *
-  # GET    n  read    -       list
-  # GET    n  read    add     add/new
-  # GET    y  read    -       read      *
-  # GET    y  read    edit    edit
 
   if($action eq 'read' && !$id && !$aspect) {
     $aspect = 'list';
   }
 
-  if($action eq 'create' && $id && (!$aspect || $aspect eq 'update')) {
-    $action = 'update';
-  }
+  if($action eq 'create' && $id) {
+    if(!$aspect || $aspect eq 'update') {
+      $action = 'update';
 
-  if($action eq 'create' && $id && $aspect eq 'delete') {
-    $action = 'delete';
+    } elsif($aspect eq 'delete') {
+      $action = 'delete';
+    }
   }
 
   $aspect ||= q();
 
-  $DEBUG and carp qq(aspect=@{[$aspect||'undef']});
-
   my $uriaspect = $self->_process_request_extensions(\$pi, $aspect, $action) || q();
   if($uriaspect ne $aspect) {
     $aspect = $uriaspect;
-    ($id)   = $pi =~ m{^/$entity/([a-z\-_\d%\@\.\+\ ]+)}mix;
+    ($id)   = $pi =~ m{^/$entity/([a-z:,\-_\d%\@\.\+\ ]+)}mix;
   }
 
   $aspect   = $self->_process_request_headers(\$accept, $aspect, $action);
@@ -240,8 +239,8 @@ sub handler {
     # prepend content-type to output buffer
     #
     if(!$viewobject->output_finished()) {
-      print qq(X-Generated-By: ClearPress\n);
-      print q(Content-type: ), $viewobject->content_type(), "\n\n" or croak q(Failed to print output);
+      print qq(X-Generated-By: ClearPress\n) or croak $OS_ERROR;
+      print q(Content-type: ), $viewobject->content_type(), "\n\n" or croak $OS_ERROR;
     }
   }
 
