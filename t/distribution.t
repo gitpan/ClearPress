@@ -1,9 +1,9 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $ $Author: zerojinx $
-# Id:            $Id: 00-distribution.t 12 2007-06-25 08:35:19Z zerojinx $
+# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $ $Author: zerojinx $
+# Id:            $Id: distribution.t 161 2008-05-30 23:08:14Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/t/00-distribution.t,v $
-# $HeadURL$
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/t/distribution.t $
 #
 package distribution;
 use strict;
@@ -11,7 +11,7 @@ use warnings;
 use Test::More;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my @r = (q$Revision: 1.1.1.1 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 161 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
 
 eval {
   require Test::Distribution;

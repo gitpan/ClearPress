@@ -1,3 +1,10 @@
+157 - Improved error handling with some smarts about requested content
+      types
+    - 'packagemap' config section maps uri entity names to package
+      subclasses for exceptions to the systematic naming rules, e.g.
+      [packagemap]
+      array_feature=feature::array
+
 135 - belongs_to_through now supported in the data model
     - Added missing Config::IniFiles dependency. Hopefully more CPAN
       tests will now pass

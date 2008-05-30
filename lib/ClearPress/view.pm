@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $
-# Id:            $Id: view.pm 12 2007-06-25 08:35:19Z zerojinx $
+# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
+# Id:            $Id: view.pm 161 2008-05-30 23:08:14Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL$
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
@@ -16,7 +16,7 @@ use Carp;
 use English qw(-no_match_vars);
 use POSIX qw(strftime);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
 our $DEBUG_OUTPUT = 0;
 
 sub new {
@@ -36,6 +36,7 @@ sub new {
   $self->{content_type} ||= ($aspect =~ /(rss|atom|ajax|xml)$/mx)?'text/xml':q();
   $self->{content_type} ||= ($aspect =~ /(js|json)$/mx)?'application/javascript':q();
   $self->{content_type} ||= ($aspect =~ /_(png)$/mx)?'image/png':q();
+  $self->{content_type} ||= ($aspect =~ /_(jpg)$/mx)?'image/jpeg':q();
   $self->{content_type} ||= 'text/html';
 
   $self->init();
@@ -88,12 +89,17 @@ sub authorised {
 
 sub template_name {
   my $self   = shift;
-  my ($name) = (ref $self) =~ /([^:]+)$/mx;
+  my $name = $self->entity_name();
+  if(!$name) {
+    ($name) = (ref $self) =~ /view::(.*)$/mx;
+  }
+  $name    ||= 'view';
   my $method = $self->method_name();
 
   if($method) {
     $name .= "_$method";
   }
+  $name =~ s/:+/_/mxg;
 
   return $name;
 }
@@ -148,7 +154,12 @@ sub render {
   }
 
   if($self->can($method)) {
+    if($aspect =~ /_(jpg|png|gif)/mx) {
+      return $self->$method();
+    }
+
     $self->$method();
+
   } else {
     croak qq(Unsupported method: $method);
   }
@@ -156,10 +167,19 @@ sub render {
   my $model   = $self->model();
   my $actions = my $warnings = q();
 
-  if(!($aspect =~ /(rss|atom|ajax|xml|json)$/mx)) {
+  if($aspect !~ /(rss|atom|ajax|xml|json)$/mx) {
     $actions  = $self->actions();
-    $self->process_template('warnings.tt2', {}, \$warnings);
+    eval {
+      $self->process_template('warnings.tt2', {}, \$warnings);
+    };
+    if($EVAL_ERROR) {
+      #########
+      # non-fatal warning - usually warnings.tt2 missing
+      #
+      carp "Warning: $EVAL_ERROR";
+    }
   }
+
   my $tmpl = $self->template_name();
 
   for my $copy (qw(logged_in)) {
@@ -341,6 +361,11 @@ sub content_type {
   return $self->_accessor('content_type', @args);
 }
 
+sub entity_name {
+  my ($self, @args) = @_;
+  return $self->_accessor('entity_name', @args);
+}
+
 sub decor {
   my $self = shift;
   my $aspect = $self->aspect() || q();
@@ -443,7 +468,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 12 $
+$LastChangedRevision: 161 $
 
 =head1 SYNOPSIS
 
@@ -552,6 +577,15 @@ View superclass for the ClearPress framework
 
   $oView->decor($bDecorToggle);
   my $bDecorToggle = $oView->decor();
+
+=head2 entity_name - get/set accessor for the entity_name
+
+ Usually set by the controller, after processing the request. Used for
+ remapping requests to classes (specifically things of the form
+ application::(model|view)::something::somethingelse .
+
+  $oView->entity_name($sEntityName);
+  my $sEntityName = $oView->entity_name();
 
 =head2 actions - templated output for available actions
 

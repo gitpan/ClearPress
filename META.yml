@@ -1,15 +1,13 @@
---- #YAML:1.0
-name:                ClearPress
-version:             146
-abstract:            ~
-license:             ~
-author:              
-    - Roger Pettett <rmp@sanger.ac.uk>
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         ClearPress
+version:      161
+version_from: lib/ClearPress.pm
+installdirs:  site
+requires:
     Carp:                          1.02
     CGI:                           3.2
+    Class::Accessor:               0.31
     Config::IniFiles:              2.38
     DBI:                           1.51
     English:                       1.01
@@ -17,6 +15,6 @@ requires:
     Lingua::EN::Inflect:           1.89
     POSIX:                         1.09
     Template:                      2.19
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $
-# Id:            $Id: decorator.pm 12 2007-06-25 08:35:19Z zerojinx $
+# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
+# Id:            $Id: decorator.pm 161 2008-05-30 23:08:14Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
-# $HeadURL: svn+ssh://cvs.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/ClearPress-tracking/lib/ClearPress/controller.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/decorator.pm $
 #
 package ClearPress::decorator;
 use strict;
@@ -13,7 +13,7 @@ use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => $VERSION,

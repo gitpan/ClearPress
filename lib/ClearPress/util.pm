@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $
+# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 12 2007-06-25 08:35:19Z zerojinx $
-# $HeadURL$
+# Id:            $Id: util.pm 161 2008-05-30 23:08:14Z zerojinx $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
@@ -16,7 +16,7 @@ use Carp;
 use POSIX qw(strftime);
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -178,7 +178,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 12 $
+$LastChangedRevision: 161 $
 
 =head1 SYNOPSIS
 

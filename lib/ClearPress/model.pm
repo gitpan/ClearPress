@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $
-# Id:            $Id: model.pm 12 2007-06-25 08:35:19Z zerojinx $
+# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
+# Id:            $Id: model.pm 161 2008-05-30 23:08:14Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL$
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
 #
 package ClearPress::model;
 use strict;
@@ -17,7 +17,7 @@ use Carp;
 use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
 
 sub fields { return (); }
 
@@ -156,11 +156,15 @@ sub gen_getfriends_through {
   }
 
   if(!$self->{$cachekey}) {
+    my ($through_pkg) = (ref $self) =~ /^(.*::)[^:]+$/mx;
+    $through_pkg     .= $through;
     my $through_key = $self->primary_key();
 #carp qq(through_key = $through_key);
     my $friend_key  = $class->primary_key();
 #carp qq(friend_key = $friend_key);
-    my $query = qq(SELECT @{[join q(, ), map { "f.$_" } $class->fields()]}
+    my $query = qq(SELECT @{[join q(, ),
+                                  (map { "f.$_" } $class->fields()),
+                                  (map { "t.$_" } $through_pkg->fields())]}
                    FROM   @{[$class->table()]} f,
                           $through            t
                    WHERE  t.$through_key = ?
@@ -387,6 +391,13 @@ sub create {
     croak q(No table defined);
   }
 
+  #########
+  # disallow saving against zero
+  #
+  if(!$self->$pk()) {
+    delete $self->{$pk};
+  }
+
   my $query = qq(INSERT INTO $table (@{[join q(, ), $self->fields()]})
                  VALUES (@{[join q(, ), map { q(?) } $self->fields()]}));
   my @args = map { $self->{$_} } $self->fields();
@@ -519,15 +530,19 @@ sub delete { ## no critic
                  WHERE $pk=?);
   eval {
     $dbh->do($query, {}, $self->$pk());
-    if($util->transactions()) {
-      $dbh->commit();
-    }
   };
 
   if($EVAL_ERROR) {
-    $dbh->rollback();
+    if($util->transactions()) {
+      $dbh->rollback();
+    }
     croak $EVAL_ERROR.$query;
   }
+
+  if($util->transactions()) {
+    $dbh->commit();
+  }
+
   return 1;
 }
 
@@ -567,7 +582,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 12 $
+$LastChangedRevision: 161 $
 
 =head1 SYNOPSIS
 

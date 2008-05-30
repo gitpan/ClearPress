@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2007-06-25 09:35:19 +0100 (Mon, 25 Jun 2007) $
-# Id:            $Id: controller.pm 12 2007-06-25 08:35:19Z zerojinx $
+# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
+# Id:            $Id: controller.pm 161 2008-05-30 23:08:14Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL$
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 12 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		'POST'   => 'create',
@@ -54,6 +54,21 @@ sub accept_headers {
 	  {'application/json' => q(_json)},
 	  {'text/xml'         => q(_xml)},
 	 ];
+}
+
+sub new {
+  my ($class, $ref) = @_;
+  $ref ||= {};
+  bless $ref, $class;
+  return $ref;
+}
+
+sub util {
+  my ($self, $util) = @_;
+  if(defined $util) {
+    $self->{util} = $util;
+  }
+  return $self->{util};
 }
 
 sub process_uri {
@@ -177,8 +192,17 @@ sub decorator {
   return $decorator;
 }
 
+sub session {
+  my ($self) = @_;
+  my $decorator = $self->decorator($self->util());
+  return $decorator->session();
+}
+
 sub handler {
   my ($self, $util) = @_;
+  if(!ref $self) {
+    $self = $self->new({util => $util});
+  }
   my $decorator     = $self->decorator($util);
   my $namespace     = $util->config->val('application', 'namespace') || $util->config->val('application', 'name');
   my $cgi           = $decorator->cgi();
@@ -186,7 +210,7 @@ sub handler {
   my ($action, $entity, $aspect, $id) = $self->process_request($util);
 
   $util->username($decorator->username());
-  $util->session($decorator->session());
+  $util->session($self->session($util));
   $util->cgi($cgi);
 
   my $viewobject = $self->dispatch({
@@ -211,16 +235,16 @@ sub handler {
     $viewobject->output_buffer($viewobject->render());
   };
   if($EVAL_ERROR) {
-    $viewobject = ClearPress::view::error->new({
-						'util'   => $util,
-						'action' => 'error',
-						'errstr' => $EVAL_ERROR,
-					       });
+    $viewobject = $self->build_error_object('ClearPress::view::error', $action, $aspect, $EVAL_ERROR);
+
     #########
     # reset headers before printing an error
     #
-    $viewobject->output_buffer($decorator->header());
-    $decor    = 1;
+    $decor = $viewobject->decor();
+    $viewobject->output_reset();
+    if($decor) {
+      $viewobject->output_buffer($decorator->header());
+    }
     $viewobject->output_buffer($viewobject->render());
   }
 
@@ -262,7 +286,19 @@ sub dispatch {
   eval {
     my @entities = split /[,\s]+/mx, $util->config->val('application','views');
     if(!scalar grep { $_ eq $entity } @entities) {
-      croak qq(No such view ($entity));
+      croak qq(No such view ($entity). Is it in your config.ini?);
+    }
+
+    my $entity_name = $entity;
+    if($util->config->SectionExists('packagemap')) {
+      #########
+      # if there are uri-to-package maps, process here
+      #
+      my $map = $util->config->val('packagemap', $entity);
+      if($map) {
+	$DEBUG and carp qq[Remapping $entity to $map];
+	$entity = $map;
+      }
     }
 
     my $modelclass = "${namespace}::model::$entity";
@@ -270,35 +306,42 @@ sub dispatch {
     my $modelpk    = $modelclass->primary_key();
 
     if(!$modelpk) {
-      croak qq(Could not load $modelclass);
+      croak qq(Could not find $entity's primary key. Have you "use"d $modelclass?);
     }
     my $modelobject = $modelclass->new({
 					'util'   => $util,
 					$modelpk => $id,
 				       });
     if(!$modelobject) {
-      croak qq(Failed to load $modelobject);
+      croak qq(Failed to instantiate $modelobject);
     }
-
     $viewobject = $viewclass->new({
-				   'util'   => $util,
-				   'model'  => $modelobject,
-				   'action' => $action,
-				   'aspect' => $aspect,
+				   util        => $util,
+				   model       => $modelobject,
+				   action      => $action,
+				   aspect      => $aspect,
+				   entity_name => $entity_name,
 				  });
     if(!$viewobject) {
-      croak qq(Failed to load $viewobject);
+      croak qq(Failed to instantiate $viewobject);
     }
   };
 
   if($EVAL_ERROR) {
-    $viewobject = ClearPress::view::error->new({
-						'util'   => $util,
-						'errstr' => $EVAL_ERROR,
-					       });
+    $viewobject = $self->build_error_object('ClearPress::view::error', $action, $aspect, $EVAL_ERROR);
   }
 
   return $viewobject;
+}
+
+sub build_error_object {
+  my ($self, $error_pkg, $action, $aspect, $eval_error) = @_;
+  return ($error_pkg->new({
+			   util   => $self->util(),
+			   errstr => $eval_error,
+			   aspect => $aspect,
+			   action => $action,
+			  }));
 }
 
 1;
@@ -310,13 +353,19 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 12 $
+$LastChangedRevision: 161 $
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
 =head1 SUBROUTINES/METHODS
+
+=head2 new
+
+=head2 session
+
+=head2 util
 
 =head2 decorator - get/set accessor for a page decorator implementing the ClearPress::decorator interface
 
@@ -352,15 +401,23 @@ $LastChangedRevision: 12 $
 
 =head2 dispatch - view generation
 
+=head2 build_error_object - builds an error view object
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 DEPENDENCIES
 
-English
-Carp
-ClearPress::decorator
+=over
+
+=item English
+
+=item Carp
+
+=item ClearPress::decorator
+
+=back
 
 =head1 INCOMPATIBILITIES
 

@@ -1,38 +1,50 @@
 #########
 # Author:        rmp
-# Maintainer:    $Author: rmp $
+# Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2007-06-26 15:25:06 +0100 (Tue, 26 Jun 2007) $
-# Id:            $Id: error.pm 113 2007-06-26 14:25:06Z rmp $
-# $HeadURL: svn+ssh://svn.internal.sanger.ac.uk/repos/svn/new-pipeline-dev/npg-tracking/branches/prerelease-2.0/lib/npg/view/error.pm $
+# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
+# Id:            $Id: error.pm 161 2008-05-30 23:08:14Z zerojinx $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
 use strict;
 use warnings;
-use base qw(ClearPress::view);
+use base qw(ClearPress::view Class::Accessor);
 use English qw(-no_match_vars);
 use Template;
+use Carp;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 113 $ =~ /(\d+)/mx; $r; };
+__PACKAGE__->mk_accessors(qw(errstr));
 
-sub errstr {
-  my ($self, @args) = @_;
-  return $self->_accessor('errstr', @args);
-}
+our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
 
 sub render {
   my $self   = shift;
+  my $aspect = $self->aspect();
   my $errstr = q(Error: ) . $self->errstr();
 
   if(Template->error()) {
     $errstr .= q(Template Error: ) . Template->error();
   }
 
-  if($EVAL_ERROR) {
-    $errstr .= q(Eval Error: ) . $EVAL_ERROR;
+#  if($EVAL_ERROR) {
+#    $errstr .= q(Eval Error: ) . $EVAL_ERROR;
+#  }
+  carp "Serving error: $errstr";
+  $errstr =~ s/\ at\ \S+\ line\ \d+//smxg;
+
+  if($aspect =~ /(ajax|xml|rss|atom)$/mx) {
+    return qq[<error>$errstr</error>];
   }
 
-  $errstr    =~ s{\S+(npg.*?)$}{$1}smgx;
+  if($aspect =~ /json$/mx) {
+    return qq[{error:"$errstr"}];
+  }
+
+  if($aspect =~ /xml$/mx) {
+    return qq[<span class="error">$errstr</span>];
+  }
+
   return q(<div id="main"><h2>An Error Occurred</h2>) .  $self->actions() . q(<p>) . $errstr . q(</p></div>);
 }
 
@@ -46,7 +58,7 @@ ClearPress::view::error - specialised view for error handling
 
 =head1 VERSION
 
-$LastChangedRevision: 113 $
+$LastChangedRevision: 161 $
 
 =head1 SYNOPSIS
 

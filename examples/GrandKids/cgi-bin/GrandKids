@@ -11,7 +11,7 @@ use GrandKids::view::family;
 use GrandKids::model::family;
 use GrandKids::view::child;
 use GrandKids::model::child;
-our $VERSION = do { my ($r) = q$LastChangedRevision$ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
 
 main();
 0;
