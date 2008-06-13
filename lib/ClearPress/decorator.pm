@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
-# Id:            $Id: decorator.pm 161 2008-05-30 23:08:14Z zerojinx $
+# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
+# Id:            $Id: decorator.pm 168 2008-06-13 19:14:08Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/decorator.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/decorator.pm $
 #
 package ClearPress::decorator;
 use strict;
@@ -13,7 +13,7 @@ use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => $VERSION,
@@ -246,8 +246,19 @@ i.e. </body></html> by default
 
 =head1 DEPENDENCIES
 
-CGI
-Class::Accessor
+=over
+
+=item strict
+
+=item warnings
+
+=item CGI
+
+=item base
+
+=item Class::Accessor
+
+=back
 
 =head1 INCOMPATIBILITIES
 
@@ -259,7 +270,7 @@ Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 Roger Pettett
+Copyright (C) 2008 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

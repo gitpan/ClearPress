@@ -5,6 +5,9 @@ use warnings;
 use base qw(ClearPress::model);
 
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
+__PACKAGE__->has_a([qw(family)]);
+__PACKAGE__->has_many([qw()]);
+__PACKAGE__->has_all();
 
 sub fields {
   return qw(id_child
@@ -12,24 +15,5 @@ sub fields {
 	    birthday name );
 }
 
-sub children {
-  my $self = shift;
-  return $self->gen_getall();
-}
-
-
-sub family {
-  my $self  = shift;
-  my $pkg   = 'GrandKids::model::family';
-  return $pkg->new({
-		    'util' => $self->util(),
-		    'id_family' => $self->id_family(),
-		   });
-}
-
-
-
-
 1;
-
  

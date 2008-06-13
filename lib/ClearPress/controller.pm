@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
-# Id:            $Id: controller.pm 161 2008-05-30 23:08:14Z zerojinx $
+# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
+# Id:            $Id: controller.pm 168 2008-06-13 19:14:08Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		'POST'   => 'create',
@@ -111,7 +111,7 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   }
 
   $aspect   = $self->_process_request_headers(\$accept, $aspect, $action);
-  $entity ||= $util->config->val('application','default_view');
+  $entity ||= $util->config->val('application', 'default_view');
   $aspect ||= q();
   $id       = CGI->unescape($id||'0');
 
@@ -149,6 +149,7 @@ sub _process_request_extensions {
   for my $pair (@{$self->accept_extensions}) {
     my ($ext, $meth) = %{$pair};
     $ext =~ s/\./\\./mxg;
+
     if(${$pi} =~ s/$ext$//mx) {
       $aspect ||= $action;
       $aspect  =~ s/$meth$//mx;
@@ -214,11 +215,11 @@ sub handler {
   $util->cgi($cgi);
 
   my $viewobject = $self->dispatch({
-				    'util'   => $util,
-				    'entity' => $entity,
-				    'aspect' => $aspect,
-				    'action' => $action,
-				    'id'     => $id,
+				    util   => $util,
+				    entity => $entity,
+				    aspect => $aspect,
+				    action => $action,
+				    id     => $id,
 				   });
 
   my $decor = $viewobject->decor();
@@ -235,7 +236,10 @@ sub handler {
     $viewobject->output_buffer($viewobject->render());
   };
   if($EVAL_ERROR) {
-    $viewobject = $self->build_error_object('ClearPress::view::error', $action, $aspect, $EVAL_ERROR);
+    $viewobject = $self->build_error_object('ClearPress::view::error',
+					    $action,
+					    $aspect,
+					    $EVAL_ERROR);
 
     #########
     # reset headers before printing an error
@@ -263,8 +267,8 @@ sub handler {
     # prepend content-type to output buffer
     #
     if(!$viewobject->output_finished()) {
-      print qq(X-Generated-By: ClearPress\n) or croak $OS_ERROR;
-      print q(Content-type: ), $viewobject->content_type(), "\n\n" or croak $OS_ERROR;
+      print qq(X-Generated-By: ClearPress\n) or croak $ERRNO;
+      print q(Content-type: ), $viewobject->content_type(), "\n\n" or croak $ERRNO;
     }
   }
 
@@ -353,7 +357,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 161 $
+$LastChangedRevision: 168 $
 
 =head1 SYNOPSIS
 
@@ -411,11 +415,19 @@ $LastChangedRevision: 161 $
 
 =over
 
+=item strict
+
+=item warnings
+
 =item English
 
 =item Carp
 
 =item ClearPress::decorator
+
+=item ClearPress::view::error
+
+=item CGI
 
 =back
 
@@ -429,7 +441,7 @@ Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 Roger Pettett
+Copyright (C) 2008 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

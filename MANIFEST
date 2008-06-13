@@ -29,6 +29,7 @@ examples/GrandKids/lib/GrandKids/model/family.pm
 examples/GrandKids/lib/GrandKids/view/child.pm
 examples/GrandKids/lib/GrandKids/view/family.pm
 lib/ClearPress.pm
+lib/ClearPress/Template/Plugin/js_string.pm
 lib/ClearPress/controller.pm
 lib/ClearPress/decorator.pm
 lib/ClearPress/model.pm

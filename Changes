@@ -1,3 +1,7 @@
+168 - Updated POD
+    - Generation script now makes use of has_a and has_many
+      friend-accessor-auto-constructors
+
 157 - Improved error handling with some smarts about requested content
       types
     - 'packagemap' config section maps uri entity names to package

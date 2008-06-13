@@ -5,5 +5,4 @@ use warnings;
 use base qw(ClearPress::view);
 
 1;
-
  

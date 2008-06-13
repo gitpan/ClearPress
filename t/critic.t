@@ -1,9 +1,9 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $ $Author: zerojinx $
-# Id:            $Id: critic.t 161 2008-05-30 23:08:14Z zerojinx $
+# Last Modified: $Date: 2008-05-31 00:13:51 +0100 (Sat, 31 May 2008) $ $Author: zerojinx $
+# Id:            $Id: critic.t 162 2008-05-30 23:13:51Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/t/00-critic.t,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/t/critic.t $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/t/critic.t $
 #
 package critic;
 use strict;
@@ -11,7 +11,7 @@ use warnings;
 use Test::More;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my @r = (q$Revision: 161 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 162 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
 
 if ( not $ENV{TEST_AUTHOR} ) {
   my $msg = 'Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.';

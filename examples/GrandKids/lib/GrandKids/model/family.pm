@@ -5,6 +5,9 @@ use warnings;
 use base qw(ClearPress::model);
 
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
+__PACKAGE__->has_a([qw()]);
+__PACKAGE__->has_many([qw(child)]);
+__PACKAGE__->has_all();
 
 sub fields {
   return qw(id_family
@@ -12,24 +15,5 @@ sub fields {
 	    address city name state zip );
 }
 
-sub families {
-  my $self = shift;
-  return $self->gen_getall();
-}
-
-
-
-
-sub children {
-  my $self  = shift;
-  my $pkg   = 'GrandKids::model::child';
-  my $query = qq(SELECT @{[join q(, ), $pkg->fields()]}
-                 FROM   @{[$pkg->table()]}
-                 WHERE  id_family = ?);
-  return $self->gen_getarray($pkg, $query, $self->id_family());
-}
-
-
 1;
-
  

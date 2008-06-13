@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
-# Id:            $Id: view.pm 161 2008-05-30 23:08:14Z zerojinx $
+# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
+# Id:            $Id: view.pm 168 2008-06-13 19:14:08Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
@@ -15,8 +15,9 @@ use ClearPress::util;
 use Carp;
 use English qw(-no_match_vars);
 use POSIX qw(strftime);
+use ClearPress::Template::Plugin::js_string;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
 our $DEBUG_OUTPUT = 0;
 
 sub new {
@@ -30,6 +31,7 @@ sub new {
   $self->{logged_in}          = $username?1:0;
   $self->{output_buffer}      = [];
   $self->{output_finished}    = 0;
+  $self->{autoescape}         = 1;
 
   my $aspect = $self->aspect() || q();
 
@@ -52,6 +54,11 @@ sub add_warning {
   $self->{warnings}  ||= [];
   push @{$self->{warnings}}, $warning;
   return;
+}
+
+sub warnings {
+  my $self = shift;
+  return $self->{warnings};
 }
 
 sub authorised {
@@ -235,7 +242,12 @@ sub _populate_from_cgi {
   #
   $model->read();
   for my $field ($model->fields()) {
-    my $v = $cgi->escapeHTML($cgi->param($field) || q());
+    my $v = $cgi->param($field) || q[];
+
+    if($self->autoescape()) {
+      $v = $cgi->escapeHTML($v);
+    }
+
     if($v) {
       $model->$field($v);
     }
@@ -278,7 +290,12 @@ sub update {
   #
   $model->read();
   for my $field ($model->fields()) {
-    my $v = $cgi->escapeHTML($cgi->param($field) || q());
+    my $v = $cgi->param($field) || q[];
+
+    if($self->autoescape()) {
+      $v = $cgi->escapeHTML($v);
+    }
+
     if($v) {
       $model->$field($v);
     }
@@ -300,7 +317,12 @@ sub create {
   #
   $model->read();
   for my $field ($model->fields()) {
-    my $v = $cgi->escapeHTML($cgi->param($field) || q());
+    my $v = $cgi->param($field) || q[];
+
+    if($self->autoescape()) {
+      $v = $cgi->escapeHTML($v);
+    }
+
     if($v) {
       $model->$field($v);
     }
@@ -320,6 +342,7 @@ sub tt {
 
   if(!$util->{tt}) {
     $util->{tt} = Template->new({
+				 PLUGIN_BASE  => 'ClearPress::Template::Plugin',
 				 RECURSION    => 1,
 				 INCLUDE_PATH => (sprintf q(%s/templates), $util->data_path()),
 				 EVAL_PERL    => 1,
@@ -364,6 +387,11 @@ sub content_type {
 sub entity_name {
   my ($self, @args) = @_;
   return $self->_accessor('entity_name', @args);
+}
+
+sub autoescape {
+  my ($self, @args) = @_;
+  return $self->_accessor('autoescape', @args);
 }
 
 sub decor {
@@ -468,7 +496,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 161 $
+$LastChangedRevision: 168 $
 
 =head1 SYNOPSIS
 
@@ -513,6 +541,10 @@ View superclass for the ClearPress framework
 =head2 add_warning
 
   $oView->add_warning($sWarningMessage);
+
+=head2 warnings - an arrayref of warning strings set for this view
+
+  my $arWarningStrings = $oView->warnings();
 
 =head2 authorised - Verify authorisation for this view
 
@@ -629,21 +661,21 @@ View superclass for the ClearPress framework
 
   $oView->process_template('template.tt2', {extra=>'params'}, $to_scalar);
 
-=head2 output_buffer - queue a string for output
+=head2 output_buffer - For streamed output: queue a string for output
 
-  $oView->output_buffer("my string");
+  $oView->output_buffer(q[my string]);
   $oView->output_buffer(@aStrings);
 
-=head2 output_end - flag no more output and flush buffer
+=head2 output_end - For streamed output: flag no more output and flush buffer
 
   $oView->output_end();
 
-=head2 output_finished - flag whether to output any more data
+=head2 output_finished - For streamed output: flag there's no more output
 
   $oView->output_finished(1);
   $oViwe->output_finished(0);
 
-=head2 output_flush - flush output buffer to STDOUT
+=head2 output_flush - For streamed output: flush output buffer to STDOUT
 
   $oView->output_flush();
 
@@ -651,16 +683,38 @@ View superclass for the ClearPress framework
 
   $oView->output_reset();
 
+=head2 autoescape - turn auto-escaping of input on/off, usually in a subclass
+
+ If you're producing applications of moderate complexity, you almost
+ certainly want to disable autoescaping and handle it more cleverly
+ yourself. Subclass ClearPress::view and set self->autoescape to zero
+ or override the subroutine:
+
+ sub autoescape { return 0; }
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 DEPENDENCIES
 
-Template
-ClearPress::util
-Carp
-English
+=over
+
+=item strict
+
+=item warnings
+
+=item Template
+
+=item ClearPress::util
+
+=item Carp
+
+=item English
+
+=item POSIX
+
+=back
 
 =head1 INCOMPATIBILITIES
 
@@ -672,7 +726,7 @@ Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 Roger Pettett
+Copyright (C) 2008 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

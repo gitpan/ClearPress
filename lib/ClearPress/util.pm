@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
+# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 161 2008-05-30 23:08:14Z zerojinx $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
+# Id:            $Id: util.pm 168 2008-06-13 19:14:08Z zerojinx $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
@@ -16,7 +16,7 @@ use Carp;
 use POSIX qw(strftime);
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -178,7 +178,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 161 $
+$LastChangedRevision: 168 $
 
 =head1 SYNOPSIS
 
@@ -265,13 +265,23 @@ $LastChangedRevision: 161 $
 
 =head1 DEPENDENCIES
 
-strict
-warnings
-DBI
-Config::IniFiles
-Carp
-English
-POSIX
+=over
+
+=item strict
+
+=item warnings
+
+=item DBI
+
+=item Config::IniFiles
+
+=item Carp
+
+=item POSIX
+
+=item English
+
+=back
 
 =head1 INCOMPATIBILITIES
 
@@ -283,7 +293,7 @@ Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 Roger Pettett
+Copyright (C) 2008 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

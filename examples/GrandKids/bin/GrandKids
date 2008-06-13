@@ -5,18 +5,18 @@ use strict;
 use lib qw(lib);
 
 BEGIN {
-  $ENV{'DOCUMENT_ROOT'} = './htdocs';
+  $ENV{DOCUMENT_ROOT} = './htdocs';
 }
 
 use ClearPress::util;
 use ClearPress::controller;
 
-use GrandKids::view::family;
-use GrandKids::model::family;
 use GrandKids::view::child;
 use GrandKids::model::child;
+use GrandKids::view::family;
+use GrandKids::model::family;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
 
 GrandKids::sa->new->run();
 
@@ -36,21 +36,21 @@ sub handle_request {
 #  print {*STDERR} Dumper($cgi);
 #  print {*STDERR} Dumper(%ENV);
   my $EXTN = {
-	      'css'  => 'text/css',
-	      'xml'  => 'text/xml',
-	      'gif'  => 'image/gif',
-	      'png'  => 'image/png',
-	      'jpg'  => 'image/jpeg',
-	      'txt'  => 'text/plain',
-	      'html' => 'text/html',
+	      css  => 'text/css',
+	      xml  => 'text/xml',
+	      gif  => 'image/gif',
+	      png  => 'image/png',
+	      jpg  => 'image/jpeg',
+	      txt  => 'text/plain',
+	      html => 'text/html',
 	     };
 
   my $util = ClearPress::util->new({
-				    'cgi' => $cgi,
+				    cgi => $cgi,
 				   });
   print "HTTP/1.0 200 OK\n";
 
-  my ($fn) = "htdocs$ENV{'REQUEST_URI'}" =~ m|([a-z\d_/\.%]+)|mix;
+  my ($fn) = "htdocs$ENV{REQUEST_URI}" =~ m|([a-z\d_/\.%]+)|mix;
   $fn      =~ s|\.\./||mxg;
 
   if(-f $fn) {
@@ -73,7 +73,7 @@ sub handle_request {
 
 sub print_banner {
   my $self = shift;
-  print q(ClearPress development server up and running at http://localhost:).$self->port()."/\n";
+  print q[ClearPress development server up and running at http://localhost:].$self->port()."/\n";
   return;
 }
  

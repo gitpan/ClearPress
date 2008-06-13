@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
-# Id:            $Id: error.pm 161 2008-05-30 23:08:14Z zerojinx $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
+# Last Modified: $Date: 2008-06-06 16:02:23 +0100 (Fri, 06 Jun 2008) $
+# Id:            $Id: error.pm 165 2008-06-06 15:02:23Z zerojinx $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
 use strict;
@@ -16,7 +16,7 @@ use Carp;
 
 __PACKAGE__->mk_accessors(qw(errstr));
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 165 $ =~ /(\d+)/mx; $r; };
 
 sub render {
   my $self   = shift;
@@ -58,7 +58,7 @@ ClearPress::view::error - specialised view for error handling
 
 =head1 VERSION
 
-$LastChangedRevision: 161 $
+$LastChangedRevision: 165 $
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,25 @@ $LastChangedRevision: 161 $
 
 =head1 DEPENDENCIES
 
-ClearPress::view
+=over
+
+=item strict
+
+=item warnings
+
+=item base
+
+=item ClearPress::view
+
+=item Class::Accessor
+
+=item English
+
+=item Template
+
+=item Carp
+
+=back
 
 =head1 INCOMPATIBILITIES
 

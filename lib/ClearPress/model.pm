@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
-# Id:            $Id: model.pm 161 2008-05-30 23:08:14Z zerojinx $
+# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
+# Id:            $Id: model.pm 168 2008-06-13 19:14:08Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/model.pm $
 #
 package ClearPress::model;
 use strict;
@@ -17,7 +17,7 @@ use Carp;
 use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 161 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
 
 sub fields { return (); }
 
@@ -214,15 +214,16 @@ sub gen_getobj_through {
 
 sub belongs_to {
   my ($class, @args) = @_;
-  return $class->hasa(@args);
-}
-
-sub has_a {
-  my ($class, @args) = @_;
-  return $class->hasa(@args);
+  return $class->has_a(@args);
 }
 
 sub hasa {
+  my ($class, @args) = @_;
+  carp q[hasa is deprecated. Use has_a];
+  return $class->has_a(@args);
+}
+
+sub has_a {
   my ($class, $attr) = @_;
   no strict 'refs'; ## no critic
 
@@ -255,12 +256,13 @@ sub hasa {
   return;
 }
 
-sub has_many {
+sub hasmany {
   my ($class, @args) = @_;
-  return $class->hasmany(@args);
+  carp q[hasmany is deprecated. Use has_many];
+  return $class->has_many(@args);
 }
 
-sub hasmany {
+sub has_many {
   my ($class, $attr) = @_;
   no strict 'refs'; ## no critic
 
@@ -375,6 +377,26 @@ sub has_many_through {
       return $self->gen_getfriends_through($yield, $through, $plural);
     };
   }
+
+  return;
+}
+
+sub has_all {
+  my ($class) = @_;
+  no strict 'refs'; ## no critic
+
+  my ($single)  = $class =~ /([^:]+)$/mx;
+  my $plural    = PL($single);
+  my $namespace = "${class}::$plural";
+
+  if (defined &{$namespace}) {
+    return;
+  }
+
+  *{$namespace} = sub {
+    my $self = shift;
+    return $self->gen_getall();
+  };
 
   return;
 }
@@ -582,7 +604,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 161 $
+$LastChangedRevision: 168 $
 
 =head1 SYNOPSIS
 
@@ -661,42 +683,42 @@ field-name in this object.
   my $oRelative = $oModel->gen_getobj_through($sClass, $sJoinTable);
   my $oRelative = $oModel->gen_getobj_through($sClass, $sJoinTable, $sCacheKey);
 
-=head2 hasa - one:one package relationship
+=head2 has_a - one:one package relationship
 
-  __PACKAGE__->hasa('my::pkg');
-  __PACKAGE__->hasa(['my::pkg1', 'my::pkg2']);
-  __PACKAGE__->hasa({method => 'my::fieldpkg'});
-  __PACKAGE__->hasa([{method_one => 'my::pkg1'},
-                     {method_two => 'my::pkg2'});
+  __PACKAGE__->has_a('my::pkg');
+  __PACKAGE__->has_a(['my::pkg1', 'my::pkg2']);
+  __PACKAGE__->has_a({method => 'my::fieldpkg'});
+  __PACKAGE__->has_a([{method_one => 'my::pkg1'},
+                      {method_two => 'my::pkg2'});
 
-=head2 hasmany - one:many package relationship
+=head2 has_many - one:many package relationship
 
-  __PACKAGE__->hasmany('my::pkg');
+  __PACKAGE__->has_many('my::pkg');
 
  If my::pkg has a table of "package" then this creates a method "sub
  packages" in $self, yielding an arrayref of my::pkg objects related
  by the primary_key of $self.
 
-  __PACKAGE__->hasmany(['my::pkg1', 'my::pkg2']);
+  __PACKAGE__->has_many(['my::pkg1', 'my::pkg2']);
 
  Define multiple relationships together.
 
 
-  __PACKAGE__->hasmany({method => 'my::fieldpkg'});
+  __PACKAGE__->has_many({method => 'my::fieldpkg'});
 
  Defines a method "sub methods" in $self yielding an arrayref of
  my::fieldpkg objects related by the primary_key of $self.
 
-  __PACKAGE__->hasmany([{method_one => 'my::pkg1'},
-                        {method_two => 'my::pkg2'});
+  __PACKAGE__->has_many([{method_one => 'my::pkg1'},
+                         {method_two => 'my::pkg2'});
 
  Defines multiple relationships with overridden method names.
 
-=head2 has_a - synonym for hasa()
+=head2 hasa - deprecated synonym for has_a()
 
-=head2 belongs_to - synonym for hasa()
+=head2 belongs_to - synonym for has_a()
 
-=head2 has_many - synonym for hasmany()
+=head2 hasmany - deprecated synonym for has_many()
 
 =head2 has_many_through - arrayref of related entities through a join table
 
@@ -712,6 +734,10 @@ field-name in this object.
 =head2 belongs_to_through - a one-to-one relationship, like belongs_to, but through a join table
 
   __PACKAGE__->belongs_to_through(['user|friend', 'user|enemy']);
+
+=head2 has_all - allows fetching of all entities of this type
+
+  __PACKAGE__->has_all();
 
 =head2 create - Generic INSERT into database
 
@@ -751,10 +777,27 @@ field-name in this object.
 
 =head1 DEPENDENCIES
 
-Class::Accessor
-ClearPress::util
-English
-Carp
+=over
+
+=item strict
+
+=item warnings
+
+=item base
+
+=item Class::Accessor
+
+=item ClearPress::util
+
+=item English
+
+=item Carp
+
+=item Lingua::EN::Inflect
+
+=item POSIX
+
+=back
 
 =head1 INCOMPATIBILITIES
 
@@ -766,7 +809,7 @@ Roger Pettett, E<lt>rpettett@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007 Roger Pettett
+Copyright (C) 2008 Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
