@@ -2,16 +2,16 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
-# Id:            $Id: js_string.pm 168 2008-06-13 19:14:08Z zerojinx $
+# Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $
+# Id:            $Id: js_string.pm 173 2008-06-13 19:50:39Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/Template/Plugin/js_string.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/Template/Plugin/js_string.pm $
 package ClearPress::Template::Plugin::js_string;
 use strict;
 use warnings;
 use base qw(Template::Plugin::Filter);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 173 $ =~ /(\d+)/mx; $r; };
 
 sub init {
   my $self = shift;
@@ -39,7 +39,7 @@ ClearPress::Template::Plugin::js_string
 
 =head1 VERSION
 
-$LastChangedRevision: 168 $
+$LastChangedRevision: 173 $
 
 =head1 SYNOPSIS
 

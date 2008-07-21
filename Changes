@@ -1,3 +1,25 @@
+TODO:
+- Switch to using inside-out objects (probably Class- or Object- InsideOut)
+- Scripts/clearpress to auto-generate tests & fixture framework
+- Improve migrations
+- Improve test coverage (currently at 75%)
+- Add regression tests
+- config caching
+- template caching
+
+    - Improved tests & code coverage for relation accessors (has_a,
+      has_many, has_a_through, has_many_through etc), views and database
+      drivers.
+
+    - NEW BEHAVIOUR: database handling has started to be pushed into
+      ClearPress::driver:: subclasses. You will commonly see transaction
+      errors with applications built using older ClearPress which
+      implement their own 'dbh' methods in util.pm .
+
+    - NEW BEHAVIOUR: better handling of NULL/undef, zero and empty
+      string may cause issues on applications which previously didn't
+      check.
+
 168 - Updated POD
     - Generation script now makes use of has_a and has_many
       friend-accessor-auto-constructors

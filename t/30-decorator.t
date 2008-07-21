@@ -35,7 +35,7 @@ use_ok('ClearPress::decorator');
 
 {
   my $dec = ClearPress::decorator->new();
-  is($dec->header(), from_file(q(t/10-decorator-header-1.frag)), 'default combined header is ok');
+  is($dec->header(), from_file(q(header-1.frag)), 'default combined header is ok');
 }
 
 {
@@ -66,19 +66,19 @@ use_ok('ClearPress::decorator');
 
 {
   my $dec = ClearPress::decorator->new();
-  is($dec->footer(), from_file(q(t/10-decorator-footer-1.frag)), 'footer returns default html');
+  is($dec->footer(), from_file(q(footer-1.frag)), 'footer returns default html');
 }
 
 {
   my $dec = ClearPress::decorator->new();
   $ENV{'SCRIPT_NAME'} = '/foo';
-  is($dec->http_header(), from_file(q(t/10-decorator-header-2.frag)), 'header w/script_name is ok');
+  is($dec->http_header(), from_file(q(header-2.frag)), 'header w/script_name is ok');
 }
 
 sub from_file {
   my $fn = shift;
 
-  open my $fh, q(<), $fn;
+  open my $fh, q[<], "t/data/rendered/$fn";
   local $RS = undef;
   my $content = <$fh>;
   close $fh;

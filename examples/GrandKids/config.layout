@@ -1,1 +1,1 @@
-./scripts/clearpress '--new' 'GrandKids' 'child->family child(name,birthday:date) family(name,address,city,state,zip)' '-y'
+../scripts/clearpress '--new' 'GrandKids' 'child->family child(name,birthday:date) family(name,address,city,state,zip)' '-y'

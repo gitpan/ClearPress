@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
-# Id:            $Id: model.pm 168 2008-06-13 19:14:08Z zerojinx $
+# Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $
+# Id:            $Id: model.pm 173 2008-06-13 19:50:39Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/model.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
 #
 package ClearPress::model;
 use strict;
@@ -16,8 +16,10 @@ use English qw(-no_match_vars);
 use Carp;
 use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
+use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 173 $ =~ /(\d+)/mx; $r; };
+Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
 
@@ -29,6 +31,9 @@ sub primary_key {
 sub table {
   my $self = shift;
   my $tbl  = (ref $self) || $self;
+  if(!$tbl) {
+    return;
+  }
   ($tbl)   = $tbl =~ /.*::([^:]+)/mx;
   return $tbl;
 }
@@ -36,17 +41,18 @@ sub table {
 sub init  { }
 
 sub new {
-  my ($class, $defs) = @_;
-  $defs ||= {};
-  bless $defs, $class;
+  my ($class, $ref) = @_;
+  $ref ||= {};
+  bless $ref, $class;
 
-  $defs->init($defs);
+  $ref->init($ref);
 
-  return $defs;
+  return $ref;
 }
 
 sub util {
   my $self = shift;
+
   if(!ref $self) {
     #########
     # If we're being accessed as a class method (e.g. for retrieving type dictionaries)
@@ -55,10 +61,11 @@ sub util {
     return ClearPress::util->new();
   }
 
-  if(!$self->{'util'}) {
+  if(!$self->{util}) {
     croak q(No utility object available caller=) . caller;
   }
-  return $self->{'util'};
+
+  return $self->{util};
 }
 
 sub get {
@@ -75,34 +82,40 @@ sub gen_getarray {
   my ($self, $class, $query, @args) = @_;
 
   if(!ref $self) {
-    $self = $self->new();
+    $self = $self->new({
+			util => $self->util(),
+		       });
   }
 
-  my $res = [];
+  my $util = $self->util();
+  my $res  = [];
   my $sth;
 
   eval {
+    my $dbh = $util->dbh();
     if($query =~ /\?/mx) {
-      $sth = $self->util->dbh->prepare_cached($query, {}, 3); # see perldoc DBI for prepare_cached collision handling
+      $sth = $dbh->prepare_cached($query, {}, $DBI_CACHE_OVERWRITE); # see perldoc DBI for prepare_cached collision handling
 
     } else {
-      $sth = $self->util->dbh->prepare($query);
+      $sth = $dbh->prepare($query);
     }
-    $sth->execute(@args);
-  };
 
-  if($EVAL_ERROR) {
-    carp $EVAL_ERROR . 'caller = '. caller;
+    $sth->execute(@args);
+    1; # sth->execute() does not return true!
+
+  } or do {
     $query =~ s/\s+/\ /smxg;
     local $LIST_SEPARATOR = q(, );
-    carp qq(Query was:\n$query\n\nParams: @args);
+    carp qq[GEN_GETARRAY ERROR\nEVAL_ERROR: $EVAL_ERROR\nCaller: @{[q[].caller]}\nQuery:\n$query\nDBH: @{[$util->dbh]}\nUTIL: $util\nParams: @{[map { (defined $_)?$_:'NULL' } @args]}];
     return;
-  }
+  };
 
   while(my $ref = $sth->fetchrow_hashref()) {
-    $ref->{'util'} = $self->util();
+    $ref->{util} = $util;
     push @{$res}, $class->new($ref);
   }
+  $sth->finish();
+
   return $res;
 }
 
@@ -152,21 +165,19 @@ sub gen_getfriends_through {
 
   if(!$cachekey) {
     ($cachekey) = $class =~ /([^:]+)$/mx;
-    $cachekey   = PL($cachekey); # . '_friends_through';
+    $cachekey   = PL($cachekey);
   }
 
   if(!$self->{$cachekey}) {
     my ($through_pkg) = (ref $self) =~ /^(.*::)[^:]+$/mx;
     $through_pkg     .= $through;
-    my $through_key = $self->primary_key();
-#carp qq(through_key = $through_key);
-    my $friend_key  = $class->primary_key();
-#carp qq(friend_key = $friend_key);
+    my $through_key   = $self->primary_key();
+    my $friend_key    = $class->primary_key();
     my $query = qq(SELECT @{[join q(, ),
                                   (map { "f.$_" } $class->fields()),
                                   (map { "t.$_" } $through_pkg->fields())]}
                    FROM   @{[$class->table()]} f,
-                          $through            t
+                          $through             t
                    WHERE  t.$through_key = ?
                    AND    t.$friend_key  = f.$friend_key);
     $self->{$cachekey} = $self->gen_getarray($class, $query, $self->$through_key());
@@ -181,8 +192,8 @@ sub gen_getobj {
   my $pk               = $class->primary_key();
   my ($cachekey)       = $class =~ /([^:]+)$/mx;
   $self->{$cachekey} ||= $class->new({
-				      'util' => $self->util(),
-				      $pk    => $self->$pk(),
+				      util => $self->util(),
+				      $pk  => $self->$pk(),
 				     });
   return $self->{$cachekey};
 }
@@ -204,8 +215,7 @@ sub gen_getobj_through {
                    FROM   @{[$class->table()]} f,
                           $through            t
                    WHERE  t.$through_key = ?
-                   AND    t.$friend_key  = f.$friend_key
-                   LIMIT 1); # there should only ever be one of these
+                   AND    t.$friend_key  = f.$friend_key); # there should only ever be one of these
     $self->{$cachekey} = $self->gen_getarray($class, $query, $self->$through_key())->[0];
   }
 
@@ -241,6 +251,10 @@ sub has_a {
 
     my $namespace = "${class}::$pkg";
     my $yield     = $class;
+    if($yield !~ /model/mx) {
+      croak qq[$pkg is not under a model:: namespace. Friend relationships will not work.];
+    }
+
     $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
 
     if (defined &{$namespace}) {
@@ -283,6 +297,10 @@ sub has_many {
     my $yield     = $class;
     $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
 
+    if($yield !~ /model/mx) {
+      croak qq[$pkg is not under a model:: namespace. Friend relationships will not work.];
+    }
+
     if (defined &{$namespace}) {
       next;
     }
@@ -298,6 +316,11 @@ sub has_many {
 }
 
 sub belongs_to_through {
+  my ($class, @args) = @_;
+  return $class->has_a_through(@args);
+}
+
+sub has_a_through {
   my ($class, $attr) = @_;
   no strict 'refs'; ## no critic
 
@@ -324,6 +347,10 @@ sub belongs_to_through {
     my $namespace = "${class}::$pkg";
     my $yield     = $class;
     $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
+
+    if($yield !~ /model/mx) {
+      croak qq[$pkg is not under a model:: namespace. Friend relationships will not work.];
+    }
 
     if (defined &{$namespace}) {
       next;
@@ -367,10 +394,14 @@ sub has_many_through {
     my $yield     = $class;
     $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
 
+    if($yield !~ /model/mx) {
+      croak qq[$pkg is not under a model:: namespace. Friend relationships will not work.];
+    }
+
     if (defined &{$namespace}) {
       next;
     }
-#carp qq(ns=$namespace, yield $yield through $through);
+
     *{$namespace} = sub {
       my $self = shift;
 
@@ -398,7 +429,7 @@ sub has_all {
     return $self->gen_getall();
   };
 
-  return;
+  return 1;
 }
 
 sub create {
@@ -424,29 +455,24 @@ sub create {
                  VALUES (@{[join q(, ), map { q(?) } $self->fields()]}));
   my @args = map { $self->{$_} } $self->fields();
   eval {
-    $dbh->do($query, {}, @args);
+    my $drv = $util->driver();
+    my $id  = $drv->create($query, @args);
+    $self->$pk($id);
 
-    #########
-    # add 'sequence' support here for Oracle
-    #
-    my $idref = $dbh->selectall_arrayref('SELECT LAST_INSERT_ID()');
-    $self->$pk($idref->[0]->[0]);
-  };
-
-  if($EVAL_ERROR) {
+  } or do {
     $tr_state and $dbh->rollback();
-    carp $query.join q(, ), @args;
+    carp qq[CREATE Query was:\n$query\n\nParams: @{[map { (defined $_)?$_:'NULL' } @args]}];
     croak $EVAL_ERROR;
-  }
+  };
 
   eval {
     $tr_state and $dbh->commit();
-  };
+    1;
 
-  if($EVAL_ERROR) {
+  } or do {
     $tr_state and $dbh->rollback();
     croak $EVAL_ERROR;
-  }
+  };
 
   return 1;
 }
@@ -466,7 +492,7 @@ sub read { ## no critic
     croak q(No table defined);
   }
 
-  if(!$self->{'_loaded'}) {
+  if(!$self->{_loaded}) {
     my @args = @_;
     if(!$query) {
       $query = qq(SELECT @{[join q(, ), $self->fields()]}
@@ -476,29 +502,41 @@ sub read { ## no critic
     }
 
     eval {
-      my $sth   = $self->util->dbh->prepare($query);
+      my $sth = $self->util->dbh->prepare($query);
       $sth->execute(@args);
 
-      my $ref   = $sth->fetchrow_hashref();
+      my $ref = $sth->fetchrow_hashref();
+
+      if(!$sth->rows()) {
+	#########
+	# entity not in database
+	#
+	$sth->finish();
+	croak q[missing entity];
+      }
+
+      $sth->finish();
+
       for my $f ($self->fields()) {
 	$self->{$f} = $ref->{$f};
       }
 
       $sth->finish();
-    };
+      1;
 
-    if($EVAL_ERROR) {
-      croak $EVAL_ERROR.$query;
-    }
+    } or do {
+      if($EVAL_ERROR =~ /missing\ entity/mx) {
+	return;
+      }
+      carp qq[SELECT ERROR\nEVAL_ERROR: $EVAL_ERROR\nQuery:\n$query\n\nParams: @{[map { (defined $_)?$_:'NULL' } @args]}\n];
+    };
   }
-  $self->{'_loaded'} = 1;
-  return $self;
+  $self->{_loaded} = 1;
+  return 1;
 }
 
 sub update {
   my $self  = shift;
-  my $util  = $self->util();
-  my $dbh   = $util->dbh();
   my $pk    = $self->primary_key();
 
   if(!$pk || !$self->$pk()) {
@@ -510,39 +548,43 @@ sub update {
     croak q(No table defined);
   }
 
-  my @fields = grep { $_ ne $pk } $self->fields();
+  my $util     = $self->util();
+  my $tr_state = $util->transactions();
+  my $dbh      = $util->dbh();
+  my @fields   = grep { exists $self->{$_} }
+                 grep { $_ ne $pk }
+                 $self->fields();
   my $query   = qq(UPDATE @{[$self->table()]}
                    SET    @{[join q(, ),
-                                  map  { qq($_ = ?) }
+                                  map  { qq[$_ = ?] }
                                   @fields]}
                    WHERE  $pk=@{[$self->$pk()]});
 
   eval {
-    $dbh->do($query, {}, map { $self->$_() || q() } @fields);
+    $dbh->do($query, {}, map { $self->$_() } @fields);
+
+  } or do {
+    $tr_state and $dbh->rollback();
+    croak $EVAL_ERROR.q[ ].$query;
   };
 
-  if($EVAL_ERROR) {
-    $dbh->rollback();
-    croak $EVAL_ERROR.$query;
-  }
+  eval {
+    $tr_state and $dbh->commit();
+    1;
 
-  if($util->transactions()) {
-    eval {
-      $dbh->commit();
-    };
-    if($EVAL_ERROR) {
-      croak $EVAL_ERROR;
-    }
-  }
+  } or do {
+    croak $EVAL_ERROR;
+  };
 
   return 1;
 }
 
 sub delete { ## no critic
-  my $self = shift;
-  my $util = $self->util();
-  my $dbh  = $util->dbh();
-  my $pk   = $self->primary_key();
+  my $self     = shift;
+  my $util     = $self->util();
+  my $tr_state = $util->transactions();
+  my $dbh      = $util->dbh();
+  my $pk       = $self->primary_key();
 
   if(!$pk || !$self->$pk()) {
     croak q(No primary key);
@@ -552,18 +594,19 @@ sub delete { ## no critic
                  WHERE $pk=?);
   eval {
     $dbh->do($query, {}, $self->$pk());
+
+  } or do {
+    $tr_state and $dbh->rollback();
+    croak $EVAL_ERROR.$query;
   };
 
-  if($EVAL_ERROR) {
-    if($util->transactions()) {
-      $dbh->rollback();
-    }
-    croak $EVAL_ERROR.$query;
-  }
+  eval {
+    $tr_state and $dbh->commit();
+    1;
 
-  if($util->transactions()) {
-    $dbh->commit();
-  }
+  } or do {
+    croak $EVAL_ERROR;
+  };
 
   return 1;
 }
@@ -581,18 +624,23 @@ sub save {
 
 sub zdate {
   my $self = shift;
-  my $date = q();
+  my $date = q[];
 
   if(scalar grep { $_ eq 'date' } $self->fields()) {
-    $date = $self->date();
+    $date = $self->date() || q[];
     $date =~ s/\ /T/mx;
     $date .='Z';
+  }
 
-  } else {
+  if(!$date) {
     $date = strftime q(%Y-%m-%dT%H:%M:%SZ), gmtime;
   }
 
   return $date;
+}
+
+sub isodate {
+  return strftime q(%Y-%m-%d %H:%M:%S), gmtime;
 }
 
 1;
@@ -604,7 +652,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 168 $
+$LastChangedRevision: 173 $
 
 =head1 SYNOPSIS
 
@@ -731,9 +779,11 @@ field-name in this object.
 
   __PACKAGE__->has_many_through(['user|centre_user']);
 
-=head2 belongs_to_through - a one-to-one relationship, like belongs_to, but through a join table
+=head2 has_a_through - a one-to-one relationship, like has_a, but through a join table
 
-  __PACKAGE__->belongs_to_through(['user|friend', 'user|enemy']);
+  __PACKAGE__->has_a_through(['user|friend', 'user|enemy']);
+
+=head2 belongs_to_through - synonym for has_a_through
 
 =head2 has_all - allows fetching of all entities of this type
 
@@ -762,6 +812,10 @@ field-name in this object.
 =head2 zdate - Generic Zulu-date based on object's date() method or gmtime
 
   my $sZuluTime = $oModel->zdate();
+
+=head2 isodate - Generic iso-formatted date YYYY-MM-DD HH:MM:SS for gmtime
+
+  my $sISODate = $oModel->isodate();
 
 =head2 as_json - JSON representation of this object
 

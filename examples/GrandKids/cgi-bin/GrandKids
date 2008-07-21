@@ -11,13 +11,13 @@ use GrandKids::view::child;
 use GrandKids::model::child;
 use GrandKids::view::family;
 use GrandKids::model::family;
-our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 173 $ =~ /(\d+)/mx; $r; };
 
 main();
 0;
 
 sub main {
-  my $util = GrandKids::util->new();
-  GrandKids::controller->handler($util);
+  my $util = ClearPress::util->new();
+  ClearPress::controller->handler($util);
 }
  

@@ -2,14 +2,15 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
-# Id:            $Id: view.pm 168 2008-06-13 19:14:08Z zerojinx $
+# Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $
+# Id:            $Id: view.pm 173 2008-06-13 19:50:39Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/view.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
 use warnings;
+use base qw(Class::Accessor);
 use Template;
 use ClearPress::util;
 use Carp;
@@ -17,8 +18,10 @@ use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use ClearPress::Template::Plugin::js_string;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 173 $ =~ /(\d+)/mx; $r; };
 our $DEBUG_OUTPUT = 0;
+
+__PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape));
 
 sub new {
   my ($class, $self)    = @_;
@@ -26,9 +29,10 @@ sub new {
   bless $self, $class;
 
   my $util                    = $self->util();
-  my $username                = $util->username();
+  my $username                = $util?$util->username():q[];
   $self->{requestor_username} = $username;
   $self->{logged_in}          = $username?1:0;
+  $self->{warnings}           = [];
   $self->{output_buffer}      = [];
   $self->{output_finished}    = 0;
   $self->{autoescape}         = 1;
@@ -46,19 +50,27 @@ sub new {
 }
 
 sub init {
-  return;
+  return 1;
 }
 
 sub add_warning {
   my ($self, $warning) = @_;
-  $self->{warnings}  ||= [];
   push @{$self->{warnings}}, $warning;
-  return;
+  return 1;
 }
 
 sub warnings {
   my $self = shift;
   return $self->{warnings};
+}
+
+sub _accessor {
+  my ($self, $field, $val) = @_;
+  carp q[_accessor is deprecated. Use __PACKAGE__->mk_accessors(...) instead];
+  if(defined $val) {
+    $self->{$field} = $val;
+  }
+  return $self->{$field};
 }
 
 sub authorised {
@@ -131,7 +143,7 @@ sub method_name {
 sub render {
   my $self   = shift;
   my $util   = $self->util();
-  my $aspect = $self->aspect();
+  my $aspect = $self->aspect() || q[];
   my $action = $self->action();
 
   if(!$util) {
@@ -148,9 +160,8 @@ sub render {
     if(!$username) {
       croak q(You are not authorised for this view. You need to log in.);
     }
-    croak q(You are not authorised for this view);
+    croak qq[You ($username) are not authorised for this view];
   }
-
 
   #########
   # Figure out and call the appropriate action if available
@@ -172,19 +183,19 @@ sub render {
   }
 
   my $model   = $self->model();
-  my $actions = my $warnings = q();
+  my $actions = my $warnings = q[];
 
   if($aspect !~ /(rss|atom|ajax|xml|json)$/mx) {
     $actions  = $self->actions();
     eval {
       $self->process_template('warnings.tt2', {}, \$warnings);
-    };
-    if($EVAL_ERROR) {
+
+    } or do {
       #########
       # non-fatal warning - usually warnings.tt2 missing
       #
       carp "Warning: $EVAL_ERROR";
-    }
+    };
   }
 
   my $tmpl = $self->template_name();
@@ -227,7 +238,7 @@ sub process_template {
     $self->tt->process($template, $params) or croak $self->tt->error();
   }
 
-  return;
+  return 1;
 }
 
 sub _populate_from_cgi {
@@ -241,18 +252,38 @@ sub _populate_from_cgi {
   # by default (in controller.pm) model will only have util & its primary_key.
   #
   $model->read();
-  for my $field ($model->fields()) {
-    my $v = $cgi->param($field) || q[];
 
+  my $pk = $model->primary_key();
+
+  my @fields = $model->fields();
+  if($pk) {
+    #########
+    # don't leave primary key in field list
+    @fields = grep { $_ ne $pk } @fields;
+  }
+
+  my $params = {
+		map { $_ => $cgi->param($_) } $cgi->param()
+	       };
+
+  for my $field (@fields) {
+    if(!exists $params->{$field}) {
+      next;
+    }
+    my $v = $params->{$field};
+
+    #########
+    # $v here will always be defined
+    # but may be false, e.g. $v=q[] or $v=q[0]
+    #
     if($self->autoescape()) {
       $v = $cgi->escapeHTML($v);
     }
 
-    if($v) {
-      $model->$field($v);
-    }
+    $model->$field($v);
   }
-  return;
+
+  return 1;
 }
 
 sub add {
@@ -266,16 +297,18 @@ sub edit {
 }
 
 sub list {
+  return 1;
 }
 
 sub read { ## no critic
+  return 1;
 }
 
 sub delete { ## no critic
   my $self  = shift;
   my $model = $self->model();
   $model->delete() or croak qq(Failed to delete entity: $EVAL_ERROR);
-  return;
+  return 1;
 }
 
 sub update {
@@ -288,21 +321,10 @@ sub update {
   # Populate model object with parameters posted into CGI
   # by default (in controller.pm) model will only have util & its primary_key.
   #
-  $model->read();
-  for my $field ($model->fields()) {
-    my $v = $cgi->param($field) || q[];
-
-    if($self->autoescape()) {
-      $v = $cgi->escapeHTML($v);
-    }
-
-    if($v) {
-      $model->$field($v);
-    }
-  }
+  $self->_populate_from_cgi();
 
   $model->update() or croak qq(Failed to update entity: $EVAL_ERROR);
-  return;
+  return 1;
 }
 
 sub create {
@@ -315,21 +337,10 @@ sub create {
   # Populate model object with parameters posted into CGI
   # by default (in controller.pm) model will only have util & its primary_key.
   #
-  $model->read();
-  for my $field ($model->fields()) {
-    my $v = $cgi->param($field) || q[];
-
-    if($self->autoescape()) {
-      $v = $cgi->escapeHTML($v);
-    }
-
-    if($v) {
-      $model->$field($v);
-    }
-  }
+  $self->_populate_from_cgi();
 
   $model->create() or croak qq(Failed to create entity: $EVAL_ERROR);
-  return;
+  return 1;
 }
 
 sub tt {
@@ -351,54 +362,11 @@ sub tt {
   return $util->{tt};
 }
 
-sub _accessor {
-  my ($self, $field, $val) = @_;
-  if(defined $val) {
-    $self->{$field} = $val;
-  }
-  return $self->{$field};
-}
-
-sub util {
-  my ($self, @args) = @_;
-  return $self->_accessor('util', @args);
-}
-
-sub model {
-  my ($self, @args) = @_;
-  return $self->_accessor('model', @args);
-}
-
-sub action {
-  my ($self, @args) = @_;
-  return $self->_accessor('action', @args);
-}
-
-sub aspect {
-  my ($self, @args) = @_;
-  return $self->_accessor('aspect', @args);
-}
-
-sub content_type {
-  my ($self, @args) = @_;
-  return $self->_accessor('content_type', @args);
-}
-
-sub entity_name {
-  my ($self, @args) = @_;
-  return $self->_accessor('entity_name', @args);
-}
-
-sub autoescape {
-  my ($self, @args) = @_;
-  return $self->_accessor('autoescape', @args);
-}
-
 sub decor {
   my $self = shift;
   my $aspect = $self->aspect() || q();
 
-  if($aspect =~ /(rss|atom|ajax|xml|json|_png)$/mx) {
+  if($aspect =~ /(rss|atom|ajax|xml|json|js|_png|_jpg)$/mx) {
     return 0;
   }
   return 1;
@@ -409,7 +377,7 @@ sub output_flush {
   $DEBUG_OUTPUT and carp "output_flush: @{[scalar @{$self->{output_buffer}}]} blobs in queue";
   print @{$self->{output_buffer}} or croak "Error flushing output: $ERRNO";
   $self->output_reset();
-  return;
+  return 1;
 }
 
 sub output_buffer {
@@ -418,7 +386,7 @@ sub output_buffer {
     push @{$self->{output_buffer}}, @args;
     $DEBUG_OUTPUT and carp "output_buffer added (@{[scalar @args]} blobs)";
   }
-  return;
+  return 1;
 }
 
 sub output_finished {
@@ -451,6 +419,8 @@ sub actions {
   $self->process_template('actions.tt2', {}, \$content);
   return $content;
 }
+
+# todo: auto-create these <action>_<format> style accessors
 
 sub list_xml {
   my $self = shift;
@@ -496,7 +466,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 168 $
+$LastChangedRevision: 173 $
 
 =head1 SYNOPSIS
 

@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
-# Id:            $Id: controller.pm 168 2008-06-13 19:14:08Z zerojinx $
+# Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $
+# Id:            $Id: controller.pm 173 2008-06-13 19:50:39Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/controller.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 173 $ =~ /(\d+)/mx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		'POST'   => 'create',
@@ -234,8 +234,8 @@ sub handler {
 
   eval {
     $viewobject->output_buffer($viewobject->render());
-  };
-  if($EVAL_ERROR) {
+
+  } or do {
     $viewobject = $self->build_error_object('ClearPress::view::error',
 					    $action,
 					    $aspect,
@@ -250,7 +250,7 @@ sub handler {
       $viewobject->output_buffer($decorator->header());
     }
     $viewobject->output_buffer($viewobject->render());
-  }
+  };
 
   #########
   # re-test decor in case it's changed by render()
@@ -329,11 +329,11 @@ sub dispatch {
     if(!$viewobject) {
       croak qq(Failed to instantiate $viewobject);
     }
-  };
+    1;
 
-  if($EVAL_ERROR) {
+  } or do {
     $viewobject = $self->build_error_object('ClearPress::view::error', $action, $aspect, $EVAL_ERROR);
-  }
+  };
 
   return $viewobject;
 }
@@ -357,7 +357,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 168 $
+$LastChangedRevision: 173 $
 
 =head1 SYNOPSIS
 

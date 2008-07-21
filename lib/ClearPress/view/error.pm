@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-06-06 16:02:23 +0100 (Fri, 06 Jun 2008) $
-# Id:            $Id: error.pm 165 2008-06-06 15:02:23Z zerojinx $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/view/error.pm $
+# Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $
+# Id:            $Id: error.pm 173 2008-06-13 19:50:39Z zerojinx $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
 use strict;
@@ -16,12 +16,12 @@ use Carp;
 
 __PACKAGE__->mk_accessors(qw(errstr));
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 165 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 173 $ =~ /(\d+)/mx; $r; };
 
 sub render {
   my $self   = shift;
   my $aspect = $self->aspect();
-  my $errstr = q(Error: ) . $self->errstr();
+  my $errstr = q(Error: ) . ($self->errstr()||q[]);
 
   if(Template->error()) {
     $errstr .= q(Template Error: ) . Template->error();
@@ -32,6 +32,7 @@ sub render {
 #  }
   carp "Serving error: $errstr";
   $errstr =~ s/\ at\ \S+\ line\ \d+//smxg;
+  $errstr =~ s/\s+$//mx;
 
   if($aspect =~ /(ajax|xml|rss|atom)$/mx) {
     return qq[<error>$errstr</error>];
@@ -39,10 +40,6 @@ sub render {
 
   if($aspect =~ /json$/mx) {
     return qq[{error:"$errstr"}];
-  }
-
-  if($aspect =~ /xml$/mx) {
-    return qq[<span class="error">$errstr</span>];
   }
 
   return q(<div id="main"><h2>An Error Occurred</h2>) .  $self->actions() . q(<p>) . $errstr . q(</p></div>);
@@ -58,7 +55,7 @@ ClearPress::view::error - specialised view for error handling
 
 =head1 VERSION
 
-$LastChangedRevision: 165 $
+$LastChangedRevision: 173 $
 
 =head1 SYNOPSIS
 

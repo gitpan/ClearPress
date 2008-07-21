@@ -2,28 +2,33 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-06-13 20:14:08 +0100 (Fri, 13 Jun 2008) $
+# Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 168 2008-06-13 19:14:08Z zerojinx $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/lib/ClearPress/util.pm $
+# Id:            $Id: util.pm 173 2008-06-13 19:50:39Z zerojinx $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
 use warnings;
-use DBI;
+use base qw(Class::Accessor);
 use Config::IniFiles;
 use Carp;
 use POSIX qw(strftime);
 use English qw(-no_match_vars);
+use ClearPress::driver;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 168 $ =~ /(\d+)/mx; $r; };
+our $VERSION              = do { my ($r) = q$LastChangedRevision: 173 $ =~ /(\d+)/mx; $r; };
+our $DEFAULT_TRANSACTIONS = 1;
+our $DEFAULT_DRIVER       = 'mysql';
+
+__PACKAGE__->mk_accessors(qw(transactions username cgi requestor profiler session));
 
 sub new {
   my ($class, $ref) = @_;
   $ref ||= {};
 
-  if(!exists $ref->{'transactions'}) {
-    $ref->{'transactions'} = 1;
+  if(!exists $ref->{transactions}) {
+    $ref->{transactions} = $DEFAULT_TRANSACTIONS;
   }
 
   my $self = bless $ref, $class;
@@ -38,10 +43,14 @@ sub configpath {
   my ($self, @args) = @_;
 
   if(scalar @args) {
-    $self->{'configpath'} = shift;
+    $self->{configpath} = shift @args;
   }
 
-  return $self->{'configpath'} || $self->data_path().'/config.ini';
+  return $self->{configpath} || $self->data_path().'/config.ini';
+}
+
+sub dbsection {
+  return $ENV{dev} || 'live';
 }
 
 sub config {
@@ -49,7 +58,7 @@ sub config {
   my $configpath = $self->configpath() || q();
   my $dtconfigpath;
 
-  if(!$self->{'_config'}) {
+  if(!$self->{_config}) {
     ($dtconfigpath) = $configpath =~ m{([a-z\d_/\.\-]+)}mix;
     $dtconfigpath ||= q();
 
@@ -61,50 +70,22 @@ sub config {
       croak qq(No such file: $dtconfigpath);
     }
 
-    $self->{'_config'} ||= Config::IniFiles->new(
+    $self->{_config} ||= Config::IniFiles->new(
 						 -file => $dtconfigpath,
 						);
   }
 
-  if(!$self->{'_config'}) {
+  if(!$self->{_config}) {
     croak qq(No configuration available:\n). join q(, ), @Config::IniFiles::errors; ## no critic
   }
 
-  return $self->{'_config'};
+  return $self->{_config};
 }
 
 sub dbh {
   my $self = shift;
 
-  if(!$self->{'dbh'}) {
-    my $config  = $self->config();
-    my $section = 'application';
-
-    if(!$section) {
-      croak q(Unable to determine config set to use);
-    }
-
-    $self->{'dsn'} = sprintf q(DBI:mysql:database=%s;host=%s),
-			     $config->val($section, 'dbname') || q(),
-			     $config->val($section, 'dbhost') || q();
-
-    $self->{'dbh'} = DBI->connect($self->{'dsn'},
-					 $config->val($section, 'dbuser') || q(),
-					 $config->val($section, 'dbpass') || q(),
-					 {RaiseError => 1,
-					  AutoCommit => 0});
-    #########
-    # rollback any junk left behind if this is a cached handle
-    #
-    $self->{'dbh'}->rollback();
-
-    #########
-    # make our transactions as clean as can be
-    #
-#    $self->{'dbh'}->do(q(SET TRANSACTION ISOLATION LEVEL SERIALIZABLE));
-  }
-
-  return $self->{'dbh'};
+  return $self->driver->dbh();
 }
 
 sub quote {
@@ -114,58 +95,41 @@ sub quote {
 
 sub _accessor {
   my ($self, $field, $val) = @_;
+  carp q[_accessor is deprecated. Use __PACKAGE__->mk_accessors(...) instead];
   if(defined $val) {
     $self->{$field} = $val;
   }
   return $self->{$field};
 }
 
-sub transactions {
+sub driver {
   my ($self, @args) = @_;
-  return $self->_accessor('transactions', @args);
-}
 
-sub username {
-  my ($self, @args) = @_;
-  return $self->_accessor('username', @args);
-}
+  if(!$self->{driver}) {
+    my $dbsection = $self->dbsection();
 
-sub cgi {
-  my ($self, @args) = @_;
-  return $self->_accessor('cgi', @args);
-}
+    if(!$dbsection) {
+      croak q(Unable to determine config set to use);
+    }
 
-sub requestor {
-  my ($self, @args) = @_;
-  return $self->_accessor('requestor', @args);
-}
+    my $drivername = $self->config->val($dbsection, 'driver') || $DEFAULT_DRIVER;
+    my $ref        = {};
+    my $config     = $self->config();
 
-sub profiler {
-  my ($self, @args) = @_;
-  return $self->_accessor('profiler', @args);
-}
+    for my $field ($config->Parameters($dbsection)) {
+      $ref->{$field} = $config->val($dbsection, $field);
+    }
 
-sub session {
-  my ($self, @args) = @_;
-  return $self->_accessor('session', @args);
-}
-
-sub DESTROY {
-  my $self = shift;
-  if($self->{'dbh'}) {
-    #########
-    # flush down any uncommitted transactions & locks
-    #
-    $self->{'dbh'}->rollback();
-    $self->{'dbh'}->disconnect();
+    $self->{driver} = ClearPress::driver->new_driver($drivername, $ref);
   }
-  return;
+
+  return $self->{driver};
 }
 
 sub log { ## no critic
   my ($self, @args) = @_;
   print {*STDERR} map { (strftime '[%Y-%m-%dT%H:%M:%S] ', localtime). "$_\n" } @args or croak $ERRNO;
-  return;
+  return 1;
 }
 
 1;
@@ -178,7 +142,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 168 $
+$LastChangedRevision: 173 $
 
 =head1 SYNOPSIS
 
@@ -205,6 +169,14 @@ $LastChangedRevision: 168 $
 =head2 config - The Config::IniFiles object for our configpath
 
   my $oConfig = $oUtil->config();
+
+=head2 driver - driver name from config.ini
+
+  my $sDriverName = $oUtil->driver();
+
+=head2 dbsection - dev/test/live/application based on $ENV{dev}
+
+  my $sSection = $oUtil->dbsection();
 
 =head2 dbh - A database handle for the supported database
 

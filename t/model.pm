@@ -4,17 +4,10 @@ use warnings;
 use base qw(ClearPress::model);
 use Test::More;
 
+__PACKAGE__->mk_accessors(fields());
+
 sub fields {
-  return qw(test_field);
-}
-
-sub test_field {
-  my ($self, $val) = @_;
-  if(defined $val) {
-    $self->{test_field} = $val;
-  }
-
-  return $self->{test_field};
+  return qw(test_pk test_field);
 }
 
 ########

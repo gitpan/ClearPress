@@ -1,9 +1,9 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2008-05-31 00:13:51 +0100 (Sat, 31 May 2008) $ $Author: zerojinx $
-# Id:            $Id: Makefile.PL 162 2008-05-30 23:13:51Z zerojinx $
+# Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $ $Author: zerojinx $
+# Id:            $Id: Makefile.PL 161 2008-05-30 23:08:14Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/Makefile.PL,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.13/Makefile.PL $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/Makefile.PL $
 #
 package Makefile;
 use strict;
@@ -13,7 +13,7 @@ use ExtUtils::MakeMaker;
 use English qw(-no_match_vars);
 use lib qw(t);
 
-our $VERSION = do { my @r = (q$Revision: 162 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 161 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
 
 WriteMakefile(
 	      'NAME'          => 'ClearPress',
