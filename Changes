@@ -7,7 +7,9 @@ TODO:
 - config caching
 - template caching
 
-    - Improved tests & code coverage for relation accessors (has_a,
+174 - Maintenance release - added missing dependencies to Makefile.PL
+
+173 - Improved tests & code coverage for relation accessors (has_a,
       has_many, has_a_through, has_many_through etc), views and database
       drivers.
 

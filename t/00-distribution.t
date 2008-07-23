@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2008-07-15 17:16:38 +0100 (Tue, 15 Jul 2008) $ $Author: zerojinx $
-# Id:            $Id: 00-distribution.t 194 2008-07-15 16:16:38Z zerojinx $
+# Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $ $Author: zerojinx $
+# Id:            $Id: 00-distribution.t 207 2008-07-21 11:12:22Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/t/00-distribution.t,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/t/00-distribution.t $
 #
@@ -11,7 +11,7 @@ use warnings;
 use Test::More;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my @r = (q$Revision: 194 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 207 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
 
 eval {
   require Test::Distribution;

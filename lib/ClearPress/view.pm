@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $
-# Id:            $Id: view.pm 173 2008-06-13 19:50:39Z zerojinx $
+# Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $
+# Id:            $Id: view.pm 207 2008-07-21 11:12:22Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use ClearPress::Template::Plugin::js_string;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 173 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 207 $ =~ /(\d+)/mx; $r; };
 our $DEBUG_OUTPUT = 0;
 
 __PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape));
@@ -466,7 +466,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 173 $
+$LastChangedRevision: 207 $
 
 =head1 SYNOPSIS
 
