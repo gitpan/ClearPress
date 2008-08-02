@@ -4,7 +4,7 @@
 # Created:       2007-03-28
 # Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $
 # Id:            $Id: error.pm 207 2008-07-21 11:12:22Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
 use strict;

@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $
+# Last Modified: $Date: 2008-08-02 18:44:15 +0100 (Sat, 02 Aug 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 207 2008-07-21 11:12:22Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
+# Id:            $Id: util.pm 224 2008-08-02 17:44:15Z zerojinx $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
@@ -17,7 +17,7 @@ use POSIX qw(strftime);
 use English qw(-no_match_vars);
 use ClearPress::driver;
 
-our $VERSION              = do { my ($r) = q$LastChangedRevision: 207 $ =~ /(\d+)/mx; $r; };
+our $VERSION              = do { my ($r) = q$LastChangedRevision: 224 $ =~ /(\d+)/mx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
@@ -58,7 +58,7 @@ sub config {
   my $configpath = $self->configpath() || q();
   my $dtconfigpath;
 
-  if(!$self->{_config}) {
+  if(!$self->{config}) {
     ($dtconfigpath) = $configpath =~ m{([a-z\d_/\.\-]+)}mix;
     $dtconfigpath ||= q();
 
@@ -70,16 +70,16 @@ sub config {
       croak qq(No such file: $dtconfigpath);
     }
 
-    $self->{_config} ||= Config::IniFiles->new(
-						 -file => $dtconfigpath,
-						);
+    $self->{config} ||= Config::IniFiles->new(
+					       -file => $dtconfigpath,
+					      );
   }
 
-  if(!$self->{_config}) {
+  if(!$self->{config}) {
     croak qq(No configuration available:\n). join q(, ), @Config::IniFiles::errors; ## no critic
   }
 
-  return $self->{_config};
+  return $self->{config};
 }
 
 sub dbh {
@@ -107,14 +107,14 @@ sub driver {
 
   if(!$self->{driver}) {
     my $dbsection = $self->dbsection();
+    my $config    = $self->config();
 
-    if(!$dbsection) {
-      croak q(Unable to determine config set to use);
+    if(!$dbsection || !$config->SectionExists($dbsection)) {
+      croak q[Unable to determine config set to use. Try adding [live] [dev] or [test] sections to config.ini];
     }
 
-    my $drivername = $self->config->val($dbsection, 'driver') || $DEFAULT_DRIVER;
+    my $drivername = $config->val($dbsection, 'driver') || $DEFAULT_DRIVER;
     my $ref        = {};
-    my $config     = $self->config();
 
     for my $field ($config->Parameters($dbsection)) {
       $ref->{$field} = $config->val($dbsection, $field);
@@ -142,7 +142,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 207 $
+$LastChangedRevision: 224 $
 
 =head1 SYNOPSIS
 

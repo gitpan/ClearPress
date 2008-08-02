@@ -5,7 +5,7 @@
 # Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $
 # Id:            $Id: js_string.pm 173 2008-06-13 19:50:39Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/Template/Plugin/js_string.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/Template/Plugin/js_string.pm $
 package ClearPress::Template::Plugin::js_string;
 use strict;
 use warnings;

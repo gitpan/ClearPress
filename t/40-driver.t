@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 11;
 use English qw(-no_match_vars);
 use Test::Trap;
 
@@ -31,3 +31,23 @@ use_ok('ClearPress::driver');
   is($drv->type_map('foo'), 'foo', 'no map for type "foo"');
   is($drv->type_map(), undef, 'no map for type "undef"');
 }
+
+{
+  my $drv1 = ClearPress::driver::test->new();
+  my $drv2 = ClearPress::driver::test->new();
+  is($drv1, $drv2, 'same singleton instance');
+}
+
+{
+  use_ok('ClearPress::driver::SQLite');
+  use_ok('ClearPress::driver::mysql');
+  
+  my $drv1 = ClearPress::driver::SQLite->new();
+  my $drv2 = ClearPress::driver::mysql->new();
+  isnt($drv1, $drv2, 'different singleton instance');
+}
+
+package ClearPress::driver::test;
+use base qw(ClearPress::driver);
+
+1;

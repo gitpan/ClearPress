@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $
-# Id:            $Id: model.pm 207 2008-07-21 11:12:22Z zerojinx $
+# Last Modified: $Date: 2008-08-02 18:44:15 +0100 (Sat, 02 Aug 2008) $
+# Id:            $Id: model.pm 224 2008-08-02 17:44:15Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
 #
 package ClearPress::model;
 use strict;
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 207 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 224 $ =~ /(\d+)/mx; $r; };
 Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
@@ -55,17 +55,31 @@ sub util {
 
   if(!ref $self) {
     #########
-    # If we're being accessed as a class method (e.g. for retrieving type dictionaries)
-    # Then play nicely and return a util.
+    # If we're being accessed as a class method (e.g. for retrieving
+    # type dictionaries) Then play nicely and return a util.
+    #
+    # Note, this currently needs subclassing if you want class-method
+    # support in your own namespace.
     #
     return ClearPress::util->new();
   }
 
-  if(!$self->{util}) {
-    croak q(No utility object available caller=) . caller;
+  if($self->{util}) {
+    return $self->{util};
   }
 
-  return $self->{util};
+  #########
+  # ClearPress::driver is now a Class::Singleton so, casually ignoring
+  # the state of any open transactions, we should be able to
+  # instantiate more copies on demand
+  #
+  my $cputil    = ClearPress::util->new();
+  my $config    = $cputil->config();
+  my $namespace = $config->val('application', 'namespace') ||
+                  $config->val('application', 'name');
+  my $util      = "${namespace}::util"->new();
+  $self->{util} = $util;
+  return $util;
 }
 
 sub get {
@@ -652,7 +666,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 207 $
+$LastChangedRevision: 224 $
 
 =head1 SYNOPSIS
 

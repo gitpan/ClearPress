@@ -37,7 +37,7 @@ my $util = t::util->new();
     my $derived = t::model::derived->new();
     $derived->util();
   };
-  like($EVAL_ERROR, qr/No\ utility\ object\ available/mx, 'die if util not present in an object');
+  like($EVAL_ERROR, qr/No\ such\ file/mx, 'die if config.ini unavailable');
 }
 
 {

@@ -1,11 +1,16 @@
 TODO:
-- Switch to using inside-out objects (probably Class- or Object- InsideOut)
-- Scripts/clearpress to auto-generate tests & fixture framework
-- Improve migrations
-- Improve test coverage (currently at 75%)
-- Add regression tests
-- config caching
-- template caching
+- maintenance: Switch to using inside-out objects (probably Class- or Object- InsideOut)
+- maintenance: scripts/clearpress to auto-generate tests & fixture framework
+- maintenance: Improve migrations
+- maintenance: Improve test coverage (currently at 75%)
+- maintenance: Add regression tests
+- performance: Config caching
+- performance: Template caching
+
+222 - ClearPress::driver is now a Class::Singleton. ** TAKE CARE ** if
+      your application makes multiple database handles of the same sort
+      - they need separate subclassing and will then be singletons
+      themselves.
 
 174 - Maintenance release - added missing dependencies to Makefile.PL
 

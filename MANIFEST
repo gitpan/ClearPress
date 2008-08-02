@@ -41,7 +41,6 @@ lib/ClearPress/view/error.pm
 scripts/clearpress
 t/00-critic.t
 t/00-distribution.t
-t/00-kwalitee.t
 t/00-pod.t
 t/00-podcoverage.t
 t/10-model.t
@@ -51,6 +50,8 @@ t/30-controller.t
 t/30-decorator.t
 t/30-filter-js_string.t
 t/30-util.t
+t/40-driver-mysql-tables.t
+t/40-driver-mysql.t
 t/40-driver-sqlite.t
 t/40-driver.t
 t/data/config.ini
@@ -74,4 +75,5 @@ t/user/admin.pm
 t/user/basic.pm
 t/util.pm
 Makefile.PL
-META.yml                                 Module meta-data (added by MakeMaker)
+Build.PL
+META.yml

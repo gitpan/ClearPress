@@ -4,7 +4,7 @@
 # Created:       2007-06-21
 # Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $
 # Id:            $Id: clearpress 207 2008-07-21 11:12:22Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/scripts/clearpress $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/scripts/clearpress $
 #
 use strict;
 use warnings;

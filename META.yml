@@ -1,27 +1,67 @@
---- #YAML:1.0
-name:                ClearPress
-version:             174
-abstract:            ~
-license:             ~
-author:              
-    - Roger Pettett <rmp@sanger.ac.uk>
-generated_by:        ExtUtils::MakeMaker version 6.44
-distribution_type:   module
-requires:     
-    Carp:                          1.02
-    CGI:                           3.20
-    Class::Accessor:               0.31
-    Config::IniFiles:              2.38
-    DBI:                           1.51
-    English:                       1.01
-    IO::Scalar:                    2.110
-    Lingua::EN::Inflect:           1.89
-    POSIX:                         1.09
-    Template:                      2.19
-    Template::Context:             2.98
-    Test::More:                    0.8
-    Test::Trap:                    0.1.1
-    XML::TreeBuilder:              3.09
+---
+name: ClearPress
+version: 224
+author:
+  - 'Roger M Pettett <rpettett@cpan.org>'
+abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: 3.20
+  Carp: 1.02
+  Class::Accessor: 0.31
+  Class::Singleton: 1.4
+  Config::IniFiles: 2.38
+  DBI: 1.51
+  English: 1.01
+  IO::Scalar: 2.110
+  Lingua::EN::Inflect: 1.89
+  POSIX: 1.09
+  Readonly: 1.03
+  Template: 2.19
+build_requires:
+  CPAN: 1.9205
+  Cwd: 3.2701
+  File::Spec: 3.2701
+  Test::More: 0.8
+  Test::Trap: 0.1.1
+  XML::TreeBuilder: 3.09
+provides:
+  ClearPress:
+    file: lib/ClearPress.pm
+    version: 224
+  ClearPress::Template::Plugin::js_string:
+    file: lib/ClearPress/Template/Plugin/js_string.pm
+    version: 173
+  ClearPress::controller:
+    file: lib/ClearPress/controller.pm
+    version: 224
+  ClearPress::decorator:
+    file: lib/ClearPress/decorator.pm
+    version: 173
+  ClearPress::driver:
+    file: lib/ClearPress/driver.pm
+    version: 177
+  ClearPress::driver::SQLite:
+    file: lib/ClearPress/driver/SQLite.pm
+    version: 177
+  ClearPress::driver::mysql:
+    file: lib/ClearPress/driver/mysql.pm
+    version: 177
+  ClearPress::model:
+    file: lib/ClearPress/model.pm
+    version: 224
+  ClearPress::util:
+    file: lib/ClearPress/util.pm
+    version: 224
+  ClearPress::view:
+    file: lib/ClearPress/view.pm
+    version: 224
+  ClearPress::view::error:
+    file: lib/ClearPress/view/error.pm
+    version: 207
+generated_by: Module::Build version 0.280801
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

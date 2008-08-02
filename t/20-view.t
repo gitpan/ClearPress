@@ -179,9 +179,9 @@ my $util = t::util->new();
   my $cgi   = CGI->new();
   $cgi->param('test_field', 'blabla');
   $cgi->param('test_pk',    'two');
-  my $util  = t::util->new({
-			    cgi => $cgi,
-			   });
+
+  $util->cgi($cgi);
+
   my $model = t::model->new({
 			     util    => $util,
 			     test_pk => 'one',
@@ -203,6 +203,8 @@ my $util = t::util->new();
     my $method_xml = "${method}_xml";
     is($view->$method_xml(), 1, "$method_xml ok");
   }
+
+  $util->cgi(undef);
 }
 
 {

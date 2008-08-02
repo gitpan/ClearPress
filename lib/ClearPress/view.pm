@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $
-# Id:            $Id: view.pm 207 2008-07-21 11:12:22Z zerojinx $
+# Last Modified: $Date: 2008-08-02 18:44:15 +0100 (Sat, 02 Aug 2008) $
+# Id:            $Id: view.pm 224 2008-08-02 17:44:15Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use ClearPress::Template::Plugin::js_string;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 207 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 224 $ =~ /(\d+)/mx; $r; };
 our $DEBUG_OUTPUT = 0;
 
 __PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape));
@@ -259,6 +259,7 @@ sub _populate_from_cgi {
   if($pk) {
     #########
     # don't leave primary key in field list
+    #
     @fields = grep { $_ ne $pk } @fields;
   }
 
@@ -466,7 +467,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 207 $
+$LastChangedRevision: 224 $
 
 =head1 SYNOPSIS
 

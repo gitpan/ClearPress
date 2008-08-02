@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $
-# Id:            $Id: controller.pm 207 2008-07-21 11:12:22Z zerojinx $
+# Last Modified: $Date: 2008-08-02 18:44:15 +0100 (Sat, 02 Aug 2008) $
+# Id:            $Id: controller.pm 224 2008-08-02 17:44:15Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 207 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 224 $ =~ /(\d+)/mx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		'POST'   => 'create',
@@ -37,22 +37,23 @@ our $CRUD    = {
 
 sub accept_extensions {
   return [
-	  {'.html' => q()},
-	  {'.xml'  => '_xml'},
-	  {'.png'  => q(_png)},
-	  {'.rss'  => q(_rss)},
-	  {'.atom' => q(_atom)},
-	  {'.js'   => q(_json)},
-	  {'.json' => q(_json)},
-	  {'.ical' => q(_ical)},
+	  {'.html' => q[]},
+	  {'.xml'  => q[_xml]},
+	  {'.png'  => q[_png]},
+	  {'.jpg'  => q[_jpg]},
+	  {'.rss'  => q[_rss]},
+	  {'.atom' => q[_atom]},
+	  {'.js'   => q[_json]},
+	  {'.json' => q[_json]},
+	  {'.ical' => q[_ical]},
 	 ];
 }
 
 sub accept_headers {
   return [
-#	  {'text/html'        => q()},
-	  {'application/json' => q(_json)},
-	  {'text/xml'         => q(_xml)},
+#	  {'text/html'        => q[]},
+	  {'application/json' => q[_json]},
+	  {'text/xml'         => q[_xml]},
 	 ];
 }
 
@@ -236,7 +237,7 @@ sub handler {
     $viewobject->output_buffer($viewobject->render());
 
   } or do {
-    $viewobject = $self->build_error_object('ClearPress::view::error',
+    $viewobject = $self->build_error_object("${namespace}::view::error",
 					    $action,
 					    $aspect,
 					    $EVAL_ERROR);
@@ -357,7 +358,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 207 $
+$LastChangedRevision: 224 $
 
 =head1 SYNOPSIS
 

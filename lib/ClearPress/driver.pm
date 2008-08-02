@@ -16,10 +16,16 @@ use ClearPress::driver::SQLite;
 use DBI;
 use English qw(-no_match_vars);
 use Carp;
+use base qw(Class::Singleton);
 
 our $VERSION = do { my ($r) = q$LastChangedRevision: 177 $ =~ /(\d+)/mx; $r; };
 
 sub new {
+  my ($class, @args) = @_;
+  return $class->instance(@args);
+}
+
+sub _new_instance {
   my ($class, $ref) = @_;
   $ref ||= {};
   bless $ref, $class;
@@ -45,7 +51,7 @@ sub new_driver {
 sub DESTROY {
   my $self = shift;
 
-  if($self->{dbh}) {
+  if($self->{dbh} && $self->{dbh}->ping()) {
     #########
     # flush down any uncommitted transactions & locks
     #
@@ -55,27 +61,27 @@ sub DESTROY {
     $self->{dbh}->disconnect();
   }
 
-  return;
+  return 1;
 }
 
-sub _dump_handles {
-  print {*STDERR} qq[Remaining database handles\n];
-  my %drivers = DBI->installed_drivers();
-  _show_child_handles($_, 0) for (values %drivers);
-}
+#sub _dump_handles {
+#  print {*STDERR} qq[Remaining database handles\n];
+#  my %drivers = DBI->installed_drivers();
+#  _show_child_handles($_, 0) for (values %drivers);
+#}
 
-sub _show_child_handles {
-  my ($h, $level) = @_;
-  if(!$h->{Active}) {
-    return;
-  }
-
-  printf {*STDERR} "%sh %s %s %s\n", $h->{Type}, $h->{ActiveKids}, "\t" x $level, $h;
-  _show_child_handles($_, $level + 1)
-    for (grep { defined } @{$h->{ChildHandles}});
-
-  return;
-}
+#sub _show_child_handles {
+#  my ($h, $level) = @_;
+#  if(!$h->{Active}) {
+#    return;
+#  }
+#
+#  printf {*STDERR} "%sh %s %s %s\n", $h->{Type}, $h->{ActiveKids}, "\t" x $level, $h;
+#  _show_child_handles($_, $level + 1)
+#    for (grep { defined } @{$h->{ChildHandles}});
+#
+#  return;
+#}
 
 sub create_table {
   my ($self, $t_name, $ref, $t_attrs) = @_;
@@ -98,6 +104,7 @@ sub create_table {
 
   my $desc  = join q[, ], @fields;
   my $attrs = join q[ ], map { "$_=$t_attrs->{$_}" } keys %{$t_attrs};
+
   $dbh->do(qq[CREATE TABLE $t_name($desc) $attrs]);
   $dbh->commit();
 
@@ -120,6 +127,9 @@ sub types {
 
 sub type_map {
   my ($self, $type) = @_;
+  if(!defined $type) {
+    return;
+  }
   return $self->types->{$type} || $type;
 }
 
@@ -173,6 +183,8 @@ $LastChangedRevision$
 =item warnings
 
 =item Carp
+
+=item Class::Singleton
 
 =back
 

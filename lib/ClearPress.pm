@@ -1,9 +1,9 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $ $Author: zerojinx $
-# Id:            $Id: ClearPress.pm 173 2008-06-13 19:50:39Z zerojinx $
+# Last Modified: $Date: 2008-08-02 18:44:15 +0100 (Sat, 02 Aug 2008) $ $Author: zerojinx $
+# Id:            $Id: ClearPress.pm 224 2008-08-02 17:44:15Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress.pm $
 #
 package ClearPress;
 use strict;
@@ -13,7 +13,7 @@ use ClearPress::view;
 use ClearPress::controller;
 use ClearPress::util;
 
-our $VERSION = do { my ($r) = q$Revision: 174 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 224 $ =~ /(\d+)/mx; $r; };
 
 1;
 __END__
@@ -24,7 +24,7 @@ ClearPress - Simple, fresh & fruity MVC framework
 
 =head1 VERSION
 
-$LastChangedRevision: 173 $
+$Revision: 224 $
 
 =head1 SYNOPSIS
 
