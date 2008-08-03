@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2008-08-02 18:44:15 +0100 (Sat, 02 Aug 2008) $ $Author: zerojinx $
-# Id:            $Id: ClearPress.pm 224 2008-08-02 17:44:15Z zerojinx $
+# Last Modified: $Date: 2008-08-03 20:47:38 +0100 (Sun, 03 Aug 2008) $ $Author: zerojinx $
+# Id:            $Id: ClearPress.pm 236 2008-08-03 19:47:38Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress.pm,v $
 # $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress.pm $
 #
@@ -13,7 +13,7 @@ use ClearPress::view;
 use ClearPress::controller;
 use ClearPress::util;
 
-our $VERSION = do { my ($r) = q$Revision: 224 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 236 $ =~ /(\d+)/mx; $r; };
 
 1;
 __END__
@@ -24,7 +24,7 @@ ClearPress - Simple, fresh & fruity MVC framework
 
 =head1 VERSION
 
-$Revision: 224 $
+$Revision: 236 $
 
 =head1 SYNOPSIS
 
@@ -191,6 +191,11 @@ $Revision: 224 $
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
+
+ Most configuration settings for ClearPress-based applications come
+ form data/config.ini . Environment variables which have influential
+ effects include in particular 'dev' (set to 'dev', 'test' or 'live')
+ and DOCUMENT_ROOT, commonly set to './htdocs'.
 
 =head1 DEPENDENCIES
 

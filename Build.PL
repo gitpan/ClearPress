@@ -23,6 +23,8 @@ my $builder = Module::Build->new(
 							 'Readonly'            => '1.03',
 							},
 				 recommends          => {
+							 'DBD::SQLite'         => '1.14',
+							 'DBD::mysql'          => '4.007',
 							},
 				 build_requires      => {
 							 'XML::TreeBuilder'    => '3.09',
@@ -33,7 +35,6 @@ my $builder = Module::Build->new(
 							 'CPAN'                => '1.9205',
 							},
 				 build_recommends    => {
-							 'Test::Kwalitee'     => '0.30',
 							 'Test::Distribution' => '0',
 							 'Test::Perl::Critic' => '0',
 							},

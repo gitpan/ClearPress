@@ -1,7 +1,14 @@
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More;
 use English qw(-no_match_vars);
+
+eval {
+  require DBD::mysql;
+  plan tests => 3;
+} or do {
+  plan skip_all => 'DBD::mysql not installed';
+};
 
 use_ok('ClearPress::driver::mysql');
 
@@ -19,5 +26,5 @@ my $drv = ClearPress::driver::mysql->new({
   eval {
     my $dbh = $drv->dbh();
   };
-  like($EVAL_ERROR, qr/Failed\ to\ connect/mix, 'eval error');
+  like($EVAL_ERROR, qr/failed/mix, 'eval error');
 }

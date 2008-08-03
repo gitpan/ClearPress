@@ -7,6 +7,8 @@ TODO:
 - performance: Config caching
 - performance: Template caching
 
+235 - Improved test resiliance w.r.t. optional dependencies
+
 222 - ClearPress::driver is now a Class::Singleton. ** TAKE CARE ** if
       your application makes multiple database handles of the same sort
       - they need separate subclassing and will then be singletons

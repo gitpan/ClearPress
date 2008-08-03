@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-08-02 18:44:15 +0100 (Sat, 02 Aug 2008) $
+# Last Modified: $Date: 2008-08-03 20:33:54 +0100 (Sun, 03 Aug 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 224 2008-08-02 17:44:15Z zerojinx $
+# Id:            $Id: util.pm 234 2008-08-03 19:33:54Z zerojinx $
 # $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
@@ -16,12 +16,13 @@ use Carp;
 use POSIX qw(strftime);
 use English qw(-no_match_vars);
 use ClearPress::driver;
+use CGI;
 
-our $VERSION              = do { my ($r) = q$LastChangedRevision: 224 $ =~ /(\d+)/mx; $r; };
+our $VERSION              = do { my ($r) = q$LastChangedRevision: 234 $ =~ /(\d+)/mx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
-__PACKAGE__->mk_accessors(qw(transactions username cgi requestor profiler session));
+__PACKAGE__->mk_accessors(qw(transactions username requestor profiler session));
 
 sub new {
   my ($class, $ref) = @_;
@@ -33,6 +34,20 @@ sub new {
 
   my $self = bless $ref, $class;
   return $self;
+}
+
+sub cgi {
+  my ($self, $cgi) = @_;
+
+  if($cgi) {
+    $self->{cgi} = $cgi;
+  }
+
+  if(!$self->{cgi}) {
+    $self->{cgi} = CGI->new();
+  }
+
+  return $self->{cgi};
 }
 
 sub data_path {
@@ -132,6 +147,9 @@ sub log { ## no critic
   return 1;
 }
 
+sub cleanup {
+}
+
 1;
 
 __END__
@@ -142,7 +160,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 224 $
+$LastChangedRevision: 234 $
 
 =head1 SYNOPSIS
 
@@ -230,6 +248,10 @@ $LastChangedRevision: 224 $
 =head2 log - Formatted debugging output to STDERR
 
   $oUtil->log(@aMessages);
+
+=head2 cleanup - housekeeping stub for subclasses - called when response has completed processing
+
+  $oUtil->cleanup();
 
 =head1 DIAGNOSTICS
 

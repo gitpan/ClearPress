@@ -55,33 +55,12 @@ sub DESTROY {
     #########
     # flush down any uncommitted transactions & locks
     #
-#    carp q[driver DESTROY Disconnecting databases called by ].caller;
     $self->{dbh}->rollback();
-#    $self->_dump_handles();
     $self->{dbh}->disconnect();
   }
 
   return 1;
 }
-
-#sub _dump_handles {
-#  print {*STDERR} qq[Remaining database handles\n];
-#  my %drivers = DBI->installed_drivers();
-#  _show_child_handles($_, 0) for (values %drivers);
-#}
-
-#sub _show_child_handles {
-#  my ($h, $level) = @_;
-#  if(!$h->{Active}) {
-#    return;
-#  }
-#
-#  printf {*STDERR} "%sh %s %s %s\n", $h->{Type}, $h->{ActiveKids}, "\t" x $level, $h;
-#  _show_child_handles($_, $level + 1)
-#    for (grep { defined } @{$h->{ChildHandles}});
-#
-#  return;
-#}
 
 sub create_table {
   my ($self, $t_name, $ref, $t_attrs) = @_;

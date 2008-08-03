@@ -1,7 +1,14 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More;
 use English qw(-no_match_vars);
+
+eval {
+  require DBD::SQLite;
+  plan tests => 8;
+} or do {
+  plan skip_all => 'DBD::SQLite not installed';
+};
 
 if(-e 'test.db') {
   unlink 'test.db';
