@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-08-03 20:33:54 +0100 (Sun, 03 Aug 2008) $
-# Id:            $Id: controller.pm 234 2008-08-03 19:33:54Z zerojinx $
+# Last Modified: $Date: 2008-08-03 21:30:57 +0100 (Sun, 03 Aug 2008) $
+# Id:            $Id: controller.pm 237 2008-08-03 20:30:57Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 234 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 237 $ =~ /(\d+)/mx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		'POST'   => 'create',
@@ -359,7 +359,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 234 $
+$LastChangedRevision: 237 $
 
 =head1 SYNOPSIS
 

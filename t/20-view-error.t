@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More;
 use t::util;
 use English qw(-no_match_vars);
 use Carp;
@@ -8,6 +8,13 @@ use Carp;
 use XML::TreeBuilder;
 use Template;
 use Test::Trap;
+
+eval {
+  require DBD::SQLite;
+  plan tests => 10;
+} or do {
+  plan skip_all => 'DBD::SQLite not installed';
+};
 
 use_ok('ClearPress::view::error');
 

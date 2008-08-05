@@ -1,12 +1,19 @@
 use strict;
 use warnings;
-use Test::More tests => 52;
+use Test::More;
 use t::util;
 use English qw(-no_match_vars);
 use t::model::derived;
 use t::model::derived_status;
 use t::model::status;
 use Carp;
+
+eval {
+  require DBD::SQLite;
+  plan tests => 52;
+} or do {
+  plan skip_all => 'DBD::SQLite not installed';
+};
 
 use_ok('ClearPress::model');
 

@@ -30,7 +30,7 @@ isa_ok($drv, 'ClearPress::driver::mysql');
   eval {
     $drv->create_table('derived', {});
   };
-  like($EVAL_ERROR, qr/failed/mix, 'create without pk');
+  like($EVAL_ERROR, qr/determine\ primary\ key/mix, 'create without pk');
 }
 
 {

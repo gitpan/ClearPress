@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 62;
+use Test::More;
 use English qw(-no_match_vars);
 use t::util;
 use IO::Scalar;
@@ -10,6 +10,13 @@ use t::user::admin;
 use t::user::basic;
 use Test::Trap;
 use Carp;
+
+eval {
+  require DBD::SQLite;
+  plan tests => 62;
+} or do {
+  plan skip_all => 'DBD::SQLite not installed';
+};
 
 use_ok('ClearPress::view');
 

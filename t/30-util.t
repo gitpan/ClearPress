@@ -1,8 +1,15 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More;
 use English qw(-no_match_vars);
 use Test::Trap;
+
+eval {
+  require DBD::SQLite;
+  plan tests => 12;
+} or do {
+  plan skip_all => 'DBD::SQLite not installed';
+};
 
 use_ok('ClearPress::util');
 

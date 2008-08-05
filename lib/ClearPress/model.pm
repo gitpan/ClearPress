@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-08-02 18:44:15 +0100 (Sat, 02 Aug 2008) $
-# Id:            $Id: model.pm 224 2008-08-02 17:44:15Z zerojinx $
+# Last Modified: $Date: 2008-08-03 21:30:57 +0100 (Sun, 03 Aug 2008) $
+# Id:            $Id: model.pm 237 2008-08-03 20:30:57Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/model.pm $
 #
 package ClearPress::model;
 use strict;
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 224 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 237 $ =~ /(\d+)/mx; $r; };
 Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
@@ -666,7 +666,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 224 $
+$LastChangedRevision: 237 $
 
 =head1 SYNOPSIS
 
