@@ -2,16 +2,16 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-08-08 22:47:09 +0100 (Fri, 08 Aug 2008) $
-# Id:            $Id: js_string.pm 245 2008-08-08 21:47:09Z zerojinx $
+# Last Modified: $Date: 2008-08-13 11:31:51 +0100 (Wed, 13 Aug 2008) $
+# Id:            $Id: js_string.pm 250 2008-08-13 10:31:51Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/Template/Plugin/js_string.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/Template/Plugin/js_string.pm $
 package ClearPress::Template::Plugin::js_string;
 use strict;
 use warnings;
 use base qw(Template::Plugin::Filter);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 245 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 250 $ =~ /(\d+)/mx; $r; };
 
 sub init {
   my $self = shift;
@@ -39,7 +39,7 @@ ClearPress::Template::Plugin::js_string - escape double-quotes, newlines and car
 
 =head1 VERSION
 
-$LastChangedRevision: 245 $
+$LastChangedRevision: 250 $
 
 =head1 SYNOPSIS
 

@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-08-13 11:26:43 +0100 (Wed, 13 Aug 2008) $
-# Id:            $Id: mysql.pm 249 2008-08-13 10:26:43Z zerojinx $
+# Last Modified: $Date: 2008-08-13 11:31:51 +0100 (Wed, 13 Aug 2008) $
+# Id:            $Id: mysql.pm 250 2008-08-13 10:31:51Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/driver/mysql.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/mysql.pm $
 #
 package ClearPress::driver::mysql;
 use strict;
@@ -15,7 +15,7 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 249 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 250 $ =~ /(\d+)/mx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'bigint unsigned not null auto_increment primary key',
@@ -90,7 +90,7 @@ ClearPress::driver::mysql - MySQL-specific implementation of the database abstra
 
 =head1 VERSION
 
-$LastChangedRevision: 249 $
+$LastChangedRevision: 250 $
 
 =head1 SYNOPSIS
 

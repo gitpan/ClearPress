@@ -5,7 +5,7 @@
 # Last Modified: $Date: 2008-08-03 20:33:54 +0100 (Sun, 03 Aug 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
 # Id:            $Id: util.pm 234 2008-08-03 19:33:54Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/util.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
