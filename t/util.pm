@@ -65,7 +65,11 @@ sub new {
 }
 
 sub data_path {
-  return 't/data';
+  my ($self, $data_path) = @_;
+  if(defined $data_path) {
+    $self->{data_path} = $data_path;
+  }
+  return $self->{data_path} || 't/data';
 }
 
 sub requestor {

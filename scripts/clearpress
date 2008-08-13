@@ -2,9 +2,9 @@
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2008-08-03 21:30:57 +0100 (Sun, 03 Aug 2008) $
-# Id:            $Id: clearpress 237 2008-08-03 20:30:57Z zerojinx $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/scripts/clearpress $
+# Last Modified: $Date: 2008-08-13 11:23:57 +0100 (Wed, 13 Aug 2008) $
+# Id:            $Id: clearpress 248 2008-08-13 10:23:57Z zerojinx $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/scripts/clearpress $
 #
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 237 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 248 $ =~ /(\d+)/mx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
 $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin);
@@ -25,7 +25,7 @@ main();
 0;
 
 
-sub main {
+sub main { ## no critic (complexity)
   my $opts      = {};
   my @argvcopy = @ARGV;
 
@@ -39,13 +39,13 @@ sub main {
 
   if($opts->{help}) {
     print qq(Usage Example:
-  $0 --new GrandKids 'child->family child(name,birthday:date) family(name,address,city,state,zip)'\n);
-    return;
+  $0 --new GrandKids 'child->family child(name,birthday:date) family(name,address,city,state,zip)'\n) or croak qq[Error printing: $ERRNO];
+    return 1;
   }
 
   if($opts->{version}) {
-    print q(ClearPress v).ClearPress->VERSION.qq(\n);
-    return;
+    print q(ClearPress v).ClearPress->VERSION.qq(\n) or croak qq[Error printing: $ERRNO];
+    return 1;
   }
 
   $opts->{driver} ||= 'mysql';
@@ -70,14 +70,14 @@ sub main {
       # table definition
       #
       my ($table, $columns) = $structure =~ /(\S+)\((\S+)\)/mx;
-      
+
       for my $column (split /,/mx, $columns) {
 	my ($name, $type) = split /:/mx, $column;
 	$name           ||= $column;
 	$type           ||= 'char(128)';
 	$schema->{$table}->{fields}->{$name} = $type;
 
-	print {*STDERR} qq($table has $name of type $type\n);
+	print {*STDERR} qq($table has $name of type $type\n) or croak qq[Error printing: $ERRNO];
       }
 
     } elsif($structure =~ /\S+\->\S+/mx) {
@@ -87,7 +87,7 @@ sub main {
       my ($one, $many) = $structure =~ /(\S+)\->(\S+)/mx;
       push @{$schema->{$one}->{has_a}},     $many;
       push @{$schema->{$many}->{has_many}}, $one;
-      print {*STDERR} qq($one has a $many\n$many has many @{[PL($one)]}\n);
+      print {*STDERR} qq($one has a $many\n$many has many @{[PL($one)]}\n) or croak qq[Error printing: $ERRNO];
     }
   }
 
@@ -104,9 +104,9 @@ sub main {
 		     });
 
   my $cfg = qq($app/config.layout);
-  open my $fh, q(>), $cfg or croak qq(Error opening $cfg: $ERRNO);
-  print $fh $0, (map { qq( '$_') } @argvcopy), qq(\n);
-  close $fh or croak qq(Error closing $cfg: $ERRNO);
+  open my $fh, q(>), $cfg or croak qq[Error opening $cfg: $ERRNO];
+  print {$fh} $PROGRAM_NAME, (map { qq( '$_') } @argvcopy), qq(\n) or croak qq[Error printing: $ERRNO];
+  close $fh or croak qq[Error closing $cfg: $ERRNO];
 
   print qq(
 You now need to configure your database.
@@ -117,8 +117,8 @@ You now need to configure your database.
   <Ctrl-D>
 3. mysql -uroot < $app/data/schema/*.mysql
 Note you may need to create your new schema in order, depending on your foreign key constraints.
-);
-  return;
+) or croak qq[Error printing: $ERRNO];
+  return 1;
 }
 
 sub read_templates {
@@ -132,10 +132,10 @@ sub read_templates {
       my $str          = <DATA>;
       $str             =~ s/$RS//smx;
       $cache->{$field} = \$str;
-      print qq(Read @{[length($str)]} bytes for $field\n);
+      print qq(Read @{[length($str)]} bytes for $field\n) or croak qq[Error printing: $ERRNO];
     }
   }
-  return;
+  return 1;
 }
 
 sub create_application {
@@ -170,7 +170,7 @@ sub create_application {
   process_template($opts, $tt, $cache->{application_sa},  "$app/bin",            $app);
   process_template($opts, $tt, $cache->{stylesheet},      "$app/htdocs",         "$app.css");
   process_template($opts, $tt, $cache->{actions},         "$app/data/templates", 'actions.tt2');
-  return;
+  return 1;
 }
 
 sub _yn {
@@ -188,15 +188,15 @@ sub process_template {
   $fn = "$path/$fn";
 
   if(!$opts->{yes} && -e $fn) {
-    print "$fn exists. Overwrite? [y/N] ";
-    _yn('N') and return;
+    print "$fn exists. Overwrite? [y/N] " or croak qq[Error printing: $ERRNO];
+    _yn('N') and return 1;
   }
 
   system qw(mkdir -p), $path;
   open my $fh, q[>], $fn or croak "Opening $fn: $ERRNO";
   $tt->process($tmpl, $opts, $fh) or croak "Template error building $fn: ".$tt->error(). "\nTemplate was:\n".${$tmpl}."\n";
   close $fh or croak "Closing $fn: $ERRNO";
-  return;
+  return 1;
 }
 
 __END__
@@ -250,7 +250,7 @@ use ClearPress::controller;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 237 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 248 $ =~ /(\d+)/mx; $r; };
 
 <% application %>::sa->new->run();
 
@@ -302,13 +302,13 @@ sub handle_request {
     ClearPress::controller->handler($util);
   }
 
-  return;
+  return 1;
 }
 
 sub print_banner {
   my $self = shift;
   print q[ClearPress development server up and running at http://localhost:].$self->port()."/\n";
-  return;
+  return 1;
 }
  
 1;
@@ -324,7 +324,7 @@ use ClearPress::controller;
 <% FOREACH view = views %>
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
-our $VERSION = do { my ($r) = q$LastChangedRevision: 237 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 248 $ =~ /(\d+)/mx; $r; };
 
 main();
 0;

@@ -13,7 +13,7 @@ use Carp;
 
 eval {
   require DBD::SQLite;
-  plan tests => 62;
+  plan tests => 66;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -314,4 +314,51 @@ my $util = t::util->new();
 				     aspect => q(),
 				    });
   is($view->authorised(), 1, 'admin user can create');
+}
+
+my $pid = $$;
+$util->data_path("/tmp/data$pid");
+{
+  my $model = t::model->new({util=>$util});
+  my $view  = ClearPress::view->new({
+				     util   => $util,
+				     model  => $model,
+				     action => 'read',
+				     aspect => q[],
+				    });
+  my $fn  = "/tmp/data$pid/templates/$pid.tt2";
+
+  mkdir "/tmp/data$pid";
+  mkdir "/tmp/data$pid/templates";
+
+  `cp t/data/templates/cache.tt2 $fn`;
+  ok(-f $fn, 'test file copied');
+  my $result1 = q[];
+  $view->process_template("$pid.tt2", {}, \$result1);
+
+  unlink $fn;
+  like($result1, qr/cached/mx, 'first result');
+}
+
+{
+  my $model = t::model->new({util=>$util});
+  my $view  = ClearPress::view->new({
+				     util   => $util,
+				     model  => $model,
+				     action => 'read',
+				     aspect => q[],
+				    });
+  my $fn  = "/tmp/data$pid/templates/$pid.tt2";
+
+  mkdir "/tmp/data$pid";
+  mkdir "/tmp/data$pid/templates";
+
+  `cp t/data/templates/actions.tt2 $fn`;
+  ok(-f $fn, 'test file copied');
+  my $result2 = q[];
+  $view->process_template("$pid.tt2", {}, \$result2);
+
+  like($result2, qr/cached/mx, 'second process used cached template');
+
+  `rm -rf /tmp/data`;
 }

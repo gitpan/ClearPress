@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-08-03 21:30:57 +0100 (Sun, 03 Aug 2008) $
-# Id:            $Id: controller.pm 237 2008-08-03 20:30:57Z zerojinx $
+# Last Modified: $Date: 2008-08-06 13:52:31 +0100 (Wed, 06 Aug 2008) $
+# Id:            $Id: controller.pm 242 2008-08-06 12:52:31Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/controller.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 237 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 242 $ =~ /(\d+)/mx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		'POST'   => 'create',
@@ -307,16 +307,12 @@ sub dispatch {
       }
     }
 
-    my $modelclass = "${namespace}::model::$entity";
-    my $viewclass  = "${namespace}::view::$entity";
-    my $modelpk    = $modelclass->primary_key();
-
-    if(!$modelpk) {
-      croak qq(Could not find $entity's primary key. Have you "use"d $modelclass?);
-    }
+    my $modelclass  = "${namespace}::model::$entity";
+    my $viewclass   = "${namespace}::view::$entity";
+    my $modelpk     = $modelclass->primary_key();
     my $modelobject = $modelclass->new({
-					'util'   => $util,
-					$modelpk => $id,
+					util => $util,
+					$modelpk?($modelpk => $id):(),
 				       });
     if(!$modelobject) {
       croak qq(Failed to instantiate $modelobject);
@@ -359,7 +355,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 237 $
+$LastChangedRevision: 242 $
 
 =head1 SYNOPSIS
 

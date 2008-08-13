@@ -1,0 +1,284 @@
+[
+          {
+            'ARGV' => []
+          },
+          {},
+          {
+            'verbose' => undef,
+            'PL_files' => undef,
+            'pollute' => undef,
+            'bindoc_dirs' => [
+                               'blib/script'
+                             ],
+            'conflicts' => {},
+            'scripts' => undef,
+            'recommends' => {
+                              'DBD::SQLite' => '1.14',
+                              'DBD::mysql' => '4.007'
+                            },
+            'pod_files' => undef,
+            'config_dir' => '_build',
+            'dist_version' => '249',
+            'recurse_into' => [],
+            'build_bat' => 0,
+            'extra_linker_flags' => [],
+            'build_class' => 'Module::Build',
+            'prereq_action_types' => [
+                                       'requires',
+                                       'build_requires',
+                                       'conflicts',
+                                       'recommends'
+                                     ],
+            'base_dir' => '/.automount/evs-users3/root/team117/rmp/dev/clearpress/branches/prerelease-1.17',
+            'allow_mb_mismatch' => 0,
+            'xs_files' => undef,
+            'destdir' => undef,
+            'metafile' => 'META.yml',
+            'build_recommends' => {
+                                    'Test::Perl::Critic' => '0',
+                                    'Test::Distribution' => '0'
+                                  },
+            'mb_version' => '0.2808',
+            'has_config_data' => undef,
+            'dist_name' => 'ClearPress',
+            'install_base' => undef,
+            'module_name' => 'ClearPress',
+            'recursive_test_files' => undef,
+            'libdoc_dirs' => [
+                               'blib/lib',
+                               'blib/arch'
+                             ],
+            'perl' => '/.automount/evs-users3/root/team117/rmp/dev/bin/perl',
+            'dist_author' => [
+                               'Roger M Pettett <rpettett@cpan.org>'
+                             ],
+            'use_rcfile' => 1,
+            'test_files' => undef,
+            'dist_abstract' => 'ClearPress - Simple, fresh & fruity MVC framework',
+            'create_readme' => undef,
+            'prefix_relpaths' => {
+                                   'core' => {
+                                               'libdoc' => [
+                                                             'man',
+                                                             'man3'
+                                                           ],
+                                               'script' => [
+                                                             'bin'
+                                                           ],
+                                               'libhtml' => [
+                                                              'html'
+                                                            ],
+                                               'bindoc' => [
+                                                             'man',
+                                                             'man1'
+                                                           ],
+                                               'bin' => [
+                                                          'bin'
+                                                        ],
+                                               'arch' => [
+                                                           'lib',
+                                                           'perl5',
+                                                           '5.8.8',
+                                                           'i686-linux'
+                                                         ],
+                                               'binhtml' => [
+                                                              'html'
+                                                            ],
+                                               'lib' => [
+                                                          'lib',
+                                                          'perl5'
+                                                        ]
+                                             },
+                                   'site' => {
+                                               'libdoc' => [
+                                                             'man',
+                                                             'man3'
+                                                           ],
+                                               'script' => [
+                                                             'bin'
+                                                           ],
+                                               'libhtml' => [
+                                                              'html'
+                                                            ],
+                                               'bindoc' => [
+                                                             'man',
+                                                             'man1'
+                                                           ],
+                                               'bin' => [
+                                                          'bin'
+                                                        ],
+                                               'arch' => [
+                                                           'lib',
+                                                           'perl5',
+                                                           'site_perl',
+                                                           '5.8.8',
+                                                           'i686-linux'
+                                                         ],
+                                               'binhtml' => [
+                                                              'html'
+                                                            ],
+                                               'lib' => [
+                                                          'lib',
+                                                          'perl5',
+                                                          'site_perl'
+                                                        ]
+                                             },
+                                   'vendor' => {
+                                                 'libdoc' => [
+                                                               'man',
+                                                               'man3'
+                                                             ],
+                                                 'script' => [
+                                                               'bin'
+                                                             ],
+                                                 'libhtml' => [
+                                                                'html'
+                                                              ],
+                                                 'bindoc' => [
+                                                               'man',
+                                                               'man1'
+                                                             ],
+                                                 'bin' => [
+                                                            'bin'
+                                                          ],
+                                                 'arch' => [
+                                                             'lib',
+                                                             'perl5',
+                                                             '5.8.8',
+                                                             'i686-linux'
+                                                           ],
+                                                 'binhtml' => [
+                                                                'html'
+                                                              ],
+                                                 'lib' => [
+                                                            'lib',
+                                                            'perl5'
+                                                          ]
+                                               }
+                                 },
+            'meta_merge' => {},
+            'get_options' => {},
+            'dist_version_from' => undef,
+            'debugger' => undef,
+            'html_css' => '',
+            'build_elements' => [
+                                  'PL',
+                                  'support',
+                                  'pm',
+                                  'xs',
+                                  'pod',
+                                  'script'
+                                ],
+            'orig_dir' => '/.automount/evs-users3/root/team117/rmp/dev/clearpress/branches/prerelease-1.17',
+            'include_dirs' => [],
+            'installdirs' => 'site',
+            'create_makefile_pl' => 'passthrough',
+            'magic_number' => undef,
+            'install_sets' => {
+                                'core' => {
+                                            'libdoc' => '/nfs/team117/rmp/dev/share/man/man3',
+                                            'script' => '/nfs/team117/rmp/dev/bin',
+                                            'libhtml' => undef,
+                                            'bindoc' => '/nfs/team117/rmp/dev/share/man/man1',
+                                            'bin' => '/nfs/team117/rmp/dev/bin',
+                                            'arch' => '/nfs/team117/rmp/dev/lib/perl5/5.8.8/i686-linux',
+                                            'binhtml' => undef,
+                                            'lib' => '/nfs/team117/rmp/dev/lib/perl5/5.8.8'
+                                          },
+                                'site' => {
+                                            'libdoc' => '/nfs/team117/rmp/dev/share/man/man3',
+                                            'script' => '/nfs/team117/rmp/dev/bin',
+                                            'libhtml' => undef,
+                                            'bindoc' => '/nfs/team117/rmp/dev/share/man/man1',
+                                            'bin' => '/nfs/team117/rmp/dev/bin',
+                                            'arch' => '/nfs/team117/rmp/dev/lib/perl5/site_perl/5.8.8/i686-linux',
+                                            'binhtml' => undef,
+                                            'lib' => '/nfs/team117/rmp/dev/lib/perl5/site_perl/5.8.8'
+                                          },
+                                'vendor' => {
+                                              'libdoc' => '/nfs/team117/rmp/dev/share/man/man3',
+                                              'script' => '/nfs/team117/rmp/dev/bin',
+                                              'libhtml' => undef,
+                                              'bindoc' => '/nfs/team117/rmp/dev/share/man/man1',
+                                              'bin' => '/nfs/team117/rmp/dev/bin',
+                                              'arch' => '',
+                                              'binhtml' => undef,
+                                              'lib' => ''
+                                            }
+                              },
+            'install_base_relpaths' => {
+                                         'libdoc' => [
+                                                       'man',
+                                                       'man3'
+                                                     ],
+                                         'script' => [
+                                                       'bin'
+                                                     ],
+                                         'libhtml' => [
+                                                        'html'
+                                                      ],
+                                         'bindoc' => [
+                                                       'man',
+                                                       'man1'
+                                                     ],
+                                         'bin' => [
+                                                    'bin'
+                                                  ],
+                                         'arch' => [
+                                                     'lib',
+                                                     'perl5',
+                                                     'i686-linux'
+                                                   ],
+                                         'binhtml' => [
+                                                        'html'
+                                                      ],
+                                         'lib' => [
+                                                    'lib',
+                                                    'perl5'
+                                                  ]
+                                       },
+            'meta_add' => {},
+            'create_packlist' => 1,
+            'requires' => {
+                            'IO::Scalar' => '2.110',
+                            'English' => '1.01',
+                            'Class::Accessor' => '0.31',
+                            'Template' => '2.19',
+                            'Readonly' => '1.03',
+                            'CGI' => '3.20',
+                            'Carp' => '1.02',
+                            'Config::IniFiles' => '2.38',
+                            'Class::Singleton' => '1.4',
+                            'POSIX' => '1.09',
+                            'Lingua::EN::Inflect' => '1.89',
+                            'DBI' => '1.51'
+                          },
+            'install_path' => {},
+            'pm_files' => undef,
+            'quiet' => undef,
+            'script_files' => [
+                                'scripts/clearpress'
+                              ],
+            'extra_compiler_flags' => [],
+            'build_script' => 'Build',
+            'original_prefix' => {
+                                   'core' => '/nfs/team117/rmp/dev',
+                                   'site' => '/nfs/team117/rmp/dev',
+                                   'vendor' => ''
+                                 },
+            'c_source' => undef,
+            'license' => 'perl',
+            'autosplit' => undef,
+            'build_requires' => {
+                                  'Test::More' => '0.8',
+                                  'File::Spec' => '3.2701',
+                                  'CPAN' => '1.9205',
+                                  'Test::Trap' => '0.1.1',
+                                  'Cwd' => '3.2701',
+                                  'XML::TreeBuilder' => '3.09'
+                                },
+            'config' => undef,
+            'blib' => 'blib',
+            'prefix' => undef
+          }
+        ]

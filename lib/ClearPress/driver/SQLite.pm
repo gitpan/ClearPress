@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-07-04 13:52:40 +0100 (Fri, 04 Jul 2008) $
-# Id:            $Id: model.pm 177 2008-07-04 12:52:40Z zerojinx $
+# Last Modified: $Date: 2008-08-13 11:26:43 +0100 (Wed, 13 Aug 2008) $
+# Id:            $Id: SQLite.pm 249 2008-08-13 10:26:43Z zerojinx $
 # Source:        $Source$
-# $HeadURL$
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/driver/SQLite.pm $
 #
 package ClearPress::driver::SQLite;
 use strict;
@@ -15,7 +15,7 @@ use Carp;
 use English qw(-no_match_vars);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 177 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 249 $ =~ /(\d+)/mx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'INTEGER PRIMARY KEY AUTOINCREMENT',
@@ -67,11 +67,11 @@ __END__
 
 =head1 NAME
 
-ClearPress::driver::SQLite
+ClearPress::driver::SQLite - SQLite-specific implementation of the database abstraction layer
 
 =head1 VERSION
 
-$LastChangedRevision$
+$LastChangedRevision: 249 $
 
 =head1 SYNOPSIS
 

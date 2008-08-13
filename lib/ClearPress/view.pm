@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-08-03 21:30:57 +0100 (Sun, 03 Aug 2008) $
-# Id:            $Id: view.pm 237 2008-08-03 20:30:57Z zerojinx $
+# Last Modified: $Date: 2008-08-08 22:50:43 +0100 (Fri, 08 Aug 2008) $
+# Id:            $Id: view.pm 247 2008-08-08 21:50:43Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/view.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
@@ -18,8 +18,9 @@ use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use ClearPress::Template::Plugin::js_string;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 237 $ =~ /(\d+)/mx; $r; };
-our $DEBUG_OUTPUT = 0;
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 247 $ =~ /(\d+)/mx; $r; };
+our $DEBUG_OUTPUT   = 0;
+our $TEMPLATE_CACHE = {};
 
 __PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape));
 
@@ -214,22 +215,40 @@ sub render {
 
 sub process_template {
   my ($self, $template, $extra_params, $where_to_ref) = @_;
-  my $util   = $self->util();
-  my $cfg    = $util->config();
+  my $util     = $self->util();
+  my $cfg      = $util->config();
   my ($entity) = (ref $self) =~ /([^:]+)$/mx;
-  my $params = {
-		requestor   => $util->requestor,
-		model       => $self->model(),
-		view        => $self,
-		entity      => $entity,
-		SCRIPT_NAME => $ENV{SCRIPT_NAME},
-		HTTP_HOST   => $ENV{HTTP_HOST},
-		now         => (strftime '%Y-%m-%dT%H:%M:%S', localtime),
-		(map {
-		  $_ => $cfg->val('globals',$_)
-		} $cfg->Parameters('globals')),
-		%{$extra_params||{}},
-	       };
+  my $params   = {
+		  requestor   => $util->requestor,
+		  model       => $self->model(),
+		  view        => $self,
+		  entity      => $entity,
+		  SCRIPT_NAME => $ENV{SCRIPT_NAME},
+		  HTTP_HOST   => $ENV{HTTP_HOST},
+		  now         => (strftime '%Y-%m-%dT%H:%M:%S', localtime),
+		  (map {
+		    $_ => $cfg->val('globals',$_)
+		  } $cfg->Parameters('globals')),
+		  %{$extra_params||{}},
+		 };
+
+
+  my $appname = $util->config->val('application', 'name') ||
+                $util->config->val('application', 'namespace') ||
+                $ENV{SCRIPT_NAME};
+
+  $TEMPLATE_CACHE->{$appname} ||= {};
+  my $template_cache = $TEMPLATE_CACHE->{$appname};
+
+  if(!$template_cache->{$template}) {
+    my $path = sprintf q(%s/templates), $util->data_path();
+    open my $fh, q[<], "$path/$template" or croak qq[Error opening $template];
+    local $RS = undef;
+    $template_cache->{$template} = <$fh>;
+    close $fh or croak qq[Error closing $template];
+  }
+
+  $template = \$template_cache->{$template};
 
   if($where_to_ref) {
     $self->tt->process($template, $params, $where_to_ref) or croak $self->tt->error();
@@ -467,7 +486,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 237 $
+$LastChangedRevision: 247 $
 
 =head1 SYNOPSIS
 

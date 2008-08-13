@@ -7,6 +7,8 @@ TODO:
 - performance: Config caching
 - performance: Template caching
 
+236 - driver support for bounded selects (currently basic string concatenation)
+
 235 - Improved test resiliance w.r.t. optional dependencies
 
 222 - ClearPress::driver is now a Class::Singleton. ** TAKE CARE ** if

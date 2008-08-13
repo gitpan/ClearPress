@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-07-04 13:52:40 +0100 (Fri, 04 Jul 2008) $
-# Id:            $Id: model.pm 177 2008-07-04 12:52:40Z zerojinx $
+# Last Modified: $Date: 2008-08-13 11:26:43 +0100 (Wed, 13 Aug 2008) $
+# Id:            $Id: driver.pm 249 2008-08-13 10:26:43Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL$
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.17/lib/ClearPress/driver.pm $
 #
 package ClearPress::driver;
 use strict;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use Carp;
 use base qw(Class::Singleton);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 177 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 249 $ =~ /(\d+)/mx; $r; };
 
 sub new {
   my ($class, @args) = @_;
@@ -116,16 +116,22 @@ sub create {
   return;
 }
 
+sub bounded_select {
+  my ($self, $query, $start, $len) = @_;
+  carp q[bounded_select unimplemented by driver ], ref $self;
+  return q[];
+}
+
 1;
 __END__
 
 =head1 NAME
 
-ClearPress::driver
+ClearPress::driver - database driver abstraction layer
 
 =head1 VERSION
 
-$LastChangedRevision$
+$LastChangedRevision: 249 $
 
 =head1 SYNOPSIS
 
@@ -148,6 +154,10 @@ $LastChangedRevision$
 =head2 type_map - access to a value in the type map, given a key
 
 =head2 types - the whole type map
+
+=head2 bounded_select - stub for select limited by number of rows and first-row position
+
+  my $bounded_select = $driver->bounded_select($unbounded_select, $rows, $start_row);
 
 =head1 DIAGNOSTICS
 
@@ -177,17 +187,10 @@ $Author: Roger Pettett$
 
 =head1 LICENSE AND COPYRIGHT
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Copyright (C) 2008 Roger Pettett
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut

@@ -1,7 +1,18 @@
+Build
+Build.PL
 Changes
 LICENSE
 MANIFEST
 README
+_build/auto_features
+_build/build_params
+_build/cleanup
+_build/config_data
+_build/features
+_build/magicnum
+_build/notes
+_build/prereqs
+_build/runtime_params
 cgi-bin/application
 examples/GrandKids/bin/GrandKids
 examples/GrandKids/cgi-bin/GrandKids
@@ -62,6 +73,7 @@ t/data/rendered/view-error-read-tt.html
 t/data/rendered/view-error-read.html
 t/data/rendered/view-error-read.xml
 t/data/templates/actions.tt2
+t/data/templates/cache.tt2
 t/dbh.pm
 t/model.pm
 t/model/attribute.pm
@@ -75,5 +87,4 @@ t/user/admin.pm
 t/user/basic.pm
 t/util.pm
 Makefile.PL
-Build.PL
 META.yml

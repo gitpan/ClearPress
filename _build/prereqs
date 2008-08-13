@@ -1,0 +1,29 @@
+{
+          'build_requires' => {
+                                'Test::More' => '0.8',
+                                'File::Spec' => '3.2701',
+                                'CPAN' => '1.9205',
+                                'Test::Trap' => '0.1.1',
+                                'Cwd' => '3.2701',
+                                'XML::TreeBuilder' => '3.09'
+                              },
+          'conflicts' => {},
+          'requires' => {
+                          'IO::Scalar' => '2.110',
+                          'English' => '1.01',
+                          'Class::Accessor' => '0.31',
+                          'Template' => '2.19',
+                          'Readonly' => '1.03',
+                          'CGI' => '3.20',
+                          'Carp' => '1.02',
+                          'Config::IniFiles' => '2.38',
+                          'Class::Singleton' => '1.4',
+                          'POSIX' => '1.09',
+                          'Lingua::EN::Inflect' => '1.89',
+                          'DBI' => '1.51'
+                        },
+          'recommends' => {
+                            'DBD::SQLite' => '1.14',
+                            'DBD::mysql' => '4.007'
+                          }
+        }
