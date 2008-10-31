@@ -1,0 +1,1 @@
+[% IF warnings %]<ul>[% FOREACH warning = warnings %]<li>[% warning %]</li>[% END %]</ul>[% END %]

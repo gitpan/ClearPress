@@ -7,6 +7,7 @@ use t::model::derived;
 use t::model::derived_status;
 use t::model::status;
 use Carp;
+use Test::Trap;
 
 eval {
   require DBD::SQLite;
@@ -18,6 +19,30 @@ eval {
 use_ok('ClearPress::model');
 
 my $util = t::util->new();
+
+{
+  my $d = t::model::derived->new({
+				  util       => $util,
+				  id_derived => 1,
+				 });
+  my $c1 = t::model::derived_child->new({
+					 util       => $util,
+					 id_derived => 1,
+					 text_dummy => 'child one',
+					});
+  ok($c1->create(), 'child one create');
+
+  my $c2 = t::model::derived_child->new({
+					 util       => $util,
+					 id_derived => 1,
+					 text_dummy => 'child two',
+					});
+  ok($c2->create(), 'child two create');
+
+  ok($d->can('children'), 'can children()');
+  my $children = $d->children();
+  is((scalar @{$children}), 2, 'children ok');
+}
 
 {
   my $model = ClearPress::model->new({util=>$util});
@@ -123,30 +148,6 @@ my $util = t::util->new();
 				   id_derived => 2,
 				  });
   is($d2->read(), undef, 'entity not in database');
-}
-
-{
-  my $d = t::model::derived->new({
-				  util => $util,
-				  id_derived => 1,
-				 });
-  my $c1 = t::model::derived_child->new({
-					 util => $util,
-					 id_derived => 1,
-					 text_dummy => 'child one',
-					});
-  ok($c1->create(), 'child one create');
-
-  my $c2 = t::model::derived_child->new({
-					 util => $util,
-					 id_derived => 1,
-					 text_dummy => 'child two',
-					});
-  ok($c2->create(), 'child two create');
-
-  ok($d->can('children'), 'can children()');
-  my $children = $d->children();
-  is((scalar @{$children}), 2, 'children ok');
 }
 
 {

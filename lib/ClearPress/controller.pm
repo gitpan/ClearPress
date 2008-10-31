@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-08-06 13:53:59 +0100 (Wed, 06 Aug 2008) $
-# Id:            $Id: controller.pm 243 2008-08-06 12:53:59Z zerojinx $
+# Last Modified: $Date: 2008-10-31 13:36:08 +0000 (Fri, 31 Oct 2008) $
+# Id:            $Id: controller.pm 265 2008-10-31 13:36:08Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.18/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -26,13 +26,13 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 243 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 265 $ =~ /(\d+)/mx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
-		'POST'   => 'create',
-		'GET'    => 'read',
-		'PUT'    => 'update',
-		'DELETE' => 'destroy',
+		POST   => 'create',
+		GET    => 'read',
+		PUT    => 'update',
+		DELETE => 'destroy',
 	       };
 
 sub accept_extensions {
@@ -46,6 +46,7 @@ sub accept_extensions {
 	  {'.js'   => q[_json]},
 	  {'.json' => q[_json]},
 	  {'.ical' => q[_ical]},
+	  {'.ajax' => q[_ajax]},
 	 ];
 }
 
@@ -61,7 +62,30 @@ sub new {
   my ($class, $ref) = @_;
   $ref ||= {};
   bless $ref, $class;
+  $ref->init();
+
+  eval {
+    #########
+    # We may be given a database handle from the cache with an open
+    # transaction (e.g. from running a few selects), so on controller
+    # construction (effectively per-page-view), we rollback any open
+    # transaction on the database handle we've been given.
+    #
+    $ref->util->dbh->rollback();
+    1;
+
+  } or do {
+    #########
+    # ignore any error
+    #
+    carp q[Failed per-request rollback on fresh database handle];
+  };
+
   return $ref;
+}
+
+sub init {
+  return 1;
 }
 
 sub util {
@@ -121,6 +145,10 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
     $entity   = (split /[\s,]+/mx, $views)[0];
   }
 
+  if(!$aspect) {
+    $aspect = $action;
+  }
+
   return $self->_check_sanity($action, $entity, $aspect, $id);
 }
 
@@ -130,13 +158,22 @@ sub _check_sanity {
   #########
   # sanity checks
   #
-  if($action eq $aspect) {
-    $aspect = q();
+
+  my $tmp = $action;
+  if(!$id && $action eq 'read') {
+    $tmp = 'list';
   }
 
-  if(scalar grep { $_ eq $aspect } values %{$CRUD}) {
-    carp qq(Discarding aspect $aspect - should it be an action?);
-    $aspect = q();
+  if(!$id && $aspect =~ /^add/mx) {
+    $tmp = 'add';
+  }
+
+  if($id && $aspect =~ /^edit/mx) {
+    $tmp = 'edit';
+  }
+
+  if($aspect !~ /^$tmp/mx) {
+    croak qq[Bad request: '$aspect' is not a '$action' action];
   }
 
   $DEBUG and carp qq(_check_sanity: action=$action, entity=$entity, aspect=$aspect, id=$id);
@@ -184,14 +221,16 @@ sub _process_request_headers {
 
 sub decorator {
   my ($self, $util) = @_;
-  my $appname       = $util->config->val('application', 'name') || 'Application';
-  my $decorator     = ClearPress::decorator->new({
-						  'title'      => (sprintf q(%s v%s),
-								   $appname,
-								   $VERSION,),
-						  'stylesheet' => [$util->config->val('application','stylesheet')],
-						 });
-  return $decorator;
+
+  if(!$self->{decorator}) {
+    my $appname        = $util->config->val('application', 'name') || 'Application';
+    $self->{decorator} = ClearPress::decorator->new({
+						     title      => $appname,
+						     stylesheet => [$util->config->val('application','stylesheet')],
+						    });
+  }
+
+  return $self->{decorator};
 }
 
 sub session {
@@ -355,7 +394,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 243 $
+$LastChangedRevision: 265 $
 
 =head1 SYNOPSIS
 
@@ -363,7 +402,13 @@ $LastChangedRevision: 243 $
 
 =head1 SUBROUTINES/METHODS
 
-=head2 new
+=head2 new - constructor, usually no specific arguments
+
+ my $oController = application::controller->new();
+
+=head2 init - post-constructor initialisation, called after new()
+
+ $oController->init();
 
 =head2 session
 

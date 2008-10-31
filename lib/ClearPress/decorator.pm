@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2008-06-13 20:50:39 +0100 (Fri, 13 Jun 2008) $
-# Id:            $Id: decorator.pm 173 2008-06-13 19:50:39Z zerojinx $
+# Last Modified: $Date: 2008-10-31 13:36:08 +0000 (Fri, 31 Oct 2008) $
+# Id:            $Id: decorator.pm 265 2008-10-31 13:36:08Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/decorator.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.18/lib/ClearPress/decorator.pm $
 #
 package ClearPress::decorator;
 use strict;
@@ -13,10 +13,10 @@ use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 173 $ =~ /(\d+)/mx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 265 $ =~ /(\d+)/mx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
-		 'meta_version'      => $VERSION,
+		 'meta_version'      => '0.1',
 		 'meta_description'  => q(),
 		 'meta_author'       => q$Author: zerojinx $,
 		 'meta_keywords'     => q(clearpress),
@@ -147,13 +147,13 @@ sub cgi {
   my ($self, $cgi) = @_;
 
   if($cgi) {
-    $self->{'cgi'} = $cgi;
+    $self->{cgi} = $cgi;
 
-  } elsif(!$self->{'cgi'}) {
-    $self->{'cgi'} = CGI->new();
+  } elsif(!$self->{cgi}) {
+    $self->{cgi} = CGI->new();
   }
 
-  return $self->{'cgi'};
+  return $self->{cgi};
 }
 
 sub session {

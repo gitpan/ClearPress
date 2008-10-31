@@ -2,10 +2,22 @@ TODO:
 - maintenance: Switch to using inside-out objects (probably Class- or Object- InsideOut)
 - maintenance: scripts/clearpress to auto-generate tests & fixture framework
 - maintenance: Improve migrations
-- maintenance: Improve test coverage (currently at 75%)
+- maintenance: Improve test coverage (currently at 81%)
 - maintenance: Add regression tests
 - performance: Config caching
-- performance: Template caching
+
+255 - A bunch of new functional tests
+    - Test-harness related stuff (t::request)
+    - Test data for dummy templates and results
+
+252 - Fixed generation of warnings.tt2 & view::error in bin/clearpress
+    - Fixed Y/N on file overwrite in bin/clearpress
+    - Auto-generate application-specific util as it's required by the singleton if not passed explicitly to objects
+    - Fixed requestor->is_member_of authorisation check if is_member_of is not supported (default not authorised) in ClearPress::view
+    - Fixed auto-generation of multiple has_a and has_many (missing whitespace) in bin/clearpress
+    - Default RESTish methods (pass-through) for *_ajax and *_json to complement existing *_xml in ClearPress::view
+    - Moved scripts/clearpress to bin/clearpress as it's more usual
+    - Template caching
 
 236 - driver support for bounded selects (currently basic string concatenation)
 

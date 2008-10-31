@@ -3,6 +3,13 @@ use strict;
 use warnings;
 use base qw(ClearPress::util);
 use Carp;
+use base qw(Exporter);
+use Readonly;
+use XML::Simple qw(XMLin);
+use JSON;
+use English qw(-no_match_vars);
+
+Readonly::Array our @EXPORT_OK => qw(is_rendered_xml is_rendered_js);
 
 $ENV{dev} = q[test];
 
@@ -95,6 +102,58 @@ sub DESTROY {
   if(-e 'test.db') {
     unlink 'test.db';
   }
+  return 1;
+}
+
+sub is_rendered_xml {
+  my ($str, $fn, @args) = @_;
+  my ($received, $expected);
+
+  if($str =~ /Content-type/smix) {
+    #########
+    # Response headers have no place in a xml parser
+    #
+    $str =~ s/.*?\n\n//smx;
+  }
+
+  eval {
+    $received = XMLin($str);
+  } or do {
+    croak qq[Failed to parse received XML:\n].$str;
+  };
+
+  eval {
+    $expected = XMLin("t/data/rendered/$fn");
+  } or do {
+    croak q[Failed to parse expected XML];
+  };
+
+  my $result = Test::More::is_deeply($received, $expected, @args);
+  if(!$result) {
+    carp $str;
+  }
+  return $result;
+}
+
+sub is_rendered_js {
+  my ($str, $fn, @args) = @_;
+
+  if($str =~ /Content-type/smix) {
+    #########
+    # Response headers have no place in a json parser
+    #
+    $str =~ s/.*?\n\n//smx;
+  }
+
+  my $received = from_json($str);
+  open my $fh, q[<], "t/data/rendered/$fn" or croak qq[Failed to open t/data/rendered/$fn];
+  local $RS = undef;
+  my $blob  = <$fh>;
+  close $fh or croak qq[Failed to close t/data/rendered/$fn];
+
+  my $expected = from_json($blob);
+
+  return Test::More::is_deeply($received, $expected, @args);
 }
 
 1;

@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-08-13 11:31:51 +0100 (Wed, 13 Aug 2008) $
-# Id:            $Id: view.pm 250 2008-08-13 10:31:51Z zerojinx $
+# Last Modified: $Date: 2008-10-22 11:48:21 +0100 (Wed, 22 Oct 2008) $
+# Id:            $Id: view.pm 258 2008-10-22 10:48:21Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.18/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use ClearPress::Template::Plugin::js_string;
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 250 $ =~ /(\d+)/mx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 258 $ =~ /(\d+)/mx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -75,12 +75,13 @@ sub _accessor {
 }
 
 sub authorised {
-  my $self   = shift;
-  my $action = $self->action() || q();
-  my $aspect = $self->aspect() || q();
-  my $util   = $self->util();
+  my $self      = shift;
+  my $action    = $self->action() || q();
+  my $aspect    = $self->aspect() || q();
+  my $util      = $self->util();
+  my $requestor = $util->requestor();
 
-  if(!$util->requestor()) {
+  if(!$requestor) {
     #########
     # If there's no requestor user object then authorisation isn't supported
     #
@@ -99,7 +100,8 @@ sub authorised {
     #########
     # by default allow only 'admin' group for non-read actions (create, update, delete)
     #
-    if($util->requestor->is_member_of('admin')) {
+    if($requestor->can('is_member_of') &&
+       $requestor->is_member_of('admin')) {
       return 1;
     }
   }
@@ -467,6 +469,31 @@ sub delete_xml {
   return $self->delete();
 }
 
+sub list_ajax {
+  my $self = shift;
+  return $self->list();
+}
+
+sub read_ajax {
+  my $self = shift;
+  return $self->read();
+}
+
+sub create_ajax {
+  my $self = shift;
+  return $self->create();
+}
+
+sub update_ajax {
+  my $self = shift;
+  return $self->update();
+}
+
+sub delete_ajax {
+  my $self = shift;
+  return $self->delete();
+}
+
 sub list_json {
   my $self = shift;
   return $self->list();
@@ -475,6 +502,21 @@ sub list_json {
 sub read_json {
   my $self = shift;
   return $self->read();
+}
+
+sub create_json {
+  my $self = shift;
+  return $self->create();
+}
+
+sub update_json {
+  my $self = shift;
+  return $self->update();
+}
+
+sub delete_json {
+  my $self = shift;
+  return $self->delete();
 }
 
 1;
@@ -486,7 +528,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 250 $
+$LastChangedRevision: 258 $
 
 =head1 SYNOPSIS
 
@@ -623,9 +665,25 @@ View superclass for the ClearPress framework
 
 =head2 delete_xml - default passthrough to delete() for xml service
 
+=head2 list_ajax - default passthrough to list() for ajax service
+
+=head2 read_ajax - default passthrough to read() for ajax service
+
+=head2 create_ajax - default passthrough to create() for ajax service
+
+=head2 update_ajax - default passthrough to update() for ajax service
+
+=head2 delete_ajax - default passthrough to delete() for ajax service
+
 =head2 list_json - default passthrough to list() for json service
 
 =head2 read_json - default passthrough to read() for json service
+
+=head2 create_json - default passthrough to create() for json service
+
+=head2 update_json - default passthrough to update() for json service
+
+=head2 delete_json - default passthrough to delete() for json service
 
 =head2 determine_aspect - calculate requested aspect of view
 

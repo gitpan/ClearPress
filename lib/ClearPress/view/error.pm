@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $
-# Id:            $Id: error.pm 207 2008-07-21 11:12:22Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
+# Last Modified: $Date: 2008-08-13 15:39:06 +0100 (Wed, 13 Aug 2008) $
+# Id:            $Id: error.pm 252 2008-08-13 14:39:06Z zerojinx $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.18/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
 use strict;
@@ -16,7 +16,7 @@ use Carp;
 
 __PACKAGE__->mk_accessors(qw(errstr));
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 207 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 252 $ =~ /(\d+)/mx; $r; };
 
 sub render {
   my $self   = shift;
@@ -55,7 +55,7 @@ ClearPress::view::error - specialised view for error handling
 
 =head1 VERSION
 
-$LastChangedRevision: 207 $
+$LastChangedRevision: 252 $
 
 =head1 SYNOPSIS
 

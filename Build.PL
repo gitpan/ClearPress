@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
 				 module_name         => 'ClearPress',
 				 dist_author         => 'Roger M Pettett <rpettett@cpan.org>',
-				 dist_version        => do { my ($r) = q$Revision: 250 $ =~ /(\d+)/mx; $r; },
+				 dist_version        => do { my ($r) = q$Revision: 263 $ =~ /(\d+)/mx; $r; },
 				 dist_abstract       => q[ClearPress - Simple, fresh & fruity MVC framework],
 				 license             => 'perl',
 				 requires            => {
@@ -33,13 +33,15 @@ my $builder = Module::Build->new(
 							 'Cwd'                 => '3.2701',
 							 'File::Spec'          => '3.2701',
 							 'CPAN'                => '1.9205',
+							 'XML::Simple'         => '2.18',
+							 'JSON'                => '2.12',
 							},
 				 build_recommends    => {
 							 'Test::Distribution' => '0',
 							 'Test::Perl::Critic' => '0',
 							},
 				 create_makefile_pl  => 'passthrough',
-				 script_files        => [qw(scripts/clearpress)],
+				 script_files        => [qw(bin/clearpress)],
 				);
 
 $builder->create_build_script();
