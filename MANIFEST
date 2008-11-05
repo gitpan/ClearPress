@@ -63,6 +63,7 @@ t/data/rendered/derived_list.ajax
 t/data/rendered/derived_list.html
 t/data/rendered/derived_list.js
 t/data/rendered/derived_list.xml
+t/data/rendered/derived_update.html
 t/data/rendered/footer-1.frag
 t/data/rendered/header-1.frag
 t/data/rendered/header-2.frag
@@ -76,6 +77,7 @@ t/data/templates/derived_list.tt2
 t/data/templates/derived_list_ajax.tt2
 t/data/templates/derived_list_json.tt2
 t/data/templates/derived_list_xml.tt2
+t/data/templates/derived_update_xml.tt2
 t/data/templates/warnings.tt2
 t/dbh.pm
 t/model.pm

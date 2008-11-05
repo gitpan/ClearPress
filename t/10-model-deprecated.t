@@ -1,6 +1,14 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More;
+
+eval {
+  require DBD::SQLite;
+  plan tests => 2;
+} or do {
+  plan skip_all => 'DBD::SQLite not installed';
+};
+
 use t::model::derived;
 use t::util;
 use Test::Trap;

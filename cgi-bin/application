@@ -3,16 +3,16 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-08-13 15:39:06 +0100 (Wed, 13 Aug 2008) $
-# Id:            $Id: application 252 2008-08-13 14:39:06Z zerojinx $
+# Last Modified: $Date: 2008-10-31 13:48:13 +0000 (Fri, 31 Oct 2008) $
+# Id:            $Id: application 267 2008-10-31 13:48:13Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/cgi-bin/application,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.18/cgi-bin/application $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/cgi-bin/application $
 #
 use strict;
 use warnings;
 use ClearPress::controller;
 
-our $VERSION = do { my @r = (q$LastChangedRevision: 252 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION = do { my @r = (q$LastChangedRevision: 267 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
 
 main();
 0;

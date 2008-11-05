@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-08-13 15:39:06 +0100 (Wed, 13 Aug 2008) $
+# Last Modified: $Date: 2008-10-31 13:48:13 +0000 (Fri, 31 Oct 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 252 2008-08-13 14:39:06Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.18/lib/ClearPress/util.pm $
+# Id:            $Id: util.pm 267 2008-10-31 13:48:13Z zerojinx $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$LastChangedRevision: 252 $ =~ /(\d+)/mx; $r; };
+our $VERSION              = do { my ($r) = q$LastChangedRevision: 267 $ =~ /(\d+)/mx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
@@ -160,7 +160,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 252 $
+$LastChangedRevision: 267 $
 
 =head1 SYNOPSIS
 

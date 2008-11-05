@@ -6,6 +6,11 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+267 - Bugfix for aspect checking - previously 'update_*' aspects
+      (e.g. update_xml) would have been incorrectly identified as a 'create'
+      action. Similarly for 'delete_*' aspects.
+    - Added SQLite checks to failing tests
+
 255 - A bunch of new functional tests
     - Test-harness related stuff (t::request)
     - Test data for dummy templates and results

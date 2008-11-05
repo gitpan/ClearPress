@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-10-31 13:36:08 +0000 (Fri, 31 Oct 2008) $
-# Id:            $Id: controller.pm 265 2008-10-31 13:36:08Z zerojinx $
+# Last Modified: $Date: 2008-11-05 17:18:44 +0000 (Wed, 05 Nov 2008) $
+# Id:            $Id: controller.pm 268 2008-11-05 17:18:44Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.18/lib/ClearPress/controller.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 265 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 268 $ =~ /(\d+)/mx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -119,10 +119,10 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   }
 
   if($action eq 'create' && $id) {
-    if(!$aspect || $aspect eq 'update') {
+    if(!$aspect || $aspect =~ /^update/mx) {
       $action = 'update';
 
-    } elsif($aspect eq 'delete') {
+    } elsif($aspect =~ /delete/mx) {
       $action = 'delete';
     }
   }
@@ -394,7 +394,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 265 $
+$LastChangedRevision: 268 $
 
 =head1 SYNOPSIS
 

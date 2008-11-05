@@ -1,6 +1,14 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More;
+
+eval {
+  require DBD::SQLite;
+  plan tests => 6;
+} or do {
+  plan skip_all => 'DBD::SQLite not installed';
+};
+
 use t::model::derived;
 use t::view::derived;
 use t::view::error;
@@ -54,4 +62,15 @@ my $util = t::util->new();
 					       },
 			    });
   is_rendered_xml($str, 'derived_create.html', 'derived create');
+}
+
+{
+  my $str = t::request->new({
+			     PATH_INFO      => '/derived/1;update_xml',
+			     REQUEST_METHOD => 'POST',
+			     util           => $util,
+			     cgi_params     => {
+					       },
+			    });
+  is_rendered_xml($str, 'derived_update.html', 'derived update');
 }

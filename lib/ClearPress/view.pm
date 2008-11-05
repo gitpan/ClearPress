@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-10-22 11:48:21 +0100 (Wed, 22 Oct 2008) $
-# Id:            $Id: view.pm 258 2008-10-22 10:48:21Z zerojinx $
+# Last Modified: $Date: 2008-10-31 13:48:13 +0000 (Fri, 31 Oct 2008) $
+# Id:            $Id: view.pm 267 2008-10-31 13:48:13Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.18/lib/ClearPress/view.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use ClearPress::Template::Plugin::js_string;
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 258 $ =~ /(\d+)/mx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 267 $ =~ /(\d+)/mx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -528,7 +528,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 258 $
+$LastChangedRevision: 267 $
 
 =head1 SYNOPSIS
 

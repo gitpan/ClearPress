@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 263
+version: 267
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -35,37 +35,37 @@ recommends:
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 252
+    version: 267
   ClearPress::Template::Plugin::js_string:
     file: lib/ClearPress/Template/Plugin/js_string.pm
-    version: 252
+    version: 267
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
-    version: 265
+    version: 268
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
-    version: 265
+    version: 267
   ClearPress::driver:
     file: lib/ClearPress/driver.pm
-    version: 252
+    version: 267
   ClearPress::driver::SQLite:
     file: lib/ClearPress/driver/SQLite.pm
-    version: 252
+    version: 267
   ClearPress::driver::mysql:
     file: lib/ClearPress/driver/mysql.pm
-    version: 252
+    version: 267
   ClearPress::model:
     file: lib/ClearPress/model.pm
-    version: 262
+    version: 267
   ClearPress::util:
     file: lib/ClearPress/util.pm
-    version: 252
+    version: 267
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 258
+    version: 267
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
-    version: 252
+    version: 267
 generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
