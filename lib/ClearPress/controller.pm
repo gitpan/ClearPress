@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-11-05 17:18:44 +0000 (Wed, 05 Nov 2008) $
-# Id:            $Id: controller.pm 268 2008-11-05 17:18:44Z zerojinx $
+# Last Modified: $Date: 2008-11-10 17:15:31 +0000 (Mon, 10 Nov 2008) $
+# Id:            $Id: controller.pm 277 2008-11-10 17:15:31Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/lib/ClearPress/controller.pm $
 #
@@ -26,15 +26,23 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 268 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 277 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
 		GET    => 'read',
 		PUT    => 'update',
-		DELETE => 'destroy',
+		DELETE => 'delete',
 	       };
-
+our $REST   = {
+	       create => 'POST',
+	       read   => 'GET',
+	       update => 'PUT|POST',
+	       delete => 'DELETE|POST',
+	       add    => 'GET',
+	       edit   => 'GET',
+	       list   => 'GET',
+	      };
 sub accept_extensions {
   return [
 	  {'.html' => q[]},
@@ -102,6 +110,32 @@ sub process_uri {
   return $self->process_request(@args);
 }
 
+sub packagespace {
+  my ($self, $type, $entity, $util) = @_;
+
+  if($type ne 'view' &&
+     $type ne 'model') {
+    return;
+  }
+
+  $util         ||= $self->util();
+  my $entity_name = $entity;
+
+  if($util->config->SectionExists('packagemap')) {
+    #########
+    # if there are uri-to-package maps, process here
+    #
+    my $map = $util->config->val('packagemap', $entity);
+    if($map) {
+      $DEBUG and carp qq[Remapping $entity to $map];
+      $entity = $map;
+    }
+  }
+
+  my $namespace = $self->namespace($util);
+  return "${namespace}::${type}::$entity";
+}
+
 sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my ($self, $util) = @_;
   my $method        = $ENV{REQUEST_METHOD} || 'GET';
@@ -109,74 +143,152 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my $pi            = $ENV{PATH_INFO}      || q();
   my $accept        = $ENV{HTTP_ACCEPT}    || q();
   my $qs            = $ENV{QUERY_STRING}   || q();
-  my ($entity)      = $pi =~ m{^/([^/;\.]+)}mx;
-  $entity         ||= q();
-  my ($id)          = $pi =~ m{^/$entity/([a-z:,\-_\d%\@\.\+\ ]+)}mix;
-  my ($aspect)      = $pi =~ m{;(\S+)}mx;
+  my ($entity)      = $pi =~ m{^/([^/;\.]+)}smx;
+  $entity         ||= q[];
+  my ($dummy, $aspect_extra, $id) = $pi =~ m{^/$entity(/(.*))?/([a-z:,\-_\d%\@\.\+\ ]+)}smix;
+
+  my ($aspect)      = $pi =~ m{;(\S+)}smx;
 
   if($action eq 'read' && !$id && !$aspect) {
     $aspect = 'list';
   }
 
   if($action eq 'create' && $id) {
-    if(!$aspect || $aspect =~ /^update/mx) {
+    if(!$aspect || $aspect =~ /^update/smx) {
       $action = 'update';
 
-    } elsif($aspect =~ /delete/mx) {
+    } elsif($aspect =~ /^delete/smx) {
       $action = 'delete';
     }
   }
 
-  $aspect ||= q();
+  $aspect ||= q[];
+  $aspect_extra ||= q[];
 
-  my $uriaspect = $self->_process_request_extensions(\$pi, $aspect, $action) || q();
+  my $uriaspect = $self->_process_request_extensions(\$pi, $aspect, $action) || q[];
   if($uriaspect ne $aspect) {
     $aspect = $uriaspect;
-    ($id)   = $pi =~ m{^/$entity/([a-z:,\-_\d%\@\.\+\ ]+)}mix;
+    ($id)   = $pi =~ m{^/$entity/?$aspect_extra/([a-z:,\-_\d%\@\.\+\ ]+)}smix;
   }
 
   $aspect   = $self->_process_request_headers(\$accept, $aspect, $action);
   $entity ||= $util->config->val('application', 'default_view');
-  $aspect ||= q();
+  $aspect ||= q[];
   $id       = CGI->unescape($id||'0');
+
+  my $viewclass = $self->packagespace('view', $entity, $util);
+
+  if($aspect_extra) {
+    $aspect_extra =~ s{/}{_}smxg;
+  }
+
+  if($id eq '0') {
+    #########
+    # no primary key:
+    # /thing;method
+    # /thing;method_xml
+    # /thing.xml;method
+    #
+    my $tmp = $aspect || $action;
+    if($aspect_extra) {
+      $tmp =~ s/_/_${aspect_extra}_/smx;
+
+      if($viewclass->can($tmp)) {
+	$aspect = $tmp;
+      }
+    }
+
+  } elsif($id !~ /^\d+$/smx) {
+    #########
+    # mangled primary key - attempt to match method in view object
+    # /thing/method          => list_thing_method (if exists), or read(pk=method)
+    # /thing/part1/part2     => list_thing_part1_part2 if exists, or read_thing_part1(pk=part2)
+    # /thing/method.xml      => list_thing_method_xml (if exists), or read_thing_xml (pk=method)
+    # /thing/part1/part2.xml => list_thing_part1_part2_xml (if exists), or read_thing_part1_xml (pk=part2)
+    #
+
+    my $tmp = $aspect;
+    if($tmp =~ /_/smx) {
+      $tmp =~ s/_/_${id}_/smx;
+    } else {
+      $tmp = "${action}_$id";
+    }
+
+    $tmp =~ s/^read/list/smx;
+    $tmp =~ s/^update/create/smx;
+
+    if($aspect_extra) {
+      $tmp =~ s/_/_${aspect_extra}_/smx;
+    }
+
+    if($viewclass->can($tmp)) {
+      $id     = 0;
+      $aspect = $tmp;
+
+      #########
+      # id has been modified, so reset action
+      #
+      if($aspect =~ /^create/smx) {
+	$action = 'create';
+      }
+
+    } else {
+      if($aspect_extra) {
+	if($aspect =~ /_/smx) {
+	  $aspect =~ s/_/_${aspect_extra}_/smx;
+	} else {
+	  $aspect .= "_$aspect_extra";
+	}
+      }
+    }
+
+  } elsif($aspect_extra) {
+    #########
+    # /thing/method/50       => read_thing_method(pk=50)
+    #
+    if($aspect =~ /_/smx) {
+      $aspect =~ s/_/_${aspect_extra}_/smx;
+    } else {
+      $aspect .= "${action}_$aspect_extra";
+    }
+  }
 
   if(!$entity) {
     my $views = $util->config->val('application', 'views');
-    $entity   = (split /[\s,]+/mx, $views)[0];
+    $entity   = (split /[\s,]+/smx, $views)[0];
   }
 
-  if(!$aspect) {
-    $aspect = $action;
+  #########
+  # fix up action
+  #
+  if($aspect !~ /^(create|read|update|delete|add|list|edit)/smx) {
+    my $action_extended = $action;
+    if(!$id) {
+      $action_extended = {
+			  read => 'list',
+			 }->{$action} || $action_extended;
+    }
+    $aspect = $action_extended . ($aspect?"_$aspect":q[]);
   }
-
-  return $self->_check_sanity($action, $entity, $aspect, $id);
-}
-
-sub _check_sanity {
-  my ($self, $action, $entity, $aspect, $id) = @_;
 
   #########
   # sanity checks
   #
-
-  my $tmp = $action;
-  if(!$id && $action eq 'read') {
-    $tmp = 'list';
+  my ($type) = $aspect =~ /^([^_]+)/ssmx; # read|list|add|edit|create|update|delete
+  if($method !~ /^$REST->{$type}$/ssmx) {
+    croak qq[Bad request. $aspect ($type) is not a $CRUD->{$method} method];
   }
 
-  if(!$id && $aspect =~ /^add/mx) {
-    $tmp = 'add';
+  if(!$id &&
+     $aspect =~ /^(delete|update|edit|read)/ssmx) {
+    croak qq[Bad request. Cannot $aspect without an id];
   }
 
-  if($id && $aspect =~ /^edit/mx) {
-    $tmp = 'edit';
+  if($id &&
+     $aspect =~ /^(create|add|list)/ssmx) {
+    croak qq[Bad request. Cannot $aspect with an id];
   }
 
-  if($aspect !~ /^$tmp/mx) {
-    croak qq[Bad request: '$aspect' is not a '$action' action];
-  }
-
-  $DEBUG and carp qq(_check_sanity: action=$action, entity=$entity, aspect=$aspect, id=$id);
   return ($action, $entity, $aspect, $id);
 }
 
@@ -186,11 +298,11 @@ sub _process_request_extensions {
   $DEBUG and carp qq(pi=$pi);
   for my $pair (@{$self->accept_extensions}) {
     my ($ext, $meth) = %{$pair};
-    $ext =~ s/\./\\./mxg;
+    $ext =~ s/\./\\./smxg;
 
-    if(${$pi} =~ s/$ext$//mx) {
+    if(${$pi} =~ s/$ext(;.*)?$//smx) {
       $aspect ||= $action;
-      $aspect  =~ s/$meth$//mx;
+      $aspect  =~ s/$meth$//smx;
       $aspect .= $meth;
       last;
     }
@@ -207,9 +319,9 @@ sub _process_request_headers {
 
   for my $pair (@{$self->accept_headers()}) {
     my ($header, $meth) = %{$pair};
-    if(${$accept} =~ /$header$/mx) {
+    if(${$accept} =~ /$header$/smx) {
       $aspect ||= $action;
-      $aspect  =~ s/$meth$//mx;
+      $aspect  =~ s/$meth$//smx;
       $aspect .= $meth;
       last;
     }
@@ -245,7 +357,7 @@ sub handler {
     $self = $self->new({util => $util});
   }
   my $decorator     = $self->decorator($util);
-  my $namespace     = $util->config->val('application', 'namespace') || $util->config->val('application', 'name');
+  my $namespace     = $self->namespace($util);
   my $cgi           = $decorator->cgi();
   my ($action, $entity, $aspect, $id) = $self->process_request($util);
 
@@ -318,36 +430,46 @@ sub handler {
   return 1;
 }
 
+sub namespace {
+  my ($self, $util) = @_;
+  my $ns   = q[];
+
+  if((ref $self && !$self->{namespace}) || !ref $self) {
+    $util ||= $self->util();
+    $ns = $util->config->val('application', 'namespace') ||
+          $util->config->val('application', 'name') ||
+	  'ClearPress';
+    if(ref $self) {
+      $self->{namespace} = $ns;
+    }
+  } else {
+    $ns = $self->{namespace};
+  }
+
+  return $ns;
+}
+
 sub dispatch {
   my ($self, $ref) = @_;
-  my $util      = $ref->{'util'};
-  my $entity    = $ref->{'entity'};
-  my $aspect    = $ref->{'aspect'};
-  my $action    = $ref->{'action'};
-  my $id        = $ref->{'id'};
-  my $namespace = $util->config->val('application', 'namespace') || $util->config->val('application', 'name');
+  my $util      = $ref->{util};
+  my $entity    = $ref->{entity};
+  my $aspect    = $ref->{aspect};
+  my $action    = $ref->{action};
+  my $id        = $ref->{id};
+  my $namespace = $self->namespace($util);
   my $viewobject;
 
   eval {
-    my @entities = split /[,\s]+/mx, $util->config->val('application','views');
+    my @entities = split /[,\s]+/smx, $util->config->val('application','views');
     if(!scalar grep { $_ eq $entity } @entities) {
       croak qq(No such view ($entity). Is it in your config.ini?);
     }
 
     my $entity_name = $entity;
-    if($util->config->SectionExists('packagemap')) {
-      #########
-      # if there are uri-to-package maps, process here
-      #
-      my $map = $util->config->val('packagemap', $entity);
-      if($map) {
-	$DEBUG and carp qq[Remapping $entity to $map];
-	$entity = $map;
-      }
-    }
 
-    my $modelclass  = "${namespace}::model::$entity";
-    my $viewclass   = "${namespace}::view::$entity";
+    my $modelclass  = $self->packagespace('model', $entity, $util);
+    my $viewclass   = $self->packagespace('view',  $entity, $util);
+
     my $modelpk     = $modelclass->primary_key();
     my $modelobject = $modelclass->new({
 					util => $util,
@@ -394,7 +516,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 268 $
+$LastChangedRevision: 277 $
 
 =head1 SYNOPSIS
 
@@ -445,6 +567,18 @@ $LastChangedRevision: 268 $
   my ($sAction, $sEntity, $sAspect, $sId) = $oCtrl->process_request($oUtil);
 
 =head2 handler - run the controller
+
+=head2 namespace - top-level package namespace from config.ini
+
+  my $sNS = $oCtrl->namespace();
+  my $sNS = app::controller->namespace();
+
+=head2 packagespace - mangled namespace given a package- and entity-type
+
+  my $pNS = $oCtrl->packagespace('model', 'entity_type');
+  my $pNS = $oCtrl->packagespace('view',  'entity_type');
+  my $pNS = app::controller->packagespace('model', 'entity_type', $oUtil);
+  my $pNS = app::controller->packagespace('view',  'entity_type', $oUtil);
 
 =head2 dispatch - view generation
 

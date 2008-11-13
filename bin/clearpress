@@ -2,8 +2,8 @@
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2008-10-31 13:48:13 +0000 (Fri, 31 Oct 2008) $
-# Id:            $Id: clearpress 267 2008-10-31 13:48:13Z zerojinx $
+# Last Modified: $Date: 2008-11-13 09:24:59 +0000 (Thu, 13 Nov 2008) $
+# Id:            $Id: clearpress 278 2008-11-13 09:24:59Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/bin/clearpress $
 #
 use strict;
@@ -16,7 +16,7 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 267 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 278 $ =~ /(\d+)/smx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
 $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin);
@@ -54,7 +54,7 @@ sub main { ## no critic (complexity)
     croak q(Please specify --new <application-name>);
   }
 
-  my ($app) = $opts->{new} =~ /^([a-z][a-z\d_]+)$/mxi;
+  my ($app) = $opts->{new} =~ /^([a-z][a-z\d_]+)$/smxi;
   $app    ||= q();
 
   if($app ne $opts->{new}) {
@@ -64,15 +64,15 @@ sub main { ## no critic (complexity)
   my $all_structure = shift @ARGV;
 
   my $schema = {};
-  for my $structure (split /\s+/mx, $all_structure) {
-    if($structure =~ /\S+\(\S+\)/mx) {
+  for my $structure (split /\s+/smx, $all_structure) {
+    if($structure =~ /\S+\(\S+\)/smx) {
       #########
       # table definition
       #
-      my ($table, $columns) = $structure =~ /(\S+)\((\S+)\)/mx;
+      my ($table, $columns) = $structure =~ /(\S+)\((\S+)\)/smx;
 
-      for my $column (split /,/mx, $columns) {
-	my ($name, $type) = split /:/mx, $column;
+      for my $column (split /,/smx, $columns) {
+	my ($name, $type) = split /:/smx, $column;
 	$name           ||= $column;
 	$type           ||= 'char(128)';
 	$schema->{$table}->{fields}->{$name} = $type;
@@ -80,11 +80,11 @@ sub main { ## no critic (complexity)
 	print {*STDERR} qq($table has $name of type $type\n) or croak qq[Error printing: $ERRNO];
       }
 
-    } elsif($structure =~ /\S+\->\S+/mx) {
+    } elsif($structure =~ /\S+\->\S+/smx) {
       #########
       # relationship
       #
-      my ($one, $many) = $structure =~ /(\S+)\->(\S+)/mx;
+      my ($one, $many) = $structure =~ /(\S+)\->(\S+)/smx;
       push @{$schema->{$one}->{has_a}},     $many;
       push @{$schema->{$many}->{has_many}}, $one;
       print {*STDERR} qq($one has a $many\n$many has many @{[PL($one)]}\n) or croak qq[Error printing: $ERRNO];
@@ -257,7 +257,7 @@ use <% application %>::util;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 267 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 278 $ =~ /(\d+)/smx; $r; };
 
 <% application %>::sa->new->run();
 
@@ -293,10 +293,10 @@ sub handle_request {
   print "HTTP/1.0 200 OK\n";
 
   my ($fn) = "htdocs$ENV{REQUEST_URI}" =~ m|([a-z\d_/\.\-%]+)|mix;
-  $fn      =~ s|\.\./||mxg;
+  $fn      =~ s|\.\./||smxg;
 
   if(-f $fn) {
-    my ($ext) = $fn =~ /\.([^\.]+)$/mx;
+    my ($ext) = $fn =~ /\.([^\.]+)$/smx;
 
     my $type  = $EXTN->{lc $ext} || 'application/octet-stream';
     print qq(Content-type: $type\n\n);
@@ -334,7 +334,7 @@ use <% application %>::view::error;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 267 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 278 $ =~ /(\d+)/smx; $r; };
 
 main();
 0;

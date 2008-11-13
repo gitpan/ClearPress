@@ -6,6 +6,17 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+269 - Extended aspect handling:
+      /batches/released/cluster.xml routes to
+      app::view::batches::read_released_xml with a primary key of
+      'cluster' by default, but if
+      app::view::batches::list_released_cluster_xml exists that will
+      be preferred.
+
+    - Also fixed a niggle - /thing/15.xml;add mixed
+      aspect+file-extension would previously have failed but should
+      now be correctly routed to app::view::thing::add_xml
+
 267 - Bugfix for aspect checking - previously 'update_*' aspects
       (e.g. update_xml) would have been incorrectly identified as a 'create'
       action. Similarly for 'delete_*' aspects.

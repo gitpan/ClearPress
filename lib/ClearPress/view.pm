@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-10-31 13:48:13 +0000 (Fri, 31 Oct 2008) $
-# Id:            $Id: view.pm 267 2008-10-31 13:48:13Z zerojinx $
+# Last Modified: $Date: 2008-11-10 17:15:31 +0000 (Mon, 10 Nov 2008) $
+# Id:            $Id: view.pm 277 2008-11-10 17:15:31Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/lib/ClearPress/view.pm $
 #
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use ClearPress::Template::Plugin::js_string;
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 267 $ =~ /(\d+)/mx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 277 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -40,10 +40,10 @@ sub new {
 
   my $aspect = $self->aspect() || q();
 
-  $self->{content_type} ||= ($aspect =~ /(rss|atom|ajax|xml)$/mx)?'text/xml':q();
-  $self->{content_type} ||= ($aspect =~ /(js|json)$/mx)?'application/javascript':q();
-  $self->{content_type} ||= ($aspect =~ /_(png)$/mx)?'image/png':q();
-  $self->{content_type} ||= ($aspect =~ /_(jpg)$/mx)?'image/jpeg':q();
+  $self->{content_type} ||= ($aspect =~ /(rss|atom|ajax|xml)$/smx)?'text/xml':q();
+  $self->{content_type} ||= ($aspect =~ /(js|json)$/smx)?'application/javascript':q();
+  $self->{content_type} ||= ($aspect =~ /_(png)$/smx)?'image/png':q();
+  $self->{content_type} ||= ($aspect =~ /_(jpg)$/smx)?'image/jpeg':q();
   $self->{content_type} ||= 'text/html';
 
   $self->init();
@@ -88,9 +88,9 @@ sub authorised {
     return 1;
   }
 
-  if($action =~ /^list/mx ||
+  if($action =~ /^list/smx ||
      ($action eq 'read' &&
-      $aspect !~ /^(add|delete|update|create)/mx)) {
+      $aspect !~ /^(add|delete|update|create)/smx)) {
     #########
     # by default assume public read access for 'read' actions
     #
@@ -113,7 +113,7 @@ sub template_name {
   my $self   = shift;
   my $name = $self->entity_name();
   if(!$name) {
-    ($name) = (ref $self) =~ /view::(.*)$/mx;
+    ($name) = (ref $self) =~ /view::(.*)$/smx;
   }
   $name    ||= 'view';
   my $method = $self->method_name();
@@ -121,7 +121,7 @@ sub template_name {
   if($method) {
     $name .= "_$method";
   }
-  $name =~ s/:+/_/mxg;
+  $name =~ s/:+/_/smxg;
 
   return $name;
 }
@@ -170,12 +170,12 @@ sub render {
   # Figure out and call the appropriate action if available
   #
   my $method = $self->method_name();
-  if($method !~ /^(add|edit|create|read|update|delete|list)/mx) {
+  if($method !~ /^(add|edit|create|read|update|delete|list)/smx) {
     croak qq(Illegal method: $method);
   }
 
   if($self->can($method)) {
-    if($aspect =~ /_(jpg|png|gif)/mx) {
+    if($aspect =~ /_(jpg|png|gif)/smx) {
       return $self->$method();
     }
 
@@ -188,7 +188,7 @@ sub render {
   my $model   = $self->model();
   my $actions = my $warnings = q[];
 
-  if($aspect !~ /(rss|atom|ajax|xml|json)$/mx) {
+  if($aspect !~ /(rss|atom|ajax|xml|json)$/smx) {
     $actions  = $self->actions();
     eval {
       $self->process_template('warnings.tt2', {}, \$warnings);
@@ -219,7 +219,7 @@ sub process_template {
   my ($self, $template, $extra_params, $where_to_ref) = @_;
   my $util     = $self->util();
   my $cfg      = $util->config();
-  my ($entity) = (ref $self) =~ /([^:]+)$/mx;
+  my ($entity) = (ref $self) =~ /([^:]+)$/smx;
   my $params   = {
 		  requestor   => $util->requestor,
 		  model       => $self->model(),
@@ -388,7 +388,7 @@ sub decor {
   my $self = shift;
   my $aspect = $self->aspect() || q();
 
-  if($aspect =~ /(rss|atom|ajax|xml|json|js|_png|_jpg)$/mx) {
+  if($aspect =~ /(rss|atom|ajax|xml|json|js|_png|_jpg)$/smx) {
     return 0;
   }
   return 1;
@@ -528,7 +528,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 267 $
+$LastChangedRevision: 277 $
 
 =head1 SYNOPSIS
 

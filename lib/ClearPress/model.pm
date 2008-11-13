@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-10-31 13:48:13 +0000 (Fri, 31 Oct 2008) $
-# Id:            $Id: model.pm 267 2008-10-31 13:48:13Z zerojinx $
+# Last Modified: $Date: 2008-11-10 17:15:31 +0000 (Mon, 10 Nov 2008) $
+# Id:            $Id: model.pm 277 2008-11-10 17:15:31Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/lib/ClearPress/model.pm $
 #
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 267 $ =~ /(\d+)/mx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 277 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
@@ -34,7 +34,7 @@ sub table {
   if(!$tbl) {
     return;
   }
-  ($tbl)   = $tbl =~ /.*::([^:]+)/mx;
+  ($tbl)   = $tbl =~ /.*::([^:]+)/smx;
   return $tbl;
 }
 
@@ -115,7 +115,7 @@ sub gen_getarray {
     1; # sth->execute() does not return true!
 
   } or do {
-    $query =~ s/\s+/\ /smxg;
+    $query =~ s/\s+/\ /ssmxg;
     local $LIST_SEPARATOR = q(, );
     carp qq[GEN_GETARRAY ERROR\nEVAL_ERROR: $EVAL_ERROR\nCaller: @{[q[].caller]}\nQuery:\n$query\nDBH: @{[$util->dbh]}\nUTIL: $util\nParams: @{[map { (defined $_)?$_:'NULL' } @args]}];
     return;
@@ -135,7 +135,7 @@ sub gen_getall {
   $class ||= ref $self;
 
   if(!$cachekey) {
-    ($cachekey) = $class =~ /([^:]+)$/mx;
+    ($cachekey) = $class =~ /([^:]+)$/smx;
     $cachekey   = PL($cachekey);
   }
 
@@ -154,7 +154,7 @@ sub gen_getfriends {
   $class ||= ref $self;
 
   if(!$cachekey) {
-    ($cachekey) = $class =~ /([^:]+)$/mx;
+    ($cachekey) = $class =~ /([^:]+)$/smx;
     $cachekey   = PL($cachekey);
   }
 
@@ -175,12 +175,12 @@ sub gen_getfriends_through {
   $class ||= ref $self;
 
   if(!$cachekey) {
-    ($cachekey) = $class =~ /([^:]+)$/mx;
+    ($cachekey) = $class =~ /([^:]+)$/smx;
     $cachekey   = PL($cachekey);
   }
 
   if(!$self->{$cachekey}) {
-    my ($through_pkg) = (ref $self) =~ /^(.*::)[^:]+$/mx;
+    my ($through_pkg) = (ref $self) =~ /^(.*::)[^:]+$/smx;
     $through_pkg     .= $through;
     my $through_key   = $self->primary_key();
     my $friend_key    = $class->primary_key();
@@ -201,7 +201,7 @@ sub gen_getobj {
   my ($self, $class)   = @_;
   $class             ||= ref $self;
   my $pk               = $class->primary_key();
-  my ($cachekey)       = $class =~ /([^:]+)$/mx;
+  my ($cachekey)       = $class =~ /([^:]+)$/smx;
   $self->{$cachekey} ||= $class->new({
 				      util => $self->util(),
 				      $pk  => $self->$pk(),
@@ -214,7 +214,7 @@ sub gen_getobj_through {
   $class ||= ref $self;
 
   if(!$cachekey) {
-    ($cachekey) = $class =~ /([^:]+)$/mx;
+    ($cachekey) = $class =~ /([^:]+)$/smx;
   }
 
   if(!$self->{$cachekey}) {
@@ -262,11 +262,11 @@ sub has_a {
 
     my $namespace = "${class}::$pkg";
     my $yield     = $class;
-    if($yield !~ /model/mx) {
+    if($yield !~ /model/smx) {
       croak qq[$pkg is not under a model:: namespace. Friend relationships will not work.];
     }
 
-    $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
+    $yield        =~ s/^(.*model::).*$/$1$pkg/smx;
 
     if (defined &{$namespace}) {
       next;
@@ -306,9 +306,9 @@ sub has_many {
     my $plural    = PL($single);
     my $namespace = "${class}::$plural";
     my $yield     = $class;
-    $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
+    $yield        =~ s/^(.*model::).*$/$1$pkg/smx;
 
-    if($yield !~ /model/mx) {
+    if($yield !~ /model/smx) {
       croak qq[$pkg is not under a model:: namespace. Friend relationships will not work.];
     }
 
@@ -345,10 +345,10 @@ sub has_a_through {
       ($pkg)    = values %{$single};
       ($single) = keys %{$single};
     }
-    $pkg =~ s/\|.*//mx;
+    $pkg =~ s/\|.*//smx;
 
     my $through;
-    ($single, $through) = split /\|/mx, $single;
+    ($single, $through) = split /\|/smx, $single;
 
     if(!$through) {
       croak qq(Cannot build belongs_to_through for $single);
@@ -356,9 +356,9 @@ sub has_a_through {
 
     my $namespace = "${class}::$pkg";
     my $yield     = $class;
-    $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
+    $yield        =~ s/^(.*model::).*$/$1$pkg/smx;
 
-    if($yield !~ /model/mx) {
+    if($yield !~ /model/smx) {
       croak qq[$pkg is not under a model:: namespace. Friend relationships will not work.];
     }
 
@@ -390,10 +390,10 @@ sub has_many_through {
       ($pkg)    = values %{$single};
       ($single) = keys %{$single};
     }
-    $pkg =~ s/\|.*//mx;
+    $pkg =~ s/\|.*//smx;
 
     my $through;
-    ($single, $through) = split /\|/mx, $single;
+    ($single, $through) = split /\|/smx, $single;
 
     if(!$through) {
       croak qq(Cannot build has_many_through for $single);
@@ -402,9 +402,9 @@ sub has_many_through {
     my $plural    = PL($single);
     my $namespace = "${class}::$plural";
     my $yield     = $class;
-    $yield        =~ s/^(.*model::).*$/$1$pkg/mx;
+    $yield        =~ s/^(.*model::).*$/$1$pkg/smx;
 
-    if($yield !~ /model/mx) {
+    if($yield !~ /model/smx) {
       croak qq[$pkg is not under a model:: namespace. Friend relationships will not work.];
     }
 
@@ -426,7 +426,7 @@ sub has_all {
   my ($class) = @_;
   no strict 'refs'; ## no critic
 
-  my ($single)  = $class =~ /([^:]+)$/mx;
+  my ($single)  = $class =~ /([^:]+)$/smx;
   my $plural    = PL($single);
   my $namespace = "${class}::$plural";
 
@@ -535,7 +535,7 @@ sub read { ## no critic
       1;
 
     } or do {
-      if($EVAL_ERROR =~ /missing\ entity/mx) {
+      if($EVAL_ERROR =~ /missing\ entity/smx) {
 	return;
       }
       carp qq[SELECT ERROR\nEVAL_ERROR: $EVAL_ERROR\nQuery:\n$query\n\nParams: @{[map { (defined $_)?$_:'NULL' } @args]}\n];
@@ -638,7 +638,7 @@ sub zdate {
 
   if(scalar grep { $_ eq 'date' } $self->fields()) {
     $date = $self->date() || q[];
-    $date =~ s/\ /T/mx;
+    $date =~ s/\ /T/smx;
     $date .='Z';
   }
 
@@ -662,7 +662,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 267 $
+$LastChangedRevision: 277 $
 
 =head1 SYNOPSIS
 

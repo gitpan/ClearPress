@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-10-31 13:48:13 +0000 (Fri, 31 Oct 2008) $
+# Last Modified: $Date: 2008-11-10 17:15:31 +0000 (Mon, 10 Nov 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 267 2008-10-31 13:48:13Z zerojinx $
+# Id:            $Id: util.pm 277 2008-11-10 17:15:31Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$LastChangedRevision: 267 $ =~ /(\d+)/mx; $r; };
+our $VERSION              = do { my ($r) = q$LastChangedRevision: 277 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
@@ -74,7 +74,7 @@ sub config {
   my $dtconfigpath;
 
   if(!$self->{config}) {
-    ($dtconfigpath) = $configpath =~ m{([a-z\d_/\.\-]+)}mix;
+    ($dtconfigpath) = $configpath =~ m{([a-z\d_/\.\-]+)}smix;
     $dtconfigpath ||= q();
 
     if($dtconfigpath ne $configpath) {
@@ -160,7 +160,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 267 $
+$LastChangedRevision: 277 $
 
 =head1 SYNOPSIS
 

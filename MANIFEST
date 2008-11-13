@@ -1,4 +1,3 @@
-Build.PL
 Changes
 LICENSE
 MANIFEST
@@ -95,4 +94,5 @@ t/util.pm
 t/view/derived.pm
 t/view/error.pm
 Makefile.PL
+Build.PL
 META.yml
