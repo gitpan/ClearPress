@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-11-10 17:15:31 +0000 (Mon, 10 Nov 2008) $
-# Id:            $Id: view.pm 277 2008-11-10 17:15:31Z zerojinx $
+# Last Modified: $Date: 2008-11-14 15:14:32 +0000 (Fri, 14 Nov 2008) $
+# Id:            $Id: view.pm 281 2008-11-14 15:14:32Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.19/lib/ClearPress/view.pm $
+# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
@@ -17,8 +17,9 @@ use Carp;
 use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use ClearPress::Template::Plugin::js_string;
+use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 277 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 281 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -287,6 +288,18 @@ sub _populate_from_cgi {
   my $params = {
 		map { $_ => $cgi->param($_) } $cgi->param()
 	       };
+  my $xml = $cgi->param('XForms:Model');
+
+  if($xml) {
+    $params = XMLin($xml);
+    for my $k (%{$params}) {
+      if(ref $params->{$k} &&
+	 ref $params->{$k} eq 'HASH' &&
+	 !scalar keys %{$params->{$k}}) {
+	delete $params->{$k};
+      }
+    }
+  }
 
   for my $field (@fields) {
     if(!exists $params->{$field}) {
@@ -329,15 +342,15 @@ sub read { ## no critic
 sub delete { ## no critic
   my $self  = shift;
   my $model = $self->model();
+
   $model->delete() or croak qq(Failed to delete entity: $EVAL_ERROR);
+
   return 1;
 }
 
 sub update {
   my $self  = shift;
-  my $util  = $self->util();
   my $model = $self->model();
-  my $cgi   = $util->cgi();
 
   #########
   # Populate model object with parameters posted into CGI
@@ -351,9 +364,7 @@ sub update {
 
 sub create {
   my $self  = shift;
-  my $util  = $self->util();
   my $model = $self->model();
-  my $cgi   = $util->cgi();
 
   #########
   # Populate model object with parameters posted into CGI
@@ -362,6 +373,7 @@ sub create {
   $self->_populate_from_cgi();
 
   $model->create() or croak qq(Failed to create entity: $EVAL_ERROR);
+
   return 1;
 }
 
@@ -528,7 +540,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 277 $
+$LastChangedRevision: 281 $
 
 =head1 SYNOPSIS
 

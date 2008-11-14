@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+278 - Support for posting XML
+
 269 - Extended aspect handling:
       /batches/released/cluster.xml routes to
       app::view::batches::read_released_xml with a primary key of

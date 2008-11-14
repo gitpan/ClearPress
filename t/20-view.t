@@ -13,7 +13,7 @@ use Carp;
 
 eval {
   require DBD::SQLite;
-  plan tests => 66;
+  plan tests => 69;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -316,9 +316,9 @@ my $util = t::util->new();
   is($view->authorised(), 1, 'admin user can create');
 }
 
-my $pid = $$;
-$util->data_path("/tmp/data$pid");
 {
+  my $pid = $$;
+  $util->data_path("/tmp/data$pid");
   my $model = t::model->new({util=>$util});
   my $view  = ClearPress::view->new({
 				     util   => $util,
@@ -338,9 +338,12 @@ $util->data_path("/tmp/data$pid");
 
   unlink $fn;
   like($result1, qr/cached/mx, 'first result');
+  $util->data_path(q[]);
 }
 
 {
+  my $pid = $$;
+  $util->data_path("/tmp/data$pid");
   my $model = t::model->new({util=>$util});
   my $view  = ClearPress::view->new({
 				     util   => $util,
@@ -361,4 +364,27 @@ $util->data_path("/tmp/data$pid");
   like($result2, qr/cached/mx, 'second process used cached template');
 
   `rm -rf /tmp/data`;
+  $util->data_path(q[]);
+}
+
+{
+  my $cgi = CGI->new();
+  my $xml = qq[<?xml version='1.0'?>\n<model><test_pk>two</test_pk><test_field>bar</test_field></model>];
+
+  $cgi->param('XForms:Model', $xml);
+  $util->cgi($cgi);
+#  use Data::Dumper;croak 'TEST'. Dumper($cgi);
+  my $model = t::model->new({
+			     test_pk => 'one',
+			     util    => $util,
+			    });
+  my $view  = ClearPress::view->new({
+				     util   => $util,
+				     model  => $model,
+				     action => 'update',
+				     aspect => q[],
+				    });
+  like($view->render(), qr/Updated/smx, 'submit-xml render ok');
+  is($model->test_pk(),    'one', 'key population from param not xml');
+  is($model->test_field(), 'bar', 'field population from xml');
 }
