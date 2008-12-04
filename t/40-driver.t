@@ -35,13 +35,13 @@ use_ok('ClearPress::driver');
 {
   my $drv1 = ClearPress::driver::test->new();
   my $drv2 = ClearPress::driver::test->new();
-  is($drv1, $drv2, 'same singleton instance');
+  isnt($drv1, $drv2, 'different instances - not singletons from ClearPress 1.20+');
 }
 
 {
   use_ok('ClearPress::driver::SQLite');
   use_ok('ClearPress::driver::mysql');
-  
+
   my $drv1 = ClearPress::driver::SQLite->new();
   my $drv2 = ClearPress::driver::mysql->new();
   isnt($drv1, $drv2, 'different singleton instance');

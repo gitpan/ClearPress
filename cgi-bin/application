@@ -6,7 +6,7 @@
 # Last Modified: $Date: 2008-05-31 00:08:14 +0100 (Sat, 31 May 2008) $
 # Id:            $Id: application 161 2008-05-30 23:08:14Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/cgi-bin/application,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/cgi-bin/application $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/cgi-bin/application $
 #
 use strict;
 use warnings;

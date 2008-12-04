@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-11-14 14:07:06 +0000 (Fri, 14 Nov 2008) $
-# Id:            $Id: driver.pm 279 2008-11-14 14:07:06Z zerojinx $
+# Last Modified: $Date: 2008-12-04 17:29:17 +0000 (Thu, 04 Dec 2008) $
+# Id:            $Id: driver.pm 287 2008-12-04 17:29:17Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver.pm $
 #
 package ClearPress::driver;
 use strict;
@@ -16,16 +16,10 @@ use ClearPress::driver::SQLite;
 use DBI;
 use English qw(-no_match_vars);
 use Carp;
-use base qw(Class::Singleton);
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 279 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 287 $ =~ /(\d+)/smx; $r; };
 
 sub new {
-  my ($class, @args) = @_;
-  return $class->instance(@args);
-}
-
-sub _new_instance {
   my ($class, $ref) = @_;
   $ref ||= {};
   bless $ref, $class;
@@ -131,7 +125,7 @@ ClearPress::driver - database driver abstraction layer
 
 =head1 VERSION
 
-$LastChangedRevision: 279 $
+$LastChangedRevision: 287 $
 
 =head1 SYNOPSIS
 
@@ -172,8 +166,6 @@ $LastChangedRevision: 279 $
 =item warnings
 
 =item Carp
-
-=item Class::Singleton
 
 =back
 

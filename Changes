@@ -6,6 +6,18 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+284 - Class::Singleton support moved from ClearPress::driver to
+      ClearPress::util. When running in a mod_perl environment
+      supporting multiple different ClearPress applications, the
+      driver would be a singleton per Apache child process, meaning
+      applications would mistakenly share whichever database
+      connection is first initialised. As drivers are not usually
+      subclassed per-application (only by database back-end platform)
+      the singleton support was moved into ClearPress::util. The util
+      is commonly subclassed for applications so this should be a
+      robust solution, particularly for shared environments.
+
+
 278 - Support for posting XML
 
 269 - Extended aspect handling:

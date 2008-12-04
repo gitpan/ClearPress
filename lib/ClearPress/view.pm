@@ -5,7 +5,7 @@
 # Last Modified: $Date: 2008-11-14 15:14:32 +0000 (Fri, 14 Nov 2008) $
 # Id:            $Id: view.pm 281 2008-11-14 15:14:32Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;

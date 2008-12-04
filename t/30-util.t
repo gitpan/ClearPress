@@ -18,7 +18,7 @@ use_ok('ClearPress::util');
   isa_ok($util, 'ClearPress::util');
 
   is($util->dbsection(), 'live', 'default dbsection');
-  $ENV{dev} = 'test';
+  local $ENV{dev} = 'test';
   is($util->dbsection(), 'test', 'ENV dbsection');
 
   is($util->configpath(), 'data/config.ini', 'default cnofigpath');
@@ -38,4 +38,3 @@ use_ok('ClearPress::util');
 
   is($util->quote(q['foo']), q['''foo''']);
 }
-

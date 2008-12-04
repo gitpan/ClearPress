@@ -51,6 +51,7 @@ t/30-controller-requests.t
 t/30-controller.t
 t/30-decorator.t
 t/30-filter-js_string.t
+t/30-util-singleton.t
 t/30-util.t
 t/40-driver-mysql-tables.t
 t/40-driver-mysql.t

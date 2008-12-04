@@ -2,15 +2,15 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-11-14 14:07:06 +0000 (Fri, 14 Nov 2008) $
+# Last Modified: $Date: 2008-12-04 17:29:17 +0000 (Thu, 04 Dec 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 279 2008-11-14 14:07:06Z zerojinx $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
+# Id:            $Id: util.pm 287 2008-12-04 17:29:17Z zerojinx $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
 use warnings;
-use base qw(Class::Accessor);
+use base qw(Class::Accessor Class::Singleton);
 use Config::IniFiles;
 use Carp;
 use POSIX qw(strftime);
@@ -18,13 +18,18 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$LastChangedRevision: 279 $ =~ /(\d+)/smx; $r; };
+our $VERSION              = do { my ($r) = q$LastChangedRevision: 287 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
 __PACKAGE__->mk_accessors(qw(transactions username requestor profiler session));
 
 sub new {
+  my ($class, @args) = @_;
+  return $class->instance(@args);
+}
+
+sub _new_instance {
   my ($class, $ref) = @_;
   $ref ||= {};
 
@@ -160,7 +165,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 279 $
+$LastChangedRevision: 287 $
 
 =head1 SYNOPSIS
 
@@ -274,6 +279,8 @@ $LastChangedRevision: 279 $
 =item POSIX
 
 =item English
+
+=item Class::Singleton
 
 =back
 

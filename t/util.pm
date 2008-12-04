@@ -23,50 +23,59 @@ sub new {
   my $self = $class->SUPER::new(@args);
   my $drv  = $self->driver();
 
-  $drv->create_table('derived',
-		     {
-		      id_derived  => 'primary key',
-		      id_derived_parent => 'integer unsigned',
-		      id_derived_status => 'integer unsigned',
-		      text_dummy  => 'text',
-		      char_dummy  => 'char(128)',
-		      int_dummy   => 'integer unsigned',
-		      float_dummy => 'float unsigned',
-		     });
+  eval {
+    $drv->create_table('derived',
+		       {
+			id_derived        => 'primary key',
+			id_derived_parent => 'integer unsigned',
+			id_derived_status => 'integer unsigned',
+			text_dummy        => 'text',
+			char_dummy        => 'char(128)',
+			int_dummy         => 'integer unsigned',
+			float_dummy       => 'float unsigned',
+		       });
 
-  $drv->create_table('derived_parent',
-		     {
-		      id_derived_parent  => 'primary key',
-		      text_dummy  => 'text',
-		     });
-  $drv->create_table('derived_child',
-		     {
-		      id_derived_child  => 'primary key',
-		      id_derived  => 'integer unsigned',
-		      text_dummy  => 'text',
-		     });
+    $drv->create_table('derived_parent',
+		       {
+			id_derived_parent => 'primary key',
+			text_dummy        => 'text',
+		       });
+    $drv->create_table('derived_child',
+		       {
+			id_derived_child  => 'primary key',
+			id_derived        => 'integer unsigned',
+			text_dummy        => 'text',
+		       });
 
-  $drv->create_table('derived_status',
-		     {
-		      id_derived_status  => 'primary key',
-		      id_status   => 'integer unsigned',
-		     });
-  $drv->create_table('status',
-		     {
-		      id_status  => 'primary key',
-		      description  => 'text',
-		     });
-  $drv->create_table('derived_attr',
-		     {
-		      id_derived_attr => 'primary key',
-		      id_attribute    => 'integer unsigned',
-		      id_derived      => 'integer unsigned',
-		     });
-  $drv->create_table('attribute',
-		     {
-		      id_attribute => 'primary key',
-		      description  => 'text',
-		     });
+    $drv->create_table('derived_status',
+		       {
+			id_derived_status => 'primary key',
+			id_status         => 'integer unsigned',
+		       });
+    $drv->create_table('status',
+		       {
+			id_status   => 'primary key',
+			description => 'text',
+		       });
+    $drv->create_table('derived_attr',
+		       {
+			id_derived_attr => 'primary key',
+			id_attribute    => 'integer unsigned',
+			id_derived      => 'integer unsigned',
+		       });
+    $drv->create_table('attribute',
+		       {
+			id_attribute => 'primary key',
+			description  => 'text',
+		       });
+  } or do {
+    #########
+    # Failure to create tables is usually down to the developer trying
+    # to initialise two util objects in the same perl instance,
+    # presuming they're unique.
+    #
+#    carp $EVAL_ERROR;
+  };
 
   return $self;
 }

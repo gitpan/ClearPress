@@ -3,7 +3,7 @@
 # Last Modified: $Date: 2008-07-21 12:12:22 +0100 (Mon, 21 Jul 2008) $ $Author: zerojinx $
 # Id:            $Id: 00-critic.t 207 2008-07-21 11:12:22Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/t/00-critic.t,v $
-# $HeadURL: https://zerojinx:@clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/t/00-critic.t $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/t/00-critic.t $
 #
 package critic;
 use strict;
