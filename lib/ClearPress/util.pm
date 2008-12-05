@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-12-04 17:29:17 +0000 (Thu, 04 Dec 2008) $
+# Last Modified: $Date: 2008-12-05 14:32:24 +0000 (Fri, 05 Dec 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 287 2008-12-04 17:29:17Z zerojinx $
+# Id:            $Id: util.pm 288 2008-12-05 14:32:24Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
@@ -18,15 +18,23 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$LastChangedRevision: 287 $ =~ /(\d+)/smx; $r; };
+our $VERSION              = do { my ($r) = q$LastChangedRevision: 288 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
 __PACKAGE__->mk_accessors(qw(transactions username requestor profiler session));
 
 sub new {
-  my ($class, @args) = @_;
-  return $class->instance(@args);
+  my ($class, $ref) = @_;
+  my $self = $class->instance($ref);
+
+  if($ref && ref $ref eq 'HASH') {
+    while(my ($k, $v) = each %{$ref}) {
+      $self->{$k} = $v;
+    }
+  }
+
+  return $self;
 }
 
 sub _new_instance {
@@ -165,7 +173,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 287 $
+$LastChangedRevision: 288 $
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use Test::Trap;
 
 eval {
   require DBD::SQLite;
-  plan tests => 6;
+  plan tests => 7;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -33,6 +33,20 @@ eval {
   is($util1, $util2, 'same singleton util subclass instance');
 
   is($util1->dbh(), $util2->dbh(), 'same dbh from different util subclass instances');
+}
+
+{
+  my $util1 = ClearPress::util->new({
+				     cgi => {},
+				    });
+  my $cgi1 = $util1->cgi();
+
+  my $util2 = ClearPress::util->new({
+				     cgi => {},
+				    });
+  my $cgi2 = $util2->cgi();
+
+  isnt($cgi1, $cgi2, 'CGI values differ');
 }
 
 package t::util::test1;
