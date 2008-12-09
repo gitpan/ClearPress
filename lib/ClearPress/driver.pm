@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-12-04 17:29:17 +0000 (Thu, 04 Dec 2008) $
-# Id:            $Id: driver.pm 287 2008-12-04 17:29:17Z zerojinx $
+# Last Modified: $Date: 2008-12-05 14:38:47 +0000 (Fri, 05 Dec 2008) $
+# Id:            $Id: driver.pm 289 2008-12-05 14:38:47Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.21/lib/ClearPress/driver.pm $
 #
 package ClearPress::driver;
 use strict;
@@ -17,7 +17,7 @@ use DBI;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 287 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -125,7 +125,7 @@ ClearPress::driver - database driver abstraction layer
 
 =head1 VERSION
 
-$LastChangedRevision: 287 $
+$LastChangedRevision: 289 $
 
 =head1 SYNOPSIS
 

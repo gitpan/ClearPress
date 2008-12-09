@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-12-05 14:32:24 +0000 (Fri, 05 Dec 2008) $
+# Last Modified: $Date: 2008-12-09 12:51:22 +0000 (Tue, 09 Dec 2008) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 288 2008-12-05 14:32:24Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
+# Id:            $Id: util.pm 290 2008-12-09 12:51:22Z zerojinx $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.21/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$LastChangedRevision: 288 $ =~ /(\d+)/smx; $r; };
+our $VERSION              = do { my ($r) = q$LastChangedRevision: 290 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
@@ -161,6 +161,18 @@ sub log { ## no critic
 }
 
 sub cleanup {
+  my $self = shift;
+
+  #########
+  # cleanup() is called by controller at the end of a request:response
+  # cycle. Here we neutralise the singleton instance so it doesn't
+  # carry over any stateful information to the next request - CGI,
+  # DBH, TT and anything else cached in data members.
+  #
+  my $class = ref $self || $self;
+  no strict 'refs'; ## no critic
+  ${"$class\::_instance"} = undef;
+  return 1;
 }
 
 1;
@@ -173,7 +185,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 288 $
+$LastChangedRevision: 290 $
 
 =head1 SYNOPSIS
 

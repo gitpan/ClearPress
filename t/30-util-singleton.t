@@ -6,7 +6,7 @@ use Test::Trap;
 
 eval {
   require DBD::SQLite;
-  plan tests => 7;
+  plan tests => 8;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -47,6 +47,14 @@ eval {
   my $cgi2 = $util2->cgi();
 
   isnt($cgi1, $cgi2, 'CGI values differ');
+}
+
+{
+  my $util1 = ClearPress::util->new();
+  $util1->cleanup();
+  my $util2 = ClearPress::util->new();
+
+  isnt($util1, $util2, 'utils differ after cleanup');
 }
 
 package t::util::test1;

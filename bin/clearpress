@@ -2,9 +2,9 @@
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2008-11-14 14:07:06 +0000 (Fri, 14 Nov 2008) $
-# Id:            $Id: clearpress 279 2008-11-14 14:07:06Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/bin/clearpress $
+# Last Modified: $Date: 2008-12-05 14:38:47 +0000 (Fri, 05 Dec 2008) $
+# Id:            $Id: clearpress 289 2008-12-05 14:38:47Z zerojinx $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.21/bin/clearpress $
 #
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 279 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
 $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin);
@@ -257,7 +257,7 @@ use <% application %>::util;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 279 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
 
 <% application %>::sa->new->run();
 
@@ -334,7 +334,7 @@ use <% application %>::view::error;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 279 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
 
 main();
 0;
