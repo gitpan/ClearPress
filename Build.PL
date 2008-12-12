@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
 				 module_name         => 'ClearPress',
 				 dist_author         => 'Roger M Pettett <rpettett@cpan.org>',
-				 dist_version        => do { my ($r) = q$Revision: 291 $ =~ /(\d+)/mx; $r; },
+				 dist_version        => do { my ($r) = q$Revision: 293 $ =~ /(\d+)/mx; $r; },
 				 dist_abstract       => q[ClearPress - Simple, fresh & fruity MVC framework],
 				 license             => 'perl',
 				 requires            => {
@@ -22,6 +22,7 @@ my $builder = Module::Build->new(
 							 'POSIX'               => '1.09',
 							 'Readonly'            => '1.03',
 							 'XML::Simple'         => '2.18',
+							 'HTML::Entities'      => '1.35',
 							},
 				 recommends          => {
 							 'DBD::SQLite'         => '1.14',
@@ -38,6 +39,7 @@ my $builder = Module::Build->new(
 							 'CPAN'                => '1.9205',
 							 'XML::Simple'         => '2.18',
 							 'JSON'                => '2.12',
+							 'XML::LibXML'         => '1.66',
 							},
 				 build_recommends    => {
 							 'Test::Distribution' => '0',

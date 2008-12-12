@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+291 - Added xml_entity TT filter - uses HTML::Entities::encode_entities_numeric
+
 284 - Class::Singleton support moved from ClearPress::driver to
       ClearPress::util. When running in a mod_perl environment
       supporting multiple different ClearPress applications, the

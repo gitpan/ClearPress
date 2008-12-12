@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 291
+version: 293
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -15,6 +15,7 @@ requires:
   Config::IniFiles: 2.38
   DBI: 1.51
   English: 1.01
+  HTML::Entities: 1.35
   IO::Scalar: 2.110
   Lingua::EN::Inflect: 1.89
   POSIX: 1.09
@@ -30,6 +31,7 @@ build_requires:
   Test::More: 0.8
   Test::Perl::Critic: 0
   Test::Trap: 0.1.1
+  XML::LibXML: 1.66
   XML::Simple: 2.18
   XML::TreeBuilder: 3.09
 recommends:
@@ -42,6 +44,9 @@ provides:
   ClearPress::Template::Plugin::js_string:
     file: lib/ClearPress/Template/Plugin/js_string.pm
     version: 289
+  ClearPress::Template::Plugin::xml_entity:
+    file: lib/ClearPress/Template/Plugin/xml_entity.pm
+    version: 293
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
     version: 289
