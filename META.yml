@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 293
+version: 295
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -40,7 +40,7 @@ recommends:
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 289
+    version: 295
   ClearPress::Template::Plugin::js_string:
     file: lib/ClearPress/Template/Plugin/js_string.pm
     version: 289
@@ -58,7 +58,7 @@ provides:
     version: 289
   ClearPress::driver::SQLite:
     file: lib/ClearPress/driver/SQLite.pm
-    version: 289
+    version: 295
   ClearPress::driver::mysql:
     file: lib/ClearPress/driver/mysql.pm
     version: 289
@@ -70,7 +70,7 @@ provides:
     version: 290
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 289
+    version: 295
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
     version: 289

@@ -6,6 +6,10 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+294 - Fixed up schema problems when auto-generating SQLite applications.
+      Allow posting XML without XForms:Model. Note it's unadvisable to
+      use this feature in the wild.
+
 291 - Added xml_entity TT filter - uses HTML::Entities::encode_entities_numeric
 
 284 - Class::Singleton support moved from ClearPress::driver to
@@ -18,7 +22,6 @@ TODO:
       the singleton support was moved into ClearPress::util. The util
       is commonly subclassed for applications so this should be a
       robust solution, particularly for shared environments.
-
 
 278 - Support for posting XML
 

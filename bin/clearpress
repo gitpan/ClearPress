@@ -2,8 +2,8 @@
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2008-12-05 14:38:47 +0000 (Fri, 05 Dec 2008) $
-# Id:            $Id: clearpress 289 2008-12-05 14:38:47Z zerojinx $
+# Last Modified: $Date: 2009-01-05 12:40:54 +0000 (Mon, 05 Jan 2009) $
+# Id:            $Id: clearpress 295 2009-01-05 12:40:54Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.21/bin/clearpress $
 #
 use strict;
@@ -16,7 +16,7 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 295 $ =~ /(\d+)/smx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
 $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin);
@@ -48,7 +48,7 @@ sub main { ## no critic (complexity)
     return 1;
   }
 
-  $opts->{driver} ||= 'mysql';
+  ($opts->{driver}) = ($opts->{driver} || 'mysql') =~ /(SQLite|mysql)/smx;
 
   if(!$opts->{new}) {
     croak q(Please specify --new <application-name>);
@@ -63,7 +63,12 @@ sub main { ## no critic (complexity)
 
   my $all_structure = shift @ARGV;
 
-  my $schema = {};
+  my $schema     = {};
+  my $driver_pkg = "ClearPress::driver::$opts->{driver}";
+
+  eval "require $driver_pkg"; ## no critic
+  my $driver = $driver_pkg->new();
+
   for my $structure (split /\s+/smx, $all_structure) {
     if($structure =~ /\S+\(\S+\)/smx) {
       #########
@@ -74,7 +79,7 @@ sub main { ## no critic (complexity)
       for my $column (split /,/smx, $columns) {
 	my ($name, $type) = split /:/smx, $column;
 	$name           ||= $column;
-	$type           ||= 'char(128)';
+	$type             = $driver->type_map($type||'char(128)');
 	$schema->{$table}->{fields}->{$name} = $type;
 
 	print {*STDERR} qq($table has $name of type $type\n) or croak qq[Error printing: $ERRNO];
@@ -108,7 +113,11 @@ sub main { ## no critic (complexity)
   print {$fh} $PROGRAM_NAME, (map { qq( '$_') } @argvcopy), qq(\n) or croak qq[Error printing: $ERRNO];
   close $fh or croak qq[Error closing $cfg: $ERRNO];
 
-  print qq(
+  if($opts->{driver} eq 'mysql') {
+    #########
+    # mysql message
+    #
+    print qq(
 You now need to configure your database.
 1. Check and/or modify $app/data/config.ini
 2. If necessary create a database, something like this:
@@ -118,6 +127,19 @@ You now need to configure your database.
 3. mysql -uroot < $app/data/schema/*.mysql
 Note you may need to create your new schema in order, depending on your foreign key constraints.
 ) or croak qq[Error printing: $ERRNO];
+
+  } else {
+    #########
+    # SQLite message
+    #
+    print qq(
+You now need to configure your database.
+1. Check and/or modify $app/data/config.ini
+2. If necessary create a database, something like this:
+  cat $app/data/schema/*.SQLite | sqlite3 $app/$app
+) or croak qq[Error printing: $ERRNO];
+  }
+
   return 1;
 }
 
@@ -126,7 +148,7 @@ sub read_templates {
   local $RS = "\n-- \n";
 
   if(!scalar keys %{$cache}) {
-    for my $field (qw(config schema application_sa application_cgi util model view view_error),
+    for my $field (qw(config schema_mysql schema_SQLite application_sa application_cgi util model view view_error),
 		   (map { "aspect_$_" } @{$ASPECTS}),
 		   qw(actions warnings stylesheet)) {
       my $str          = <DATA>;
@@ -142,6 +164,7 @@ sub create_application {
   my $opts   = shift;
   my $app    = $opts->{application};
   my $cache  = $opts->{template_cache};
+  my $driver = $opts->{driver};
   my $schema = $opts->{schema};
   my $tt     = Template->new({
 			     EVAL_PERL => 1,
@@ -156,7 +179,8 @@ sub create_application {
     $opts->{has_many} = $schema->{$view}->{has_many} || [];
     $opts->{has_a}    = $schema->{$view}->{has_a}    || [];
 
-    process_template($opts, $tt, $cache->{schema}, "$app/data/schema",    "$view.$opts->{'driver'}");
+    process_template($opts, $tt, $cache->{"schema_$driver"}, "$app/data/schema",    "$view.$driver");
+
     process_template($opts, $tt, $cache->{model},  "$app/lib/$app/model", "$view.pm");
     process_template($opts, $tt, $cache->{view},   "$app/lib/$app/view",  "$view.pm");
 
@@ -211,16 +235,19 @@ views=<% PERL %>print join q(,), @{$stash->get('views')}<% END %>
 stylesheet=/<% application %>.css
 
 [live]
+driver=<% driver %>
 dbhost=localhost
 dbname=<% application %>
 dbuser=root
 
 [dev]
+driver=<% driver %>
 dbhost=localhost
 dbname=<% application %>
 dbuser=root
 
 [test]
+driver=<% driver %>
 dbhost=localhost
 dbname=<% application %>
 dbuser=root
@@ -238,6 +265,16 @@ CREATE TABLE `<% name %>` (
 <% END %>
   PRIMARY KEY  (`id_<% name %>`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- 
+<%# SQLite table schema %>
+DROP TABLE IF EXISTS <% name %>;
+CREATE TABLE <% name %> (
+<% FOREACH field = fields %>  <% field.name %> <% field.type %>,
+<% END %><% FOREACH rel = has_a %>  id_<% rel %> integer,
+<% END %>  id_<% name %> integer primary key autoincrement
+);
+<% FOREACH rel = has_a %>
+CREATE INDEX <% name %>_id_<% rel %> on <% name %> (id_<% rel %>);<% END %>
 -- 
 #!/usr/bin/perl -T
 <%# standalone application %>
@@ -257,7 +294,7 @@ use <% application %>::util;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 295 $ =~ /(\d+)/smx; $r; };
 
 <% application %>::sa->new->run();
 
@@ -334,7 +371,7 @@ use <% application %>::view::error;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 295 $ =~ /(\d+)/smx; $r; };
 
 main();
 0;

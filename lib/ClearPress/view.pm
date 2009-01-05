@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-12-05 14:38:47 +0000 (Fri, 05 Dec 2008) $
-# Id:            $Id: view.pm 289 2008-12-05 14:38:47Z zerojinx $
+# Last Modified: $Date: 2009-01-05 12:40:54 +0000 (Mon, 05 Jan 2009) $
+# Id:            $Id: view.pm 295 2009-01-05 12:40:54Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.21/lib/ClearPress/view.pm $
 #
@@ -17,9 +17,10 @@ use Carp;
 use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use ClearPress::Template::Plugin::js_string;
+use ClearPress::Template::Plugin::xml_entity;
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 295 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -288,8 +289,34 @@ sub _populate_from_cgi {
   my $params = {
 		map { $_ => $cgi->param($_) } $cgi->param()
 	       };
-  my $xml = $cgi->param('XForms:Model');
 
+  #########
+  # parse old-style XML POST payload
+  #
+  my $xmlpost = $cgi->param('POSTDATA');
+  if($xmlpost) {
+    eval {
+      $params = XMLin($xmlpost);
+      for my $k (%{$params}) {
+	if(ref $params->{$k} &&
+	   ref $params->{$k} eq 'HASH' &&
+	   !scalar keys %{$params->{$k}}) {
+	  delete $params->{$k};
+	}
+      }
+      1;
+    } or do {
+      #########
+      # Not an XML-formatted POST body. Ignore for now.
+      #
+      carp q[Got error while parsing POSTDATA: ].$EVAL_ERROR;
+    };
+  }
+
+  #########
+  # parse new-style XML POST payload
+  #
+  my $xml = $cgi->param('XForms:Model');
   if($xml) {
     $params = XMLin($xml);
     for my $k (%{$params}) {
@@ -540,7 +567,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 289 $
+$LastChangedRevision: 295 $
 
 =head1 SYNOPSIS
 

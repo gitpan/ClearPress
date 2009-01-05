@@ -13,7 +13,7 @@ use Carp;
 
 eval {
   require DBD::SQLite;
-  plan tests => 69;
+  plan tests => 72;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -373,7 +373,29 @@ my $util = t::util->new();
 
   $cgi->param('XForms:Model', $xml);
   $util->cgi($cgi);
-#  use Data::Dumper;croak 'TEST'. Dumper($cgi);
+
+  my $model = t::model->new({
+			     test_pk => 'one',
+			     util    => $util,
+			    });
+  my $view  = ClearPress::view->new({
+				     util   => $util,
+				     model  => $model,
+				     action => 'update',
+				     aspect => q[],
+				    });
+  like($view->render(), qr/Updated/smx, 'submit-xml render ok');
+  is($model->test_pk(),    'one', 'key population from param not xml');
+  is($model->test_field(), 'bar', 'field population from xml');
+}
+
+{
+  my $cgi = CGI->new();
+  my $xml = qq[<?xml version='1.0'?>\n<model><test_pk>two</test_pk><test_field>bar</test_field></model>];
+
+  $cgi->param('POSTDATA', $xml);
+  $util->cgi($cgi);
+
   my $model = t::model->new({
 			     test_pk => 'one',
 			     util    => $util,
