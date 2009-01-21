@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-12-05 14:38:47 +0000 (Fri, 05 Dec 2008) $
-# Id:            $Id: model.pm 289 2008-12-05 14:38:47Z zerojinx $
+# Last Modified: $Date: 2009-01-21 14:21:49 +0000 (Wed, 21 Jan 2009) $
+# Id:            $Id: model.pm 300 2009-01-21 14:21:49Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.21/lib/ClearPress/model.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
 #
 package ClearPress::model;
 use strict;
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
@@ -246,7 +246,6 @@ sub hasa {
 
 sub has_a {
   my ($class, $attr) = @_;
-  no strict 'refs'; ## no critic
 
   if(ref $attr ne 'ARRAY') {
     $attr = [$attr];
@@ -272,6 +271,7 @@ sub has_a {
       next;
     }
 
+    no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
     *{$namespace} = sub {
       my $self = shift;
       return $self->gen_getobj($yield);
@@ -289,7 +289,6 @@ sub hasmany {
 
 sub has_many {
   my ($class, $attr) = @_;
-  no strict 'refs'; ## no critic
 
   if(ref $attr ne 'ARRAY') {
     $attr = [$attr];
@@ -316,6 +315,7 @@ sub has_many {
       next;
     }
 
+    no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
     *{$namespace} = sub {
       my $self = shift;
       return $self->gen_getfriends($yield, $plural);
@@ -332,7 +332,6 @@ sub belongs_to_through {
 
 sub has_a_through {
   my ($class, $attr) = @_;
-  no strict 'refs'; ## no critic
 
   if(ref $attr ne 'ARRAY') {
     $attr = [$attr];
@@ -366,6 +365,7 @@ sub has_a_through {
       next;
     }
 
+    no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
     *{$namespace} = sub {
       my $self = shift;
       return $self->gen_getobj_through($yield, $through);
@@ -377,7 +377,6 @@ sub has_a_through {
 
 sub has_many_through {
   my ($class, $attr) = @_;
-  no strict 'refs'; ## no critic
 
   if(ref $attr ne 'ARRAY') {
     $attr = [$attr];
@@ -412,6 +411,7 @@ sub has_many_through {
       next;
     }
 
+    no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
     *{$namespace} = sub {
       my $self = shift;
 
@@ -424,7 +424,6 @@ sub has_many_through {
 
 sub has_all {
   my ($class) = @_;
-  no strict 'refs'; ## no critic
 
   my ($single)  = $class =~ /([^:]+)$/smx;
   my $plural    = PL($single);
@@ -434,6 +433,7 @@ sub has_all {
     return;
   }
 
+  no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
   *{$namespace} = sub {
     my $self = shift;
     return $self->gen_getall();
@@ -487,10 +487,9 @@ sub create {
   return 1;
 }
 
-sub read { ## no critic
-  my $self  = shift;
-  my $query = shift;
-  my $pk    = $self->primary_key();
+sub read { ## no critic (homonym)
+  my ($self, $query, @args) = @_;
+  my $pk = $self->primary_key();
 
   if(!$query && !$self->{$pk}) {
 #    carp q(No primary key);
@@ -503,7 +502,6 @@ sub read { ## no critic
   }
 
   if(!$self->{_loaded}) {
-    my @args = @_;
     if(!$query) {
       $query = qq(SELECT @{[join q(, ), $self->fields()]}
                   FROM   $table
@@ -589,7 +587,7 @@ sub update {
   return 1;
 }
 
-sub delete { ## no critic
+sub delete { ## no critic (homonym)
   my $self     = shift;
   my $util     = $self->util();
   my $tr_state = $util->transactions();
@@ -662,7 +660,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 289 $
+$LastChangedRevision: 300 $
 
 =head1 SYNOPSIS
 

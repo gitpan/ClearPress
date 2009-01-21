@@ -2,25 +2,25 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-01-05 12:40:54 +0000 (Mon, 05 Jan 2009) $
-# Id:            $Id: view.pm 295 2009-01-05 12:40:54Z zerojinx $
+# Last Modified: $Date: 2009-01-21 14:21:49 +0000 (Wed, 21 Jan 2009) $
+# Id:            $Id: view.pm 300 2009-01-21 14:21:49Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.21/lib/ClearPress/view.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
 use warnings;
 use base qw(Class::Accessor);
 use Template;
+use Template::Filters;
 use ClearPress::util;
 use Carp;
 use English qw(-no_match_vars);
 use POSIX qw(strftime);
-use ClearPress::Template::Plugin::js_string;
-use ClearPress::Template::Plugin::xml_entity;
+use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 295 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -219,16 +219,32 @@ sub render {
 
 sub process_template {
   my ($self, $template, $extra_params, $where_to_ref) = @_;
-  my $util     = $self->util();
-  my $cfg      = $util->config();
-  my ($entity) = (ref $self) =~ /([^:]+)$/smx;
+  my $util        = $self->util();
+  my $cfg         = $util->config();
+  my ($entity)    = (ref $self) =~ /([^:]+)$/smx;
+  $entity       ||= q[];
+  my $script_name = $ENV{SCRIPT_NAME} || q[/];
+  my $http_host   = $ENV{HTTP_HOST}   || q[localhost];
+  my $http_port   = $ENV{HTTP_PORT}   || q[];
+  my $https       = $ENV{HTTPS}?q[https]:q[http];
+  my $href        = sprintf q[%s://%s%s%s%s],
+			    $https,
+			    $http_host,
+			    $http_port?":$http_port":q[],
+			    $script_name,
+			    ($script_name eq q[/])?q[]:q[/];
+
   my $params   = {
 		  requestor   => $util->requestor,
 		  model       => $self->model(),
 		  view        => $self,
 		  entity      => $entity,
-		  SCRIPT_NAME => $ENV{SCRIPT_NAME},
-		  HTTP_HOST   => $ENV{HTTP_HOST},
+		  SCRIPT_NAME => $script_name,
+		  HTTP_HOST   => $http_host,
+		  HTTP_PORT   => $http_port,
+		  HTTPS       => $https,
+		  SCRIPT_HREF => $href,
+		  ENTITY_HREF => "$href$entity",
 		  now         => (strftime '%Y-%m-%dT%H:%M:%S', localtime),
 		  (map {
 		    $_ => $cfg->val('globals',$_)
@@ -362,11 +378,11 @@ sub list {
   return 1;
 }
 
-sub read { ## no critic
+sub read { ## no critic (homonym)
   return 1;
 }
 
-sub delete { ## no critic
+sub delete { ## no critic (homonym)
   my $self  = shift;
   my $model = $self->model();
 
@@ -413,11 +429,28 @@ sub tt {
   }
 
   if(!$util->{tt}) {
+    my $filters = Template::Filters->new({
+					  FILTERS => {
+						      js_string => sub {
+							my $string = shift;
+							$string =~ s/\r/\\r/smxg;
+							$string =~ s/\n/\\n/smxg;
+							$string =~ s/"/\\"/smxg;
+							return $string;
+						      },
+						      xml_entity => sub {
+							my $string = shift;
+							return encode_entities_numeric($string),
+						      },
+						     },
+					 });
     $util->{tt} = Template->new({
 				 PLUGIN_BASE  => 'ClearPress::Template::Plugin',
 				 RECURSION    => 1,
 				 INCLUDE_PATH => (sprintf q(%s/templates), $util->data_path()),
 				 EVAL_PERL    => 1,
+				 ENCODING     => 'utf8',
+				 LOAD_FILTERS => [ $filters ],
 				}) or croak $Template::ERROR;
   }
   return $util->{tt};
@@ -567,7 +600,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 295 $
+$LastChangedRevision: 300 $
 
 =head1 SYNOPSIS
 
@@ -787,11 +820,21 @@ View superclass for the ClearPress framework
 
 =over
 
+=item base
+
 =item strict
 
 =item warnings
 
+=item Class::Accessor
+
 =item Template
+
+=item Template::Filters
+
+=item HTML::Entities
+
+=item XML::Simple
 
 =item ClearPress::util
 

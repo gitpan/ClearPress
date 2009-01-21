@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2008-12-09 12:51:22 +0000 (Tue, 09 Dec 2008) $
+# Last Modified: $Date: 2009-01-21 14:21:49 +0000 (Wed, 21 Jan 2009) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 290 2008-12-09 12:51:22Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.21/lib/ClearPress/util.pm $
+# Id:            $Id: util.pm 300 2009-01-21 14:21:49Z zerojinx $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$LastChangedRevision: 290 $ =~ /(\d+)/smx; $r; };
+our $VERSION              = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
@@ -104,7 +104,7 @@ sub config {
   }
 
   if(!$self->{config}) {
-    croak qq(No configuration available:\n). join q(, ), @Config::IniFiles::errors; ## no critic
+    croak qq(No configuration available:\n). join q(, ), @Config::IniFiles::errors; ## no critic (Variables::ProhibitPackageVars)
   }
 
   return $self->{config};
@@ -154,7 +154,7 @@ sub driver {
   return $self->{driver};
 }
 
-sub log { ## no critic
+sub log { ## no critic (homonym)
   my ($self, @args) = @_;
   print {*STDERR} map { (strftime '[%Y-%m-%dT%H:%M:%S] ', localtime). "$_\n" } @args or croak $ERRNO;
   return 1;
@@ -170,7 +170,8 @@ sub cleanup {
   # DBH, TT and anything else cached in data members.
   #
   my $class = ref $self || $self;
-  no strict 'refs'; ## no critic
+
+  no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
   ${"$class\::_instance"} = undef;
   return 1;
 }
@@ -185,7 +186,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$LastChangedRevision: 290 $
+$LastChangedRevision: 300 $
 
 =head1 SYNOPSIS
 

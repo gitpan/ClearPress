@@ -1,10 +1,15 @@
 TODO:
-- maintenance: Switch to using inside-out objects (probably Class- or Object- InsideOut)
+- maintenance: Switch to using inside-out objects (probably Moose)
 - maintenance: scripts/clearpress to auto-generate tests & fixture framework
 - maintenance: Improve migrations
 - maintenance: Improve test coverage (currently at 81%)
 - maintenance: Add regression tests
 - performance: Config caching
+
+298 - Conformance to Perl::Critic 1.094001
+
+297 - Made js_string and xml_entity filters available by
+      default. There's no longer any need to 'USE <x>' them.
 
 294 - Fixed up schema problems when auto-generating SQLite applications.
       Allow posting XML without XForms:Model. Note it's unadvisable to

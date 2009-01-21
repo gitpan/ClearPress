@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-12-05 14:38:47 +0000 (Fri, 05 Dec 2008) $
-# Id:            $Id: controller.pm 289 2008-12-05 14:38:47Z zerojinx $
+# Last Modified: $Date: 2009-01-21 14:21:49 +0000 (Wed, 21 Jan 2009) $
+# Id:            $Id: controller.pm 300 2009-01-21 14:21:49Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.21/lib/ClearPress/controller.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 289 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -133,6 +133,7 @@ sub packagespace {
   }
 
   my $namespace = $self->namespace($util);
+#carp qq[namespace=$namespace, type=$type, entity=$entity caller=],caller();
   return "${namespace}::${type}::$entity";
 }
 
@@ -175,6 +176,22 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   $entity ||= $util->config->val('application', 'default_view');
   $aspect ||= q[];
   $id       = CGI->unescape($id||'0');
+
+  #########
+  # no view determined and no configured default_view
+  # pull the first one off the list
+  #
+  if(!$entity) {
+    my $views = $util->config->val('application', 'views');
+    $entity   = (split /[\s,]+/smx, $views)[0];
+  }
+
+  #########
+  # no view determined, no default_view and none in the list
+  #
+  if(!$entity) {
+    croak q[No available views];
+  }
 
   my $viewclass = $self->packagespace('view', $entity, $util);
 
@@ -251,11 +268,6 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
     } else {
       $aspect .= "${action}_$aspect_extra";
     }
-  }
-
-  if(!$entity) {
-    my $views = $util->config->val('application', 'views');
-    $entity   = (split /[\s,]+/smx, $views)[0];
   }
 
   #########
@@ -516,7 +528,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 289 $
+$LastChangedRevision: 300 $
 
 =head1 SYNOPSIS
 

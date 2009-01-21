@@ -29,8 +29,6 @@ examples/GrandKids/lib/GrandKids/model/family.pm
 examples/GrandKids/lib/GrandKids/view/child.pm
 examples/GrandKids/lib/GrandKids/view/family.pm
 lib/ClearPress.pm
-lib/ClearPress/Template/Plugin/js_string.pm
-lib/ClearPress/Template/Plugin/xml_entity.pm
 lib/ClearPress/controller.pm
 lib/ClearPress/decorator.pm
 lib/ClearPress/driver.pm
@@ -51,8 +49,6 @@ t/20-view.t
 t/30-controller-requests.t
 t/30-controller.t
 t/30-decorator.t
-t/30-filter-js_string.t
-t/30-filter-xml_entity.t
 t/30-util-singleton.t
 t/30-util.t
 t/40-driver-mysql-tables.t
@@ -97,6 +93,7 @@ t/user/basic.pm
 t/util.pm
 t/view/derived.pm
 t/view/error.pm
+test.db
 Makefile.PL
 Build.PL
 META.yml

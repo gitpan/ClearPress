@@ -11,6 +11,8 @@ eval {
   plan skip_all => 'DBD::SQLite not installed';
 };
 
+diag(q[Expect ClearPress::driver / SQLite warnings about failure to create tables]);
+
 {
   my $util1 = t::util->new();
   my $util2 = t::util->new();
