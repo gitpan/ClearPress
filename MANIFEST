@@ -93,7 +93,6 @@ t/user/basic.pm
 t/util.pm
 t/view/derived.pm
 t/view/error.pm
-test.db
 Makefile.PL
 Build.PL
 META.yml
