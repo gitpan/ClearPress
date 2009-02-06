@@ -55,6 +55,7 @@ t/40-driver-mysql-tables.t
 t/40-driver-mysql.t
 t/40-driver-sqlite.t
 t/40-driver.t
+t/50-clearpress.t
 t/data/config.ini
 t/data/rendered/derived_create.html
 t/data/rendered/derived_list.ajax

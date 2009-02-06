@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-01-21 14:21:49 +0000 (Wed, 21 Jan 2009) $
-# Id:            $Id: view.pm 300 2009-01-21 14:21:49Z zerojinx $
+# Last Modified: $Date: 2009-02-06 14:24:10 +0000 (Fri, 06 Feb 2009) $
+# Id:            $Id: view.pm 309 2009-02-06 14:24:10Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 309 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -223,7 +223,7 @@ sub process_template {
   my $cfg         = $util->config();
   my ($entity)    = (ref $self) =~ /([^:]+)$/smx;
   $entity       ||= q[];
-  my $script_name = $ENV{SCRIPT_NAME} || q[/];
+  my $script_name = $ENV{SCRIPT_NAME} || q[];
   my $http_host   = $ENV{HTTP_HOST}   || q[localhost];
   my $http_port   = $ENV{HTTP_PORT}   || q[];
   my $https       = $ENV{HTTPS}?q[https]:q[http];
@@ -433,13 +433,15 @@ sub tt {
 					  FILTERS => {
 						      js_string => sub {
 							my $string = shift;
-							$string =~ s/\r/\\r/smxg;
-							$string =~ s/\n/\\n/smxg;
-							$string =~ s/"/\\"/smxg;
+							$string  ||= q[];
+							$string    =~ s/\r/\\r/smxg;
+							$string    =~ s/\n/\\n/smxg;
+							$string    =~ s/"/\\"/smxg;
 							return $string;
 						      },
 						      xml_entity => sub {
 							my $string = shift;
+							$string  ||= q[];
 							return encode_entities_numeric($string),
 						      },
 						     },
@@ -600,7 +602,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 300 $
+$LastChangedRevision: 309 $
 
 =head1 SYNOPSIS
 

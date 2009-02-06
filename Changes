@@ -6,6 +6,10 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+302 - Bugfix affecting SCRIPT_NAME use in the standalone server
+    - Application builder now emits mysql schema-loading help with the
+      correct precedence
+
 298 - Conformance to Perl::Critic 1.094001
 
 297 - Made js_string and xml_entity filters available by

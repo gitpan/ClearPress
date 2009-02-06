@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 301
+version: 310
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -64,7 +64,7 @@ provides:
     version: 300
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 300
+    version: 309
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
     version: 279

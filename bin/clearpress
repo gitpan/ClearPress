@@ -2,8 +2,8 @@
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2009-01-21 14:21:49 +0000 (Wed, 21 Jan 2009) $
-# Id:            $Id: clearpress 300 2009-01-21 14:21:49Z zerojinx $
+# Last Modified: $Date: 2009-02-06 14:24:10 +0000 (Fri, 06 Feb 2009) $
+# Id:            $Id: clearpress 309 2009-02-06 14:24:10Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/bin/clearpress $
 #
 use strict;
@@ -16,7 +16,7 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 309 $ =~ /(\d+)/smx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
 $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin);
@@ -108,6 +108,10 @@ sub main { ## no critic (complexity)
 		      'schema'         => $schema,
 		     });
 
+  my $precedence = [map  { $_->{name} }
+		    sort _sorter
+		    values %{$schema}];
+
   my $cfg = qq($app/config.layout);
   open my $fh, q(>), $cfg or croak qq[Error opening $cfg: $ERRNO];
   print {$fh} $PROGRAM_NAME, (map { qq( '$_') } @argvcopy), qq(\n) or croak qq[Error printing: $ERRNO];
@@ -121,10 +125,9 @@ sub main { ## no critic (complexity)
 You now need to configure your database.
 1. Check and/or modify $app/data/config.ini
 2. If necessary create a database, something like this:
-  mysql -uroot
-  create database $app;
-  <Ctrl-D>
-3. mysql -uroot < $app/data/schema/*.mysql
+  mysqladmin -uroot create $app
+3. cat @{[map { "$app/data/schema/$_.mysql \\\n      " } @{$precedence}]} | mysql -uroot $app
+
 Note you may need to create your new schema in order, depending on your foreign key constraints.
 ) or croak qq[Error printing: $ERRNO];
 
@@ -172,6 +175,7 @@ sub create_application {
 			    });
 
   for my $view (@{$opts->{views}}) {
+    $schema->{$view}->{name} = $view;
     $opts->{name}     = $view;
     $opts->{fields}   = [map { {name => $_,
 				type => $schema->{$view}->{fields}->{$_}};
@@ -199,6 +203,7 @@ sub create_application {
   process_template($opts, $tt, $cache->{stylesheet},      "$app/htdocs",         "$app.css");
   process_template($opts, $tt, $cache->{actions},         "$app/data/templates", 'actions.tt2');
   process_template($opts, $tt, $cache->{warnings},        "$app/data/templates", 'warnings.tt2');
+
   return 1;
 }
 
@@ -226,6 +231,21 @@ sub process_template {
   $tt->process($tmpl, $opts, $fh) or croak "Template error building $fn: ".$tt->error(). "\nTemplate was:\n".${$tmpl}."\n";
   close $fh or croak "Closing $fn: $ERRNO";
   return 1;
+}
+
+sub _sorter {
+  my $a_deps = $a->{has_a} || [];
+  my $b_deps = $b->{has_a} || [];
+
+  if(scalar grep { $_ eq $b->{name} } @{$a_deps}) {
+    return 1;
+  }
+
+  if(scalar grep { $_ eq $a->{name} } @{$b_deps}) {
+    return -1; ## no critic (ProhibitMagicNumbers)
+  }
+
+  return (scalar @{$a_deps} <=> scalar @{$b_deps});
 }
 
 __END__
@@ -296,7 +316,7 @@ use <% application %>::util;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 309 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $PORT => 8080;
 
 my $opts = {};
@@ -377,7 +397,7 @@ use <% application %>::view::error;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 309 $ =~ /(\d+)/smx; $r; };
 
 main();
 0;
