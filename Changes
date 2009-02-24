@@ -6,6 +6,10 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+320 - Improvements to singleton handling
+    - Template-toolkit filter registration for views
+    - Revisions for latest perlcritic regex enforcement
+
 317 - Added 'streamed_aspects' view method for easier streamed responses
     - Added model construction with primary key rather than hashref
     - Default to *_ajax aspect with XMLHttpRequest request header

@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-02-24 10:36:40 +0000 (Tue, 24 Feb 2009) $
-# Id:            $Id: controller.pm 318 2009-02-24 10:36:40Z zerojinx $
+# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
+# Id:            $Id: controller.pm 320 2009-02-24 18:15:24Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 318 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -144,9 +144,9 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my $pi            = $ENV{PATH_INFO}      || q();
   my $accept        = $ENV{HTTP_ACCEPT}    || q();
   my $qs            = $ENV{QUERY_STRING}   || q();
-  my ($entity)      = $pi =~ m{^/([^/;\.]+)}smx;
+  my ($entity)      = $pi =~ m{^/([^/;.]+)}smx;
   $entity         ||= q[];
-  my ($dummy, $aspect_extra, $id) = $pi =~ m{^/$entity(/(.*))?/([a-z:,\-_\d%\@\.\+\ ]+)}smix;
+  my ($dummy, $aspect_extra, $id) = $pi =~ m{^/$entity(/(.*))?/([[:lower:]:,\-_[:digit:]%@.+\s]+)}smix;
 
   my ($aspect)      = $pi =~ m{;(\S+)}smx;
 
@@ -172,7 +172,7 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my $uriaspect = $self->_process_request_extensions(\$pi, $aspect, $action) || q[];
   if($uriaspect ne $aspect) {
     $aspect = $uriaspect;
-    ($id)   = $pi =~ m{^/$entity/?$aspect_extra/([a-z:,\-_\d%\@\.\+\ ]+)}smix;
+    ($id)   = $pi =~ m{^/$entity/?$aspect_extra/([[:lower:]:,\-_[:digit:]%@.+\s]+)}smix;
   }
 
   #########
@@ -186,7 +186,7 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   #
   my $hxrw = $ENV{HTTP_X_REQUESTED_WITH} || q[];
   if($hxrw =~ /XMLHttpRequest/smix &&
-    $aspect !~ /(_ajax|_json|_xml)$/smx) {
+    $aspect !~ /(?:_ajax|_json|_xml)$/smx) {
     $aspect .= q[_ajax];
   }
 
@@ -290,7 +290,7 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   #########
   # fix up action
   #
-  if($aspect !~ /^(create|read|update|delete|add|list|edit)/smx) {
+  if($aspect !~ /^(?:create|read|update|delete|add|list|edit)/smx) {
     my $action_extended = $action;
     if(!$id) {
       $action_extended = {
@@ -309,12 +309,12 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   }
 
   if(!$id &&
-     $aspect =~ /^(delete|update|edit|read)/ssmx) {
+     $aspect =~ /^(?:delete|update|edit|read)/ssmx) {
     croak qq[Bad request. Cannot $aspect without an id];
   }
 
   if($id &&
-     $aspect =~ /^(create|add|list)/ssmx) {
+     $aspect =~ /^(?:create|add|list)/ssmx) {
     croak qq[Bad request. Cannot $aspect with an id];
   }
 
@@ -328,7 +328,7 @@ sub _process_request_extensions {
   $DEBUG and carp qq(pi=$pi);
   for my $pair (@{$self->accept_extensions}) {
     my ($ext, $meth) = %{$pair};
-    $ext =~ s/\./\\./smxg;
+    $ext =~ s/[.]/\\./smxg;
 
     if(${$pi} =~ s/$ext(;.*)?$//smx) {
       $aspect ||= $action;
@@ -546,7 +546,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 318 $
+$LastChangedRevision: 320 $
 
 =head1 SYNOPSIS
 

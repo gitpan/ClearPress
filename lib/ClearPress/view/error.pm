@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2008-11-14 14:07:06 +0000 (Fri, 14 Nov 2008) $
-# Id:            $Id: error.pm 279 2008-11-14 14:07:06Z zerojinx $
+# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
+# Id:            $Id: error.pm 320 2009-02-24 18:15:24Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
@@ -16,7 +16,7 @@ use Carp;
 
 __PACKAGE__->mk_accessors(qw(errstr));
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 279 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
 
 sub render {
   my $self   = shift;
@@ -31,10 +31,10 @@ sub render {
 #    $errstr .= q(Eval Error: ) . $EVAL_ERROR;
 #  }
   carp "Serving error: $errstr";
-  $errstr =~ s/\ at\ \S+\ line\ \d+//smxg;
+  $errstr =~ s/[ ]at[ ]S+[ ]line[ ][[:digit:]]+//smxg;
   $errstr =~ s/\s+$//smx;
 
-  if($aspect =~ /(ajax|xml|rss|atom)$/smx) {
+  if($aspect =~ /(?:ajax|xml|rss|atom)$/smx) {
     return qq[<error>$errstr</error>];
   }
 
@@ -55,7 +55,7 @@ ClearPress::view::error - specialised view for error handling
 
 =head1 VERSION
 
-$LastChangedRevision: 279 $
+$LastChangedRevision: 320 $
 
 =head1 SYNOPSIS
 

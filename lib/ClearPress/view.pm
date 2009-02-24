@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-02-24 10:36:40 +0000 (Tue, 24 Feb 2009) $
-# Id:            $Id: view.pm 318 2009-02-24 10:36:40Z zerojinx $
+# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
+# Id:            $Id: view.pm 320 2009-02-24 18:15:24Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 318 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -42,10 +42,10 @@ sub new {
 
   my $aspect = $self->aspect() || q();
 
-  $self->{content_type} ||= ($aspect =~ /(rss|atom|ajax|xml)$/smx)?'text/xml':q();
-  $self->{content_type} ||= ($aspect =~ /(js|json)$/smx)?'application/javascript':q();
-  $self->{content_type} ||= ($aspect =~ /_(png)$/smx)?'image/png':q();
-  $self->{content_type} ||= ($aspect =~ /_(jpg)$/smx)?'image/jpeg':q();
+  $self->{content_type} ||= ($aspect =~ /(?:rss|atom|ajax|xml)$/smx)?'text/xml':q();
+  $self->{content_type} ||= ($aspect =~ /(?:js|json)$/smx)?'application/javascript':q();
+  $self->{content_type} ||= ($aspect =~ /_png$/smx)?'image/png':q();
+  $self->{content_type} ||= ($aspect =~ /_jpg$/smx)?'image/jpeg':q();
   $self->{content_type} ||= 'text/html';
 
   $self->init();
@@ -92,7 +92,7 @@ sub authorised {
 
   if($action =~ /^list/smx ||
      ($action eq 'read' &&
-      $aspect !~ /^(add|delete|update|create)/smx)) {
+      $aspect !~ /^(?:add|delete|update|create)/smx)) {
     #########
     # by default assume public read access for 'read' actions
     #
@@ -178,12 +178,12 @@ sub render {
   # Figure out and call the appropriate action if available
   #
   my $method = $self->method_name();
-  if($method !~ /^(add|edit|create|read|update|delete|list)/smx) {
+  if($method !~ /^(?:add|edit|create|read|update|delete|list)/smx) {
     croak qq(Illegal method: $method);
   }
 
   if($self->can($method)) {
-    if($aspect =~ /_(jpg|png|gif)/smx) {
+    if($aspect =~ /_(?:jpg|png|gif)/smx) {
       return $self->$method();
     }
 
@@ -215,7 +215,7 @@ sub render {
   my $model   = $self->model();
   my $actions = my $warnings = q[];
 
-  if($aspect !~ /(rss|atom|ajax|xml|json)$/smx) {
+  if($aspect !~ /(?:rss|atom|ajax|xml|json)$/smx) {
     $actions  = $self->actions();
     eval {
       $self->process_template('warnings.tt2', {}, \$warnings);
@@ -448,6 +448,28 @@ sub create {
   return 1;
 }
 
+sub add_tt_filter {
+  my ($self, $name, $code) = @_;
+
+  if(!$name || !$code) {
+    return 1;
+  }
+
+  $self->tt_filters->{$name} = $code;
+
+  return;
+}
+
+sub tt_filters {
+  my $self = shift;
+
+  if(!$self->{tt_filters}) {
+    $self->{tt_filters} = {};
+  }
+  
+  return $self->{tt_filters};
+}
+
 sub tt {
   my ($self, $tt) = @_;
   my $util = $self->util();
@@ -457,22 +479,22 @@ sub tt {
   }
 
   if(!$util->{tt}) {
+    $self->add_tt_filter('js_string', sub {
+			                   my $string = shift;
+					   $string  ||= q[];
+					   $string    =~ s/\r/\\r/smxg;
+					   $string    =~ s/\n/\\n/smxg;
+					   $string    =~ s/"/\\"/smxg;
+					   return $string;
+					 });
+    $self->add_tt_filter('xml_entity', sub {
+					    my $string = shift;
+					    $string  ||= q[];
+					    return encode_entities_numeric($string),
+					  });
+
     my $filters = Template::Filters->new({
-					  FILTERS => {
-						      js_string => sub {
-							my $string = shift;
-							$string  ||= q[];
-							$string    =~ s/\r/\\r/smxg;
-							$string    =~ s/\n/\\n/smxg;
-							$string    =~ s/"/\\"/smxg;
-							return $string;
-						      },
-						      xml_entity => sub {
-							my $string = shift;
-							$string  ||= q[];
-							return encode_entities_numeric($string),
-						      },
-						     },
+					  FILTERS => $self->tt_filters(),
 					 });
     $util->{tt} = Template->new({
 				 PLUGIN_BASE  => 'ClearPress::Template::Plugin',
@@ -490,7 +512,7 @@ sub decor {
   my $self = shift;
   my $aspect = $self->aspect() || q();
 
-  if($aspect =~ /(rss|atom|ajax|xml|json|js|_png|_jpg)$/smx) {
+  if($aspect =~ /(?:rss|atom|ajax|xml|json|js|_png|_jpg)$/smx) {
     return 0;
   }
   return 1;
@@ -640,7 +662,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 318 $
+$LastChangedRevision: 320 $
 
 =head1 SYNOPSIS
 
@@ -735,6 +757,23 @@ View superclass for the ClearPress framework
 =head2 tt - a configured Template (TT2) object
 
   my $tt = $oView->tt();
+
+=head2 add_tt_filter - add a named template toolkit content filter, usually performed in init()
+
+  sub init {
+    my $self = shift;
+    $self->add_tt_filter('foo_filter',
+                         sub {
+                              my $string = shift;
+                              $string =~ s/foo/bar/smxg;
+                              return $string;
+                             });
+    return;
+  }
+
+=head2 tt_filters - hashref of configured template toolkit filters
+
+  my $hrFilters = $oView->tt_filters();
 
 =head2 util - get/set accessor for utility object
 

@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 318
+version: 320
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -21,7 +21,11 @@ requires:
   POSIX: 1.09
   Readonly: 1.03
   Template: 2.19
+  Template::Filters: 2.86
   XML::Simple: 2.18
+  base: 2.13
+  strict: 1.03
+  warnings: 1.05
 build_requires:
   CPAN: 1.9205
   Cwd: 3.2701
@@ -43,7 +47,7 @@ provides:
     version: 318
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
-    version: 318
+    version: 320
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
     version: 279
@@ -52,22 +56,22 @@ provides:
     version: 287
   ClearPress::driver::SQLite:
     file: lib/ClearPress/driver/SQLite.pm
-    version: 300
+    version: 320
   ClearPress::driver::mysql:
     file: lib/ClearPress/driver/mysql.pm
     version: 279
   ClearPress::model:
     file: lib/ClearPress/model.pm
-    version: 318
+    version: 320
   ClearPress::util:
     file: lib/ClearPress/util.pm
-    version: 300
+    version: 320
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 318
+    version: 320
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
-    version: 279
+    version: 320
 generated_by: Module::Build version 0.31012
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2009-01-21 14:21:49 +0000 (Wed, 21 Jan 2009) $
-# Id:            $Id: SQLite.pm 300 2009-01-21 14:21:49Z zerojinx $
+# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
+# Id:            $Id: SQLite.pm 320 2009-02-24 18:15:24Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/SQLite.pm $
 #
@@ -15,7 +15,7 @@ use Carp;
 use English qw(-no_match_vars);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'integer primary key autoincrement',
@@ -52,7 +52,7 @@ sub create {
 
   $dbh->do($query, {}, @args);
 
-  my ($table)  = $query =~ /INTO\s+([a-z\d_]+)/smix;
+  my ($table)  = $query =~ /INTO\s+([[:lower:][:digit:]_]+)/smix;
   my $sequence = q[SELECT seq FROM sqlite_sequence WHERE name=?];
   my $idref    = $dbh->selectall_arrayref($sequence, {}, $table);
 
@@ -72,7 +72,7 @@ ClearPress::driver::SQLite - SQLite-specific implementation of the database abst
 
 =head1 VERSION
 
-$LastChangedRevision: 300 $
+$LastChangedRevision: 320 $
 
 =head1 SYNOPSIS
 

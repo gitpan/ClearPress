@@ -2,8 +2,8 @@
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2009-02-06 14:24:10 +0000 (Fri, 06 Feb 2009) $
-# Id:            $Id: clearpress 309 2009-02-06 14:24:10Z zerojinx $
+# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
+# Id:            $Id: clearpress 320 2009-02-24 18:15:24Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/bin/clearpress $
 #
 use strict;
@@ -16,7 +16,7 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 309 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
 $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin);
@@ -54,7 +54,7 @@ sub main { ## no critic (complexity)
     croak q(Please specify --new <application-name>);
   }
 
-  my ($app) = $opts->{new} =~ /^([a-z][a-z\d_]+)$/smxi;
+  my ($app) = $opts->{new} =~ /^([[:lower:]][[:lower:][:digit:]_]+)$/smxi;
   $app    ||= q();
 
   if($app ne $opts->{new}) {
@@ -70,11 +70,11 @@ sub main { ## no critic (complexity)
   my $driver = $driver_pkg->new();
 
   for my $structure (split /\s+/smx, $all_structure) {
-    if($structure =~ /\S+\(\S+\)/smx) {
+    if($structure =~ /\S+[(]\S+[)]/smx) {
       #########
       # table definition
       #
-      my ($table, $columns) = $structure =~ /(\S+)\((\S+)\)/smx;
+      my ($table, $columns) = $structure =~ /(\S+)[(](\S+)[)]/smx;
 
       for my $column (split /,/smx, $columns) {
 	my ($name, $type) = split /:/smx, $column;
@@ -316,7 +316,7 @@ use <% application %>::util;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 309 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $PORT => 8080;
 
 my $opts = {};
@@ -397,7 +397,7 @@ use <% application %>::view::error;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 309 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
 
 main();
 0;

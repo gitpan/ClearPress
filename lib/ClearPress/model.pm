@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2009-02-24 10:36:40 +0000 (Tue, 24 Feb 2009) $
-# Id:            $Id: model.pm 318 2009-02-24 10:36:40Z zerojinx $
+# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
+# Id:            $Id: model.pm 320 2009-02-24 18:15:24Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
 #
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 318 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
@@ -82,6 +82,24 @@ sub util {
   }
 
   if($self->{util}) {
+    return $self->{util};
+  }
+
+  #########
+  # attempt to instantiate a util using $self's namespace
+  #
+  my ($ref) = (ref $self) =~ /^([^:]+)/smx;
+  my $nsutil;
+  eval {
+    my $ns  = "${ref}::util";
+    $nsutil = $ns->new();
+
+  } or do {
+    carp qq[Failed to construct a util from the current namespace ($ref).];
+  };
+
+  if($nsutil) {
+    $self->{util} = $nsutil;
     return $self->{util};
   }
 
@@ -282,7 +300,7 @@ sub has_a {
       croak qq[$pkg is not under a model:: namespace. Friend relationships will not work.];
     }
 
-    $yield        =~ s/^(.*model::).*$/$1$pkg/smx;
+    $yield =~ s/^(.*model::).*$/$1$pkg/smx;
 
     if (defined &{$namespace}) {
       next;
@@ -361,10 +379,10 @@ sub has_a_through {
       ($pkg)    = values %{$single};
       ($single) = keys %{$single};
     }
-    $pkg =~ s/\|.*//smx;
+    $pkg =~ s/[|].*//smx;
 
     my $through;
-    ($single, $through) = split /\|/smx, $single;
+    ($single, $through) = split /[|]/smx, $single;
 
     if(!$through) {
       croak qq(Cannot build belongs_to_through for $single);
@@ -406,10 +424,10 @@ sub has_many_through {
       ($pkg)    = values %{$single};
       ($single) = keys %{$single};
     }
-    $pkg =~ s/\|.*//smx;
+    $pkg =~ s/[|].*//smx;
 
     my $through;
-    ($single, $through) = split /\|/smx, $single;
+    ($single, $through) = split /[|]/smx, $single;
 
     if(!$through) {
       croak qq(Cannot build has_many_through for $single);
@@ -550,7 +568,7 @@ sub read { ## no critic (homonym)
       1;
 
     } or do {
-      if($EVAL_ERROR =~ /missing\ entity/smx) {
+      if($EVAL_ERROR =~ /missing\sentity/smx) {
 	return;
       }
       carp qq[SELECT ERROR\nEVAL_ERROR: $EVAL_ERROR\nQuery:\n$query\n\nParams: @{[map { (defined $_)?$_:'NULL' } @args]}\n];
@@ -653,7 +671,7 @@ sub zdate {
 
   if(scalar grep { $_ eq 'date' } $self->fields()) {
     $date = $self->date() || q[];
-    $date =~ s/\ /T/smx;
+    $date =~ s/[ ]/T/smx;
     $date .='Z';
   }
 
@@ -677,7 +695,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 318 $
+$LastChangedRevision: 320 $
 
 =head1 SYNOPSIS
 

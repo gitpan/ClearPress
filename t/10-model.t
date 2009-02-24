@@ -65,8 +65,11 @@ my $util = t::util->new();
 }
 
 {
+  my $derived = {};
+  bless $derived, q[testfoo];
+  @testfoo::ISA = qw(ClearPress::model);
+
   eval {
-    my $derived = t::model::derived->new();
     $derived->util();
   };
   like($EVAL_ERROR, qr/No\ such\ file/mx, 'die if config.ini unavailable');
