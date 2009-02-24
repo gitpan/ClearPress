@@ -11,33 +11,33 @@ eval {
   plan skip_all => 'DBD::SQLite not installed';
 };
 
-diag(q[Expect ClearPress::driver / SQLite warnings about failure to create tables]);
+#diag(q[Expect ClearPress::driver / SQLite warnings about failure to create tables]);
 
-{
+trap {
   my $util1 = t::util->new();
   my $util2 = t::util->new();
   is($util1, $util2, 'same singleton util instance');
 
   is($util1->dbh(), $util2->dbh(), 'same dbh from different utils');
-}
+};
 
-{
+trap {
   my $util1 = t::util::test1->new();
   my $util2 = t::util::test2->new();
   isnt($util1, $util2, 'different singleton util subclass instance');
 
   isnt($util1->dbh(), $util2->dbh(), 'different dbh from different utils');
-}
+};
 
-{
+trap {
   my $util1 = t::util::test1->new();
   my $util2 = t::util::test1->new();
   is($util1, $util2, 'same singleton util subclass instance');
 
   is($util1->dbh(), $util2->dbh(), 'same dbh from different util subclass instances');
-}
+};
 
-{
+trap {
   my $util1 = ClearPress::util->new({
 				     cgi => {},
 				    });
@@ -49,15 +49,15 @@ diag(q[Expect ClearPress::driver / SQLite warnings about failure to create table
   my $cgi2 = $util2->cgi();
 
   isnt($cgi1, $cgi2, 'CGI values differ');
-}
+};
 
-{
+trap {
   my $util1 = ClearPress::util->new();
   $util1->cleanup();
   my $util2 = ClearPress::util->new();
 
   isnt($util1, $util2, 'utils differ after cleanup');
-}
+};
 
 package t::util::test1;
 use base qw(t::util);

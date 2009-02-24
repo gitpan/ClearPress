@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-01-21 14:21:49 +0000 (Wed, 21 Jan 2009) $
-# Id:            $Id: controller.pm 300 2009-01-21 14:21:49Z zerojinx $
+# Last Modified: $Date: 2009-02-24 10:36:40 +0000 (Tue, 24 Feb 2009) $
+# Id:            $Id: controller.pm 318 2009-02-24 10:36:40Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 318 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -166,13 +166,30 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   $aspect ||= q[];
   $aspect_extra ||= q[];
 
+  #########
+  # process request extensions
+  #
   my $uriaspect = $self->_process_request_extensions(\$pi, $aspect, $action) || q[];
   if($uriaspect ne $aspect) {
     $aspect = $uriaspect;
     ($id)   = $pi =~ m{^/$entity/?$aspect_extra/([a-z:,\-_\d%\@\.\+\ ]+)}smix;
   }
 
+  #########
+  # process HTTP 'Accept' header
+  #
   $aspect   = $self->_process_request_headers(\$accept, $aspect, $action);
+
+  #########
+  # check existence of X-Requested-With (XHR) (jquery, prototype and similar ajax requests)
+  # TODO: make process_request_headers more generic and move this into there
+  #
+  my $hxrw = $ENV{HTTP_X_REQUESTED_WITH} || q[];
+  if($hxrw =~ /XMLHttpRequest/smix &&
+    $aspect !~ /(_ajax|_json|_xml)$/smx) {
+    $aspect .= q[_ajax];
+  }
+
   $entity ||= $util->config->val('application', 'default_view');
   $aspect ||= q[];
   $id       = CGI->unescape($id||'0');
@@ -301,6 +318,7 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
     croak qq[Bad request. Cannot $aspect with an id];
   }
 
+  $aspect =~ s/__/_/smxg;
   return ($action, $entity, $aspect, $id);
 }
 
@@ -528,7 +546,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 300 $
+$LastChangedRevision: 318 $
 
 =head1 SYNOPSIS
 

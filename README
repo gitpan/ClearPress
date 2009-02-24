@@ -7,9 +7,8 @@ integrate closely with code used to drive existing websites the author
 had been involved with in the past.
 
 ClearPress is still very new and under active development though quite
-stable in production. This release represents the first product
-increment following a three-week code sprint starting in the middle of
-May 2007.
+stable in production at the Wellcome Trust Sanger Institute, Oxford
+Nanopore Technologies and my various of my "non-work" work projects (
+http://psyphi.net/ ).
 
-I plan to release more complete documentation with the current or next
-code sprint.
+Further documentation available at http://clearpress.net/

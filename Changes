@@ -6,6 +6,13 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+317 - Added 'streamed_aspects' view method for easier streamed responses
+    - Added model construction with primary key rather than hashref
+    - Default to *_ajax aspect with XMLHttpRequest request header
+
+314 - Support loading models with a scalar primary key instead of
+      insisting on a hashref
+
 302 - Bugfix affecting SCRIPT_NAME use in the standalone server
     - Application builder now emits mysql schema-loading help with the
       correct precedence
@@ -16,7 +23,7 @@ TODO:
       default. There's no longer any need to 'USE <x>' them.
 
 294 - Fixed up schema problems when auto-generating SQLite applications.
-      Allow posting XML without XForms:Model. Note it's unadvisable to
+    - Allow posting XML without XForms:Model. Note it's unadvisable to
       use this feature in the wild.
 
 291 - Added xml_entity TT filter - uses HTML::Entities::encode_entities_numeric

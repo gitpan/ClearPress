@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-02-06 14:24:10 +0000 (Fri, 06 Feb 2009) $
-# Id:            $Id: view.pm 309 2009-02-06 14:24:10Z zerojinx $
+# Last Modified: $Date: 2009-02-24 10:36:40 +0000 (Tue, 24 Feb 2009) $
+# Id:            $Id: view.pm 318 2009-02-24 10:36:40Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 309 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 318 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -142,7 +142,13 @@ sub method_name {
     $method = 'list';
   }
 
+  $method =~ s/__/_/smxg;
+
   return $method;
+}
+
+sub streamed_aspects {
+  return [];
 }
 
 sub render {
@@ -181,7 +187,26 @@ sub render {
       return $self->$method();
     }
 
+    #########
+    # handle streamed methods
+    #
+    my $streamed = 0;
+    for my $str_aspect (@{$self->streamed_aspects()}) {
+      if($aspect eq $str_aspect) {
+	$streamed = 1;
+      }
+    }
+
+    if($streamed) {
+      $self->output_flush();
+    }
+
     $self->$method();
+
+    if($streamed) {
+      $self->output_end();
+      return q[];
+    }
 
   } else {
     croak qq(Unsupported method: $method);
@@ -203,6 +228,9 @@ sub render {
     };
   }
 
+  #########
+  # handle block (non-streamed) methods
+  #
   my $tmpl = $self->template_name();
 
   for my $copy (qw(logged_in)) {
@@ -471,7 +499,17 @@ sub decor {
 sub output_flush {
   my $self = shift;
   $DEBUG_OUTPUT and carp "output_flush: @{[scalar @{$self->{output_buffer}}]} blobs in queue";
-  print @{$self->{output_buffer}} or croak "Error flushing output: $ERRNO";
+
+  eval {
+    print @{$self->{output_buffer}} or croak "Error flushing output: $ERRNO";
+    1;
+  } or do {
+    #########
+    # client stopped receiving (e.g. disconnect from lengthy streamed response)
+    #
+    carp $EVAL_ERROR;
+  };
+
   $self->output_reset();
   return 1;
 }
@@ -602,7 +640,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 309 $
+$LastChangedRevision: 318 $
 
 =head1 SYNOPSIS
 
@@ -662,6 +700,18 @@ View superclass for the ClearPress framework
 =head2 render - generates and returns content for this view
 
   my $sViewOutput = $oView->render();
+
+=head2 streamed_aspects - an arrayref of aspects which perform streamed output.
+
+  Implemented in subclass:
+
+  sub streamed_aspects {
+    return [qw(list list_xml list_json)];
+  }
+
+  sub list { ... }
+  sub list_xml { ... }
+  sub list_json { ... }
 
 =head2 list - stub for entity list actions
 
@@ -758,10 +808,6 @@ View superclass for the ClearPress framework
 =head2 update_json - default passthrough to update() for json service
 
 =head2 delete_json - default passthrough to delete() for json service
-
-=head2 determine_aspect - calculate requested aspect of view
-
-  Based on HTTP headers, environment variables and URL components.
 
 =head2 init - post-constructor initialisation hook for subclasses
 

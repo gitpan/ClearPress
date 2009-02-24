@@ -11,7 +11,7 @@ use Test::Trap;
 
 eval {
   require DBD::SQLite;
-  plan tests => 52;
+  plan tests => 53;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -223,4 +223,10 @@ my $util = t::util->new();
 {
   my $d = t::model::derived->new();
   like($d->zdate(), qr/\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}Z/mx);
+}
+
+{
+  my $d = t::model::derived->new(1);
+  $d->util($util);
+  is($d->id_derived(), 1, 'construction with only a primary key');
 }

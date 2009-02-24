@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2008-11-14 14:07:06 +0000 (Fri, 14 Nov 2008) $ $Author: zerojinx $
-# Id:            $Id: ClearPress.pm 279 2008-11-14 14:07:06Z zerojinx $
+# Last Modified: $Date: 2009-02-24 10:36:40 +0000 (Tue, 24 Feb 2009) $ $Author: zerojinx $
+# Id:            $Id: ClearPress.pm 318 2009-02-24 10:36:40Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress.pm $
 #
@@ -13,18 +13,18 @@ use ClearPress::view;
 use ClearPress::controller;
 use ClearPress::util;
 
-our $VERSION = do { my ($r) = q$Revision: 301 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 318 $ =~ /(\d+)/smx; $r; };
 
 1;
 __END__
 
 =head1 NAME
 
-ClearPress - Simple, fresh & fruity MVC framework
+ClearPress - Simple, fresh & fruity MVC framework - http://clearpress.net/
 
 =head1 VERSION
 
-$Revision: 301 $
+$Revision: 318 $
 
 =head1 SYNOPSIS
 

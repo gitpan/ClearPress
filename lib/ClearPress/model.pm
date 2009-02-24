@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2009-01-21 14:21:49 +0000 (Wed, 21 Jan 2009) $
-# Id:            $Id: model.pm 300 2009-01-21 14:21:49Z zerojinx $
+# Last Modified: $Date: 2009-02-24 10:36:40 +0000 (Tue, 24 Feb 2009) $
+# Id:            $Id: model.pm 318 2009-02-24 10:36:40Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
 #
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 318 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
@@ -43,6 +43,18 @@ sub init  { }
 sub new {
   my ($class, $ref) = @_;
   $ref ||= {};
+
+  if(!ref $ref) {
+    my $pk = $class->primary_key();
+    if($pk) {
+      $ref = {
+	      $pk => $ref,
+	     };
+    } else {
+      croak q[Could not set primary key in an object with no fields];
+    }
+  }
+
   bless $ref, $class;
 
   $ref->init($ref);
@@ -51,7 +63,7 @@ sub new {
 }
 
 sub util {
-  my $self = shift;
+  my ($self, $util) = @_;
 
   if(!ref $self) {
     #########
@@ -62,6 +74,11 @@ sub util {
     # support in your own namespace.
     #
     return ClearPress::util->new();
+  }
+
+  if($util) {
+    $self->{util} = $util;
+    return $util;
   }
 
   if($self->{util}) {
@@ -77,7 +94,7 @@ sub util {
   my $config    = $cputil->config();
   my $namespace = $config->val('application', 'namespace') ||
                   $config->val('application', 'name');
-  my $util      = "${namespace}::util"->new();
+  $util         = "${namespace}::util"->new();
   $self->{util} = $util;
   return $util;
 }
@@ -660,7 +677,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$LastChangedRevision: 300 $
+$LastChangedRevision: 318 $
 
 =head1 SYNOPSIS
 
@@ -694,6 +711,13 @@ $LastChangedRevision: 300 $
 =head2 new - Constructor
 
   my $oInstance = ClearPress::model::subclass->new();
+
+  also supports creation with a hashref of key:values and creation
+  with a scalar primary key, e.g.
+
+  my $oInstance = ClearPress::model::subclass->new({id_subclass => 10});
+
+  my $oInstance = ClearPress::model::subclass->new(10);
 
 =head2 util - ClearPress::util object
 
