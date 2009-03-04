@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+323 - Default support for .txt and .xls
+
 320 - Improvements to singleton handling
     - Template-toolkit filter registration for views
     - Revisions for latest perlcritic regex enforcement

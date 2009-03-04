@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
-# Id:            $Id: controller.pm 320 2009-02-24 18:15:24Z zerojinx $
+# Last Modified: $Date: 2009-03-03 15:33:20 +0000 (Tue, 03 Mar 2009) $
+# Id:            $Id: controller.pm 323 2009-03-03 15:33:20Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 323 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -55,6 +55,8 @@ sub accept_extensions {
 	  {'.json' => q[_json]},
 	  {'.ical' => q[_ical]},
 	  {'.ajax' => q[_ajax]},
+	  {'.txt'  => q[_txt]},
+	  {'.xls'  => q[_xls]},
 	 ];
 }
 
@@ -546,7 +548,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 320 $
+$LastChangedRevision: 323 $
 
 =head1 SYNOPSIS
 

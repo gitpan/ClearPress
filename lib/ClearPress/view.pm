@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
-# Id:            $Id: view.pm 320 2009-02-24 18:15:24Z zerojinx $
+# Last Modified: $Date: 2009-03-04 10:05:12 +0000 (Wed, 04 Mar 2009) $
+# Id:            $Id: view.pm 324 2009-03-04 10:05:12Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 324 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -40,15 +40,19 @@ sub new {
   $self->{output_finished}    = 0;
   $self->{autoescape}         = 1;
 
-  my $aspect = $self->aspect() || q();
+  my $aspect = $self->aspect() || q[];
 
-  $self->{content_type} ||= ($aspect =~ /(?:rss|atom|ajax|xml)$/smx)?'text/xml':q();
-  $self->{content_type} ||= ($aspect =~ /(?:js|json)$/smx)?'application/javascript':q();
-  $self->{content_type} ||= ($aspect =~ /_png$/smx)?'image/png':q();
-  $self->{content_type} ||= ($aspect =~ /_jpg$/smx)?'image/jpeg':q();
-  $self->{content_type} ||= 'text/html';
+  $self->{content_type} ||= ($aspect =~ /(?:rss|atom|ajax|xml)$/smx)?'text/xml':q[];
+  $self->{content_type} ||= ($aspect =~ /(?:js|json)$/smx)?'application/javascript':q[];
+  $self->{content_type} ||= ($aspect =~ /_png$/smx)?'image/png':q[];
+  $self->{content_type} ||= ($aspect =~ /_jpg$/smx)?'image/jpeg':q[];
+  $self->{content_type} ||= ($aspect =~ /_txt$/smx)?'text/plain':q[];
+  $self->{content_type} ||= ($aspect =~ /_xls$/smx)?'application/vnd.ms-excel':q[];
 
   $self->init();
+
+  $self->{content_type} ||= 'text/html';
+
   return $self;
 }
 
@@ -78,8 +82,8 @@ sub _accessor {
 
 sub authorised {
   my $self      = shift;
-  my $action    = $self->action() || q();
-  my $aspect    = $self->aspect() || q();
+  my $action    = $self->action() || q[];
+  my $aspect    = $self->aspect() || q[];
   my $util      = $self->util();
   my $requestor = $util->requestor();
 
@@ -92,7 +96,7 @@ sub authorised {
 
   if($action =~ /^list/smx ||
      ($action eq 'read' &&
-      $aspect !~ /^(?:add|delete|update|create)/smx)) {
+      $aspect !~ /^(?:add|edit|delete|update|create)/smx)) {
     #########
     # by default assume public read access for 'read' actions
     #
@@ -100,7 +104,7 @@ sub authorised {
 
   } else {
     #########
-    # by default allow only 'admin' group for non-read actions (create, update, delete)
+    # by default allow only 'admin' group for non-read aspects (add, edit, create, update, delete)
     #
     if($requestor->can('is_member_of') &&
        $requestor->is_member_of('admin')) {
@@ -215,7 +219,7 @@ sub render {
   my $model   = $self->model();
   my $actions = my $warnings = q[];
 
-  if($aspect !~ /(?:rss|atom|ajax|xml|json)$/smx) {
+  if($self->decor()) {
     $actions  = $self->actions();
     eval {
       $self->process_template('warnings.tt2', {}, \$warnings);
@@ -238,7 +242,7 @@ sub render {
   }
 
   my $cfg     = $util->config();
-  my $content = q();
+  my $content = q[];
 
   $self->process_template("$tmpl.tt2", {}, \$content);
 
@@ -452,12 +456,12 @@ sub add_tt_filter {
   my ($self, $name, $code) = @_;
 
   if(!$name || !$code) {
-    return 1;
+    return;
   }
 
   $self->tt_filters->{$name} = $code;
 
-  return;
+  return 1;
 }
 
 sub tt_filters {
@@ -510,9 +514,9 @@ sub tt {
 
 sub decor {
   my $self = shift;
-  my $aspect = $self->aspect() || q();
+  my $aspect = $self->aspect() || q[];
 
-  if($aspect =~ /(?:rss|atom|ajax|xml|json|js|_png|_jpg)$/smx) {
+  if($aspect =~ /(?:rss|atom|ajax|xml|json|js|_png|_jpg|_txt)$/smx) {
     return 0;
   }
   return 1;
@@ -570,7 +574,7 @@ sub output_reset {
 
 sub actions {
   my $self    = shift;
-  my $content = q();
+  my $content = q[];
 
   $self->process_template('actions.tt2', {}, \$content);
   return $content;
@@ -662,7 +666,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 320 $
+$LastChangedRevision: 324 $
 
 =head1 SYNOPSIS
 
@@ -676,7 +680,7 @@ $LastChangedRevision: 320 $
 
   print $oView->render();
 
-  print $oView->decor()?$oDecorator->footer():q();
+  print $oView->decor()?$oDecorator->footer():q[];
 
 =head1 DESCRIPTION
 
