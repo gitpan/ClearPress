@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2008-11-14 14:07:06 +0000 (Fri, 14 Nov 2008) $
-# Id:            $Id: decorator.pm 279 2008-11-14 14:07:06Z zerojinx $
+# Last Modified: $Date: 2009-05-03 17:18:48 +0100 (Sun, 03 May 2009) $
+# Id:            $Id: decorator.pm 333 2009-05-03 16:18:48Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/decorator.pm $
 #
@@ -13,13 +13,14 @@ use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 279 $ =~ /(\d+)/smx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 333 $ =~ /(\d+)/smx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => '0.1',
-		 'meta_description'  => q(),
+		 'meta_description'  => q[],
 		 'meta_author'       => q$Author: zerojinx $,
-		 'meta_keywords'     => q(clearpress),
+		 'meta_keywords'     => q[clearpress],
+		 'username'          => q[],
 		};
 
 our $ARRAY_FIELDS = {
@@ -35,7 +36,7 @@ sub fields {
   return qw(title stylesheet style jsfile script atom rss
             meta_keywords meta_description meta_author meta_version
             meta_refresh meta_cookie meta_content_type meta_expires
-            onload onunload onresize)
+            onload onunload onresize username)
 }
 
 sub get {
@@ -117,15 +118,15 @@ sub site_header {
     qq(    <script type="text/javascript">$_</script>\n);
   } grep { $_ } $self->script()]});
 
-  my $onload   = (scalar $self->onload())   ? qq( onload="@{[  join q(;), $self->onload()]}")   : q();
-  my $onunload = (scalar $self->onunload()) ? qq( onunload="@{[join q(;), $self->onunload()]}") : q();
-  my $onresize = (scalar $self->onresize()) ? qq( onresize="@{[join q(;), $self->onresize()]}") : q();
+  my $onload   = (scalar $self->onload())   ? qq( onload="@{[  join q(;), $self->onload()]}")   : q[];
+  my $onunload = (scalar $self->onunload()) ? qq( onunload="@{[join q(;), $self->onunload()]}") : q[];
+  my $onresize = (scalar $self->onresize()) ? qq( onresize="@{[join q(;), $self->onresize()]}") : q[];
   return qq(<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb">
   <head>
     <meta http-equiv="Content-Type" content="@{[$self->meta_content_type() || $self->defaults('meta_content_type')]}" />
-@{[(scalar $self->meta_cookie())?(map { qq( <meta http-equiv="Set-Cookie" content="$_" />\n) } $self->meta_cookie()):q()]}@{[$self->meta_refresh()?qq(<meta http-equiv="Refresh" content="@{[$self->meta_refresh()]}" />):q()]}@{[$self->meta_expires()?qq(<meta http-equiv="Expires" content="@{[$self->meta_expires()]}" />):q()]}    <meta name="author"      content="@{[$self->meta_author()      || $self->defaults('meta_author')]}" />
+@{[(scalar $self->meta_cookie())?(map { qq( <meta http-equiv="Set-Cookie" content="$_" />\n) } $self->meta_cookie()):q[]]}@{[$self->meta_refresh()?qq(<meta http-equiv="Refresh" content="@{[$self->meta_refresh()]}" />):q[]]}@{[$self->meta_expires()?qq(<meta http-equiv="Expires" content="@{[$self->meta_expires()]}" />):q[]]}    <meta name="author"      content="@{[$self->meta_author()      || $self->defaults('meta_author')]}" />
     <meta name="version"     content="@{[$self->meta_version()     || $self->defaults('meta_version')]}" />
     <meta name="description" content="@{[$self->meta_description() || $self->defaults('meta_description')]}" />
     <meta name="keywords"    content="@{[$self->meta_keywords()    || $self->defaults('meta_keywords')]}" />
@@ -137,10 +138,6 @@ $ss$rss$atom$js$script  </head>
 sub footer {
   return q(  </body>
 </html>);
-}
-
-sub username {
-  return q();
 }
 
 sub cgi {
@@ -220,7 +217,7 @@ i.e. </body></html> by default
 
   my $sHTMLFooter = $oDecorator->site_footer
 
-=head2 username - username of authenticated user
+=head2 username - get/set username of authenticated user
 
   my $sUsername = $oDecorator->username();
 

@@ -6,6 +6,11 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+327 - Basic authentication mechanisms - LDAP/AD, passwd/getpwuid
+
+325 - Added support for HTTP_X_FORWARDED_HOST and ...PORT for sitting
+      behind a reverse-proxy
+
 323 - Default support for .txt and .xls
 
 320 - Improvements to singleton handling

@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 323
+version: 333
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -13,16 +13,20 @@ requires:
   Class::Accessor: 0.31
   Class::Singleton: 1.4
   Config::IniFiles: 2.38
+  Crypt::Blowfish: 2.10
+  Crypt::CBC: 2.30
   DBI: 1.51
   English: 1.01
   HTML::Entities: 1.35
   IO::Scalar: 2.110
   Lingua::EN::Inflect: 1.89
+  MIME::Base64: 3.07
   POSIX: 1.09
   Readonly: 1.03
   Template: 2.19
   Template::Filters: 2.86
   XML::Simple: 2.18
+  YAML::Tiny: 1.36
   base: 2.13
   strict: 1.03
   warnings: 1.05
@@ -41,16 +45,32 @@ build_requires:
 recommends:
   DBD::SQLite: 1.14
   DBD::mysql: 4.007
+  Net::LDAP: 0.39
 provides:
   ClearPress:
     file: lib/ClearPress.pm
     version: 318
+  ClearPress::authdecor:
+    file: lib/ClearPress/authdecor.pm
+    version: 750
+  ClearPress::authenticator:
+    file: lib/ClearPress/authenticator.pm
+    version: 740
+  ClearPress::authenticator::ldap:
+    file: lib/ClearPress/authenticator/ldap.pm
+    version: 740
+  ClearPress::authenticator::passwd:
+    file: lib/ClearPress/authenticator/passwd.pm
+    version: 740
+  ClearPress::authenticator::session:
+    file: lib/ClearPress/authenticator/session.pm
+    version: 740
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
     version: 323
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
-    version: 279
+    version: 333
   ClearPress::driver:
     file: lib/ClearPress/driver.pm
     version: 287
@@ -68,11 +88,11 @@ provides:
     version: 320
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 324
+    version: 333
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
     version: 320
-generated_by: Module::Build version 0.31012
+generated_by: Module::Build version 0.32
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

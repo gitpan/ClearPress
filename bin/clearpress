@@ -2,8 +2,8 @@
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
-# Id:            $Id: clearpress 320 2009-02-24 18:15:24Z zerojinx $
+# Last Modified: $Date: 2009-05-03 17:18:48 +0100 (Sun, 03 May 2009) $
+# Id:            $Id: clearpress 333 2009-05-03 16:18:48Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/bin/clearpress $
 #
 use strict;
@@ -16,10 +16,10 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 333 $ =~ /(\d+)/smx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
-$ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin);
+local $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin /opt/local/bin);
 
 main();
 0;
@@ -316,7 +316,7 @@ use <% application %>::util;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 333 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $PORT => 8080;
 
 my $opts = {};
@@ -397,7 +397,7 @@ use <% application %>::view::error;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 333 $ =~ /(\d+)/smx; $r; };
 
 main();
 0;

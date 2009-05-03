@@ -4,6 +4,8 @@ MANIFEST
 README
 bin/clearpress
 cgi-bin/application
+cgi-bin/login
+cgi-bin/logout
 examples/GrandKids/bin/GrandKids
 examples/GrandKids/cgi-bin/GrandKids
 examples/GrandKids/config.layout
@@ -29,6 +31,11 @@ examples/GrandKids/lib/GrandKids/model/family.pm
 examples/GrandKids/lib/GrandKids/view/child.pm
 examples/GrandKids/lib/GrandKids/view/family.pm
 lib/ClearPress.pm
+lib/ClearPress/authdecor.pm
+lib/ClearPress/authenticator.pm
+lib/ClearPress/authenticator/ldap.pm
+lib/ClearPress/authenticator/passwd.pm
+lib/ClearPress/authenticator/session.pm
 lib/ClearPress/controller.pm
 lib/ClearPress/decorator.pm
 lib/ClearPress/driver.pm
@@ -56,6 +63,9 @@ t/40-driver-mysql.t
 t/40-driver-sqlite.t
 t/40-driver.t
 t/50-clearpress.t
+t/60-authenticator-passwd.t
+t/60-authenticator-session.t
+t/60-authenticator.t
 t/data/config.ini
 t/data/rendered/derived_create.html
 t/data/rendered/derived_list.ajax

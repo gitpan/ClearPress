@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-03-04 10:05:12 +0000 (Wed, 04 Mar 2009) $
-# Id:            $Id: view.pm 324 2009-03-04 10:05:12Z zerojinx $
+# Last Modified: $Date: 2009-05-03 17:18:48 +0100 (Sun, 03 May 2009) $
+# Id:            $Id: view.pm 333 2009-05-03 16:18:48Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 324 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 333 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -249,15 +249,16 @@ sub render {
   return $warnings . $actions . $content || q(No data);
 }
 
-sub process_template {
+sub process_template { ## no critic (Complexity)
   my ($self, $template, $extra_params, $where_to_ref) = @_;
   my $util        = $self->util();
   my $cfg         = $util->config();
   my ($entity)    = (ref $self) =~ /([^:]+)$/smx;
   $entity       ||= q[];
   my $script_name = $ENV{SCRIPT_NAME} || q[];
-  my $http_host   = $ENV{HTTP_HOST}   || q[localhost];
-  my $http_port   = $ENV{HTTP_PORT}   || q[];
+  my ($xfh, $xfp) = ($ENV{HTTP_X_FORWARDED_HOST}, $ENV{HTTP_X_FORWARDED_PORT});
+  my $http_host   = ($xfh ? $xfh : $ENV{HTTP_HOST})   || q[localhost];
+  my $http_port   = ($xfh ? $xfp : $ENV{HTTP_PORT})   || q[];
   my $https       = $ENV{HTTPS}?q[https]:q[http];
   my $href        = sprintf q[%s://%s%s%s%s],
 			    $https,
@@ -265,6 +266,12 @@ sub process_template {
 			    $http_port?":$http_port":q[],
 			    $script_name,
 			    ($script_name eq q[/])?q[]:q[/];
+
+  my $cfg_globals = {
+		     (map {
+		       $_ => $cfg->val('globals',$_)
+		     } $cfg->Parameters('globals'))
+		    };
 
   my $params   = {
 		  requestor   => $util->requestor,
@@ -278,9 +285,7 @@ sub process_template {
 		  SCRIPT_HREF => $href,
 		  ENTITY_HREF => "$href$entity",
 		  now         => (strftime '%Y-%m-%dT%H:%M:%S', localtime),
-		  (map {
-		    $_ => $cfg->val('globals',$_)
-		  } $cfg->Parameters('globals')),
+		  %{$cfg_globals},
 		  %{$extra_params||{}},
 		 };
 
@@ -470,7 +475,7 @@ sub tt_filters {
   if(!$self->{tt_filters}) {
     $self->{tt_filters} = {};
   }
-  
+
   return $self->{tt_filters};
 }
 
@@ -666,7 +671,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 324 $
+$LastChangedRevision: 333 $
 
 =head1 SYNOPSIS
 
