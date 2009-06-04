@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-03-03 15:33:20 +0000 (Tue, 03 Mar 2009) $
-# Id:            $Id: controller.pm 323 2009-03-03 15:33:20Z zerojinx $
+# Last Modified: $Date: 2009-06-02 12:52:46 +0100 (Tue, 02 Jun 2009) $
+# Id:            $Id: controller.pm 335 2009-06-02 11:52:46Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 323 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 335 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -407,10 +407,6 @@ sub handler {
 
   my $decor = $viewobject->decor();
 
-  if(!$viewobject->isa('ClearPress::view::error')) {
-    $decorator->save_session();
-  }
-
   if($decor) {
     $viewobject->output_buffer($decorator->header());
   }
@@ -456,6 +452,13 @@ sub handler {
   }
 
   $viewobject->output_end();
+
+  #########
+  # save the session after the request has processed
+  #
+  if(!$viewobject->isa('ClearPress::view::error')) {
+    $decorator->save_session();
+  }
 
   $util->cleanup();
   undef $util;
@@ -548,7 +551,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 323 $
+$LastChangedRevision: 335 $
 
 =head1 SYNOPSIS
 

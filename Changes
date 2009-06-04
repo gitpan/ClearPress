@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+334 - sessions saved after processing request, not during
+
 327 - Basic authentication mechanisms - LDAP/AD, passwd/getpwuid
 
 325 - Added support for HTTP_X_FORWARDED_HOST and ...PORT for sitting
