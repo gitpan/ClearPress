@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 18;
 use English qw(-no_match_vars);
 
 use_ok('ClearPress::decorator');
@@ -8,7 +8,6 @@ use_ok('ClearPress::decorator');
 {
   my $dec = ClearPress::decorator->new();
   isa_ok($dec, 'ClearPress::decorator', 'constructs without an argument');
-  is($dec->title(), 'ClearPress', 'has default title');
 }
 
 {
@@ -36,7 +35,7 @@ use_ok('ClearPress::decorator');
 {
   $ClearPress::decorator::DEFAULTS->{meta_version} = 123;
   my $dec = ClearPress::decorator->new();
-  is($dec->header(), from_file(q(header-1.frag)), 'default combined header is ok');
+  is($dec->header(), from_file(q(header-1.frag)), 'default combined header');
 }
 
 {

@@ -1,15 +1,15 @@
 #########
 # Author:        rmp
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2009-08-03 00:05:09 +0100 (Mon, 03 Aug 2009) $
+# Id:            $Id: authenticator.pm 339 2009-08-02 23:05:09Z zerojinx $
 # Source:        $Source$
-# $HeadURL$
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/lib/ClearPress/authenticator.pm $
 #
 package ClearPress::authenticator;
 use strict;
 use warnings;
 
-our $VERSION = do { my ($r) = q$Revision: 740 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 339 $ =~ /(\d+)/smx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -32,7 +32,7 @@ ClearPress::authenticator
 
 =head1 VERSION
 
-$LastChangedRevision: 740 $
+$LastChangedRevision: 339 $
 
 =head1 SYNOPSIS
 

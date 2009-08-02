@@ -1,10 +1,10 @@
 #!/usr/bin/env perl -T
 #########
 # Author:        rmp
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2009-08-03 00:05:09 +0100 (Mon, 03 Aug 2009) $
+# Id:            $Id: login 339 2009-08-02 23:05:09Z zerojinx $
 # Source:        $Source$
-# $HeadURL$
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/cgi-bin/login $
 #
 use strict;
 use warnings;

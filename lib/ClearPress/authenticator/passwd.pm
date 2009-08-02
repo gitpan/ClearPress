@@ -1,9 +1,9 @@
 #########
 # Author:        rmp
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2009-08-03 00:05:09 +0100 (Mon, 03 Aug 2009) $
+# Id:            $Id: passwd.pm 339 2009-08-02 23:05:09Z zerojinx $
 # Source:        $Source$
-# $HeadURL$
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/lib/ClearPress/authenticator/passwd.pm $
 #
 package ClearPress::authenticator::passwd;
 use strict;
@@ -11,7 +11,7 @@ use warnings;
 use base qw(ClearPress::authenticator);
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision: 740 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 339 $ =~ /(\d+)/smx; $r; };
 
 sub authen_credentials {
   my ($self, $ref) = @_;
@@ -43,7 +43,7 @@ ClearPress::authenticator::passwd
 
 =head1 VERSION
 
-$LastChangedRevision: 740 $
+$LastChangedRevision: 339 $
 
 =head1 SYNOPSIS
 

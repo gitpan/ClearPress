@@ -2,12 +2,12 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2009-06-09 20:17:59 +0100 (Tue, 09 Jun 2009) $
-# Id:            $Id: mysql.pm 338 2009-06-09 19:17:59Z zerojinx $
+# Last Modified: $Date: 2009-08-03 00:05:09 +0100 (Mon, 03 Aug 2009) $
+# Id:            $Id: Pg.pm 339 2009-08-02 23:05:09Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/lib/ClearPress/driver/mysql.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/lib/ClearPress/driver/Pg.pm $
 #
-package ClearPress::driver::mysql;
+package ClearPress::driver::Pg;
 use strict;
 use warnings;
 use base qw(ClearPress::driver);
@@ -15,7 +15,7 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 338 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 339 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'bigint unsigned not null auto_increment primary key',
@@ -25,7 +25,7 @@ sub dbh {
 
   if(!$self->{dbh} ||
      !$self->{dbh}->ping()) {
-    my $dsn = sprintf q(DBI:mysql:database=%s;host=%s;port=%s),
+    my $dsn = sprintf q(DBI:Pg:database=%s;host=%s;port=%s),
 		      $self->{dbname} || q[],
 		      $self->{dbhost} || q[localhost],
 		      $self->{dbport} || q[3306];
@@ -86,11 +86,13 @@ __END__
 
 =head1 NAME
 
-ClearPress::driver::mysql - MySQL-specific implementation of the database abstraction layer
+ClearPress::driver::Pg - Pg-specific implementation of the database abstraction layer
+
+** WARNING! ALPHA CODE **
 
 =head1 VERSION
 
-$LastChangedRevision: 338 $
+$LastChangedRevision: 339 $
 
 =head1 SYNOPSIS
 
@@ -106,7 +108,7 @@ $LastChangedRevision: 338 $
 
   my $iAssignedId = $oDriver->create($query)
 
-=head2 create_table - mysql-specific create_table
+=head2 create_table - Postgres-specific create_table
 
 =head2 types - the whole type map
 

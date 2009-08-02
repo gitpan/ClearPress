@@ -25,10 +25,13 @@ examples/GrandKids/data/templates/family_edit.tt2
 examples/GrandKids/data/templates/family_list.tt2
 examples/GrandKids/data/templates/family_read.tt2
 examples/GrandKids/data/templates/family_update.tt2
+examples/GrandKids/data/templates/warnings.tt2
 examples/GrandKids/htdocs/GrandKids.css
 examples/GrandKids/lib/GrandKids/model/child.pm
 examples/GrandKids/lib/GrandKids/model/family.pm
+examples/GrandKids/lib/GrandKids/util.pm
 examples/GrandKids/lib/GrandKids/view/child.pm
+examples/GrandKids/lib/GrandKids/view/error.pm
 examples/GrandKids/lib/GrandKids/view/family.pm
 lib/ClearPress.pm
 lib/ClearPress/authdecor.pm
@@ -39,6 +42,7 @@ lib/ClearPress/authenticator/session.pm
 lib/ClearPress/controller.pm
 lib/ClearPress/decorator.pm
 lib/ClearPress/driver.pm
+lib/ClearPress/driver/Pg.pm
 lib/ClearPress/driver/SQLite.pm
 lib/ClearPress/driver/mysql.pm
 lib/ClearPress/model.pm

@@ -1,16 +1,16 @@
 #!/usr/bin/perl -T
 #########
 # Author:        rmp
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2009-08-03 00:05:09 +0100 (Mon, 03 Aug 2009) $
+# Id:            $Id: logout 339 2009-08-02 23:05:09Z zerojinx $
 # Source:        $Source$
-# $HeadURL$
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/cgi-bin/logout $
 #
 use strict;
 use warnings;
 use ClearPress::authdecor qw($AUTH_COOKIE);
 
-our $VERSION = do { my ($r) = q$Revision: 740 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 339 $ =~ /(\d+)/smx; $r; };
 
 my $decor  = ClearPress::authdecor->new();
 my $cgi    = $decor->cgi();
