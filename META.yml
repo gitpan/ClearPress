@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 338
+version: 340
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'

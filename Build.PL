@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
 				 module_name         => 'ClearPress',
 				 dist_author         => 'Roger M Pettett <rpettett@cpan.org>',
-				 dist_version        => do { my ($r) = q$Revision: 338 $ =~ /(\d+)/mx; $r; },
+				 dist_version        => do { my ($r) = q$Revision: 340 $ =~ /(\d+)/mx; $r; },
 				 dist_abstract       => q[ClearPress - Simple, fresh & fruity MVC framework],
 				 license             => 'perl',
 				 requires            => {
