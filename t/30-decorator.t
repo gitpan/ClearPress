@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 18;
+use Test::More tests => 19;
 use English qw(-no_match_vars);
 
 use_ok('ClearPress::decorator');
@@ -21,16 +21,34 @@ use_ok('ClearPress::decorator');
   is($dec->defaults('meta_content_type'), 'text/html', 'has default content_type of text/html');
   is($dec->meta_content_type(), 'text/html', 'supports meta_content_type() method');
   is($dec->get('junk'), undef, 'returns undef on non-existent attribute fetch');
-  is(scalar $dec->get('jsfile'), 0, 'returns empty array on jsfile fetch');
+  is_deeply($dec->get('jsfile'), [], 'returns empty array on jsfile fetch');
+}
+
+{
+  my $dec = ClearPress::decorator->new();
+
   my $ref = ['/foo.js'];
   if($ClearPress::decorator::DEFAULTS) {
     $ClearPress::decorator::DEFAULTS->{'jsfile'} = $ref;
   }
-  is(scalar $dec->jsfile(), 1, 'returns default array for jsfile()');
-
-  $dec->jsfile($ref);
-  is(scalar $dec->jsfile(), 1, 'returns given array for jsfile()');
+  is_deeply($dec->jsfile(), $ref, 'returns default array for jsfile()');
 }
+
+{
+  my $dec = ClearPress::decorator->new();
+
+  my $ref = ['/bar.js'];
+  $dec->jsfile($ref);
+  is_deeply($dec->jsfile(), $ref, 'returns given array for jsfile()');
+}
+
+{
+  my $dec = ClearPress::decorator->new();
+
+  $dec->jsfile(q[foo.js,bar.js]);
+  is_deeply($dec->jsfile(), [qw(foo.js bar.js)], 'returns given array for jsfile()');
+}
+
 
 {
   $ClearPress::decorator::DEFAULTS->{meta_version} = 123;

@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2009-08-03 00:05:09 +0100 (Mon, 03 Aug 2009) $
-# Id:            $Id: decorator.pm 339 2009-08-02 23:05:09Z zerojinx $
+# Last Modified: $Date: 2009-08-17 09:40:40 +0100 (Mon, 17 Aug 2009) $
+# Id:            $Id: decorator.pm 342 2009-08-17 08:40:40Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/lib/ClearPress/decorator.pm $
 #
@@ -13,7 +13,7 @@ use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 339 $ =~ /(\d+)/smx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 342 $ =~ /(\d+)/smx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => '0.1',
@@ -43,7 +43,11 @@ sub get {
   my ($self, $field) = @_;
 
   if($ARRAY_FIELDS->{$field}) {
-    return @{$self->{$field} || $DEFAULTS->{$field} || []};
+    my $val = $self->{$field} || $DEFAULTS->{$field} || [];
+    if(!ref $val) {
+      $val = [$val];
+    }
+    return [map { split /,/smx, $_ } @{$val}];
 
   } else {
     return $self->{$field} || $DEFAULTS->{$field};
@@ -96,7 +100,7 @@ sub site_header {
 
   my $ss = qq(@{[map {
     qq(    <link rel="stylesheet" type="text/css" href="$_" />);
-  } grep { $_ } $self->stylesheet()]});
+  } grep { $_ } @{$self->stylesheet()}]});
 
   if($self->style()) {
     $ss .= q(<style type="text/css">). $self->style() .q(</style>);
@@ -104,19 +108,19 @@ sub site_header {
 
   my $rss = qq(@{[map {
     qq(    <link rel="alternate" type="application/rss+xml" title="RSS" href="$_" />\n);
-  } grep { $_ } $self->rss()]});
+  } grep { $_ } @{$self->rss()}]});
 
   my $atom = qq(@{[map {
     qq(    <link rel="alternate" type="application/atom+xml" title="ATOM" href="$_" />\n);
-  } grep { $_ } $self->atom()]});
+  } grep { $_ } @{$self->atom()}]});
 
   my $js = qq(@{[map {
     qq(    <script type="text/javascript" src="@{[$cgi->escapeHTML($_)]}"></script>\n);
-  } grep { $_ } $self->jsfile()]});
+  } grep { $_ } @{$self->jsfile()}]});
 
   my $script = qq(@{[map {
     qq(    <script type="text/javascript">$_</script>\n);
-  } grep { $_ } $self->script()]});
+  } grep { $_ } @{$self->script()}]});
 
   my $onload   = (scalar $self->onload())   ? qq( onload="@{[  join q(;), $self->onload()]}")   : q[];
   my $onunload = (scalar $self->onunload()) ? qq( onunload="@{[join q(;), $self->onunload()]}") : q[];

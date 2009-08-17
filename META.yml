@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 340
+version: 345
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -70,7 +70,7 @@ provides:
     version: 339
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
-    version: 339
+    version: 342
   ClearPress::driver:
     file: lib/ClearPress/driver.pm
     version: 338
@@ -82,7 +82,7 @@ provides:
     version: 338
   ClearPress::driver::mysql:
     file: lib/ClearPress/driver/mysql.pm
-    version: 338
+    version: 341
   ClearPress::model:
     file: lib/ClearPress/model.pm
     version: 338

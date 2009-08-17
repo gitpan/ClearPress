@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2009-06-09 20:17:59 +0100 (Tue, 09 Jun 2009) $
-# Id:            $Id: mysql.pm 338 2009-06-09 19:17:59Z zerojinx $
+# Last Modified: $Date: 2009-08-13 17:14:11 +0100 (Thu, 13 Aug 2009) $
+# Id:            $Id: mysql.pm 341 2009-08-13 16:14:11Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/lib/ClearPress/driver/mysql.pm $
 #
@@ -15,7 +15,7 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 338 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 341 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'bigint unsigned not null auto_increment primary key',
@@ -23,8 +23,12 @@ Readonly::Scalar our $TYPES => {
 sub dbh {
   my $self = shift;
 
-  if(!$self->{dbh} ||
-     !$self->{dbh}->ping()) {
+  if($self->{dbh} && !$self->{dbh}->ping()) {
+    $self->{dbh}->disconnect();
+    delete $self->{dbh};
+  }
+
+  if(!$self->{dbh}) {
     my $dsn = sprintf q(DBI:mysql:database=%s;host=%s;port=%s),
 		      $self->{dbname} || q[],
 		      $self->{dbhost} || q[localhost],
@@ -90,7 +94,7 @@ ClearPress::driver::mysql - MySQL-specific implementation of the database abstra
 
 =head1 VERSION
 
-$LastChangedRevision: 338 $
+$LastChangedRevision: 341 $
 
 =head1 SYNOPSIS
 
