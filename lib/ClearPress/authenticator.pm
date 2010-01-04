@@ -9,7 +9,7 @@ package ClearPress::authenticator;
 use strict;
 use warnings;
 
-our $VERSION = do { my ($r) = q$Revision: 348 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 751 $ =~ /(\d+)/smx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -32,7 +32,7 @@ ClearPress::authenticator
 
 =head1 VERSION
 
-$LastChangedRevision: 348 $
+$Revision: 348 $
 
 =head1 SYNOPSIS
 

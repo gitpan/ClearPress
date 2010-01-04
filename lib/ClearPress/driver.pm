@@ -17,7 +17,7 @@ use DBI;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 287 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 348 $ =~ /(\d+)/smx; $r; };
 
 sub new {
   my ($class, $ref) = @_;

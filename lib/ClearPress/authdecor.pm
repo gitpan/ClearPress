@@ -12,7 +12,7 @@ use base qw(ClearPress::decorator Exporter);
 use ClearPress::authenticator::session;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 348 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 751 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DOMAIN      => 'mysite.com';
 Readonly::Scalar our $AUTH_COOKIE => 'mysite_sso';
 Readonly::Array  our @EXPORT_OK   => qw($AUTH_COOKIE);
@@ -154,7 +154,7 @@ ClearPress::authdecor
 
 =head1 VERSION
 
-$LastChangedRevision: 348 $
+$Revision: 348 $
 
 =head1 SYNOPSIS
 

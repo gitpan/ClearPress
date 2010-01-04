@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 348
+version: 349
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -51,22 +51,22 @@ configure_requires:
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 348
+    version: 349
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
-    version: 348
+    version: 751
   ClearPress::authenticator:
     file: lib/ClearPress/authenticator.pm
-    version: 348
+    version: 751
   ClearPress::authenticator::ldap:
     file: lib/ClearPress/authenticator/ldap.pm
-    version: 348
+    version: 751
   ClearPress::authenticator::passwd:
     file: lib/ClearPress/authenticator/passwd.pm
-    version: 348
+    version: 751
   ClearPress::authenticator::session:
     file: lib/ClearPress/authenticator/session.pm
-    version: 348
+    version: 751
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
     version: 348
@@ -75,7 +75,7 @@ provides:
     version: 348
   ClearPress::driver:
     file: lib/ClearPress/driver.pm
-    version: 287
+    version: 348
   ClearPress::driver::Pg:
     file: lib/ClearPress/driver/Pg.pm
     version: 348
@@ -87,10 +87,10 @@ provides:
     version: 348
   ClearPress::model:
     file: lib/ClearPress/model.pm
-    version: 320
+    version: 348
   ClearPress::util:
     file: lib/ClearPress/util.pm
-    version: 320
+    version: 348
   ClearPress::view:
     file: lib/ClearPress/view.pm
     version: 346

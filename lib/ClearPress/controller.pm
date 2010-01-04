@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 348 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 348 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -567,7 +567,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 348 $
+$Revision: 348 $
 
 =head1 SYNOPSIS
 

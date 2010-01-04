@@ -11,7 +11,7 @@ use warnings;
 use base qw(ClearPress::authenticator);
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision: 348 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 751 $ =~ /(\d+)/smx; $r; };
 
 sub authen_credentials {
   my ($self, $ref) = @_;
