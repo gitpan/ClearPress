@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 346
+version: 348
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -51,7 +51,7 @@ configure_requires:
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 318
+    version: 348
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 348
