@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2009-05-03 17:18:48 +0100 (Sun, 03 May 2009) $
-# Id:            $Id: decorator.pm 333 2009-05-03 16:18:48Z zerojinx $
+# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
+# Id:            $Id: decorator.pm 348 2010-01-04 13:02:42Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/decorator.pm $
 #
@@ -13,7 +13,7 @@ use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 333 $ =~ /(\d+)/smx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 348 $ =~ /(\d+)/smx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => '0.1',
@@ -43,7 +43,11 @@ sub get {
   my ($self, $field) = @_;
 
   if($ARRAY_FIELDS->{$field}) {
-    return @{$self->{$field} || $DEFAULTS->{$field} || []};
+    my $val = $self->{$field} || $DEFAULTS->{$field} || [];
+    if(!ref $val) {
+      $val = [$val];
+    }
+    return [map { split /,/smx, $_ } @{$val}];
 
   } else {
     return $self->{$field} || $DEFAULTS->{$field};
@@ -57,9 +61,9 @@ sub defaults {
 
 sub new {
   my ($class, $ref) = @_;
-  $ref ||= {
-	    'title' => 'ClearPress',
-	   };
+  if(!$ref) {
+    $ref = {};
+  }
   bless $ref, $class;
   return $ref;
 }
@@ -96,7 +100,7 @@ sub site_header {
 
   my $ss = qq(@{[map {
     qq(    <link rel="stylesheet" type="text/css" href="$_" />);
-  } grep { $_ } $self->stylesheet()]});
+  } grep { $_ } @{$self->stylesheet()}]});
 
   if($self->style()) {
     $ss .= q(<style type="text/css">). $self->style() .q(</style>);
@@ -104,19 +108,19 @@ sub site_header {
 
   my $rss = qq(@{[map {
     qq(    <link rel="alternate" type="application/rss+xml" title="RSS" href="$_" />\n);
-  } grep { $_ } $self->rss()]});
+  } grep { $_ } @{$self->rss()}]});
 
   my $atom = qq(@{[map {
     qq(    <link rel="alternate" type="application/atom+xml" title="ATOM" href="$_" />\n);
-  } grep { $_ } $self->atom()]});
+  } grep { $_ } @{$self->atom()}]});
 
   my $js = qq(@{[map {
     qq(    <script type="text/javascript" src="@{[$cgi->escapeHTML($_)]}"></script>\n);
-  } grep { $_ } $self->jsfile()]});
+  } grep { $_ } @{$self->jsfile()}]});
 
   my $script = qq(@{[map {
     qq(    <script type="text/javascript">$_</script>\n);
-  } grep { $_ } $self->script()]});
+  } grep { $_ } @{$self->script()}]});
 
   my $onload   = (scalar $self->onload())   ? qq( onload="@{[  join q(;), $self->onload()]}")   : q[];
   my $onunload = (scalar $self->onunload()) ? qq( onunload="@{[join q(;), $self->onunload()]}") : q[];
@@ -130,7 +134,7 @@ sub site_header {
     <meta name="version"     content="@{[$self->meta_version()     || $self->defaults('meta_version')]}" />
     <meta name="description" content="@{[$self->meta_description() || $self->defaults('meta_description')]}" />
     <meta name="keywords"    content="@{[$self->meta_keywords()    || $self->defaults('meta_keywords')]}" />
-    <title>@{[$self->title()]}</title>
+    <title>@{[$self->title || 'ClearPress Application']}</title>
 $ss$rss$atom$js$script  </head>
   <body$onload$onunload$onresize>\n);
 }
@@ -240,6 +244,42 @@ i.e. </body></html> by default
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
+
+=head2 title - HTML page title
+
+=head2 stylesheet - External CSS URL (arrayref permitted)
+
+=head2 style - Embedded CSS content
+
+=head2 jsfile - External Javascript URL (arrayref permitted)
+
+=head2 script - Embedded Javascript content (arrayref permitted)
+
+=head2 atom - External ATOM feed URL (arrayref permitted)
+
+=head2 rss - External RSS feed URL (arrayref permitted)
+
+=head2 meta_keywords - HTML meta keywords
+
+=head2 meta_description - HTML meta description
+
+=head2 meta_author - HTML meta author
+
+=head2 meta_version - HTML meta version
+
+=head2 meta_refresh - HTML meta refresh
+
+=head2 meta_cookie - HTML meta cookie
+
+=head2 meta_content_type - HTML meta content-type
+
+=head2 meta_expires - HTML meta expires
+
+=head2 onload - body onload value (javascript)
+
+=head2 onunload - body onunload value (javascript)
+
+=head2 onresize - body onresize value (javascript)
 
 =head1 DEPENDENCIES
 

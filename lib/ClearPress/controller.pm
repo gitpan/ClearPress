@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-06-02 12:52:46 +0100 (Tue, 02 Jun 2009) $
-# Id:            $Id: controller.pm 335 2009-06-02 11:52:46Z zerojinx $
+# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
+# Id:            $Id: controller.pm 348 2010-01-04 13:02:42Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 335 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 348 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -367,11 +367,28 @@ sub decorator {
   my ($self, $util) = @_;
 
   if(!$self->{decorator}) {
-    my $appname        = $util->config->val('application', 'name') || 'Application';
-    $self->{decorator} = ClearPress::decorator->new({
-						     title      => $appname,
-						     stylesheet => [$util->config->val('application','stylesheet')],
-						    });
+    my $appname   = $util->config->val('application', 'name') || 'Application';
+    my $namespace = $self->namespace;
+    my $decorpkg  = "${namespace}::decorator";
+    my $config    = $util->config;
+    my $decor;
+
+    eval {
+      require $decorpkg;
+      $decor = $decorpkg->new();
+    } or do {
+      $decor = ClearPress::decorator->new();
+    };
+
+    for my $field ($decor->fields) {
+      $decor->$field($config->val('application', $field));
+    }
+
+    if(!$decor->title) {
+      $decor->title($config->val('application', 'name') || 'ClearPress Application');
+    }
+
+    $self->{decorator} = $decor;
   }
 
   return $self->{decorator};
@@ -491,7 +508,6 @@ sub dispatch {
   my $aspect    = $ref->{aspect};
   my $action    = $ref->{action};
   my $id        = $ref->{id};
-  my $namespace = $self->namespace($util);
   my $viewobject;
 
   eval {
@@ -551,7 +567,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$LastChangedRevision: 335 $
+$LastChangedRevision: 348 $
 
 =head1 SYNOPSIS
 

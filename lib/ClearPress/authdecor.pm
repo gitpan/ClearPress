@@ -1,9 +1,9 @@
 #########
 # Author:        rmp
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
+# Id:            $Id: authdecor.pm 348 2010-01-04 13:02:42Z zerojinx $
 # Source:        $Source$
-# $HeadURL$
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authdecor.pm $
 #
 package ClearPress::authdecor;
 use strict;
@@ -12,7 +12,7 @@ use base qw(ClearPress::decorator Exporter);
 use ClearPress::authenticator::session;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 750 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 348 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DOMAIN      => 'mysite.com';
 Readonly::Scalar our $AUTH_COOKIE => 'mysite_sso';
 Readonly::Array  our @EXPORT_OK   => qw($AUTH_COOKIE);
@@ -23,7 +23,7 @@ sub new {
 
   $self->{title}       = 'My Site';
   $self->{stylesheet}  = [qw(/css/mysite.css)];
-  $self->{meta_author} = q$Author: me $;
+  $self->{meta_author} = q$Author: zerojinx $;
 
   if(!ref $self->{jsfile}) {
     $self->{jsfile} = [];
@@ -154,7 +154,7 @@ ClearPress::authdecor
 
 =head1 VERSION
 
-$LastChangedRevision: 750 $
+$LastChangedRevision: 348 $
 
 =head1 SYNOPSIS
 

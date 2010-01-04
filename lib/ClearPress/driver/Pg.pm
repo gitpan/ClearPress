@@ -3,11 +3,11 @@
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
 # Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: mysql.pm 348 2010-01-04 13:02:42Z zerojinx $
+# Id:            $Id: Pg.pm 348 2010-01-04 13:02:42Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/mysql.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/Pg.pm $
 #
-package ClearPress::driver::mysql;
+package ClearPress::driver::Pg;
 use strict;
 use warnings;
 use base qw(ClearPress::driver);
@@ -23,13 +23,9 @@ Readonly::Scalar our $TYPES => {
 sub dbh {
   my $self = shift;
 
-  if($self->{dbh} && !$self->{dbh}->ping()) {
-    $self->{dbh}->disconnect();
-    delete $self->{dbh};
-  }
-
-  if(!$self->{dbh}) {
-    my $dsn = sprintf q(DBI:mysql:database=%s;host=%s;port=%s),
+  if(!$self->{dbh} ||
+     !$self->{dbh}->ping()) {
+    my $dsn = sprintf q(DBI:Pg:database=%s;host=%s;port=%s),
 		      $self->{dbname} || q[],
 		      $self->{dbhost} || q[localhost],
 		      $self->{dbport} || q[3306];
@@ -90,7 +86,9 @@ __END__
 
 =head1 NAME
 
-ClearPress::driver::mysql - MySQL-specific implementation of the database abstraction layer
+ClearPress::driver::Pg - Pg-specific implementation of the database abstraction layer
+
+** WARNING! ALPHA CODE **
 
 =head1 VERSION
 
@@ -110,7 +108,7 @@ $LastChangedRevision: 348 $
 
   my $iAssignedId = $oDriver->create($query)
 
-=head2 create_table - mysql-specific create_table
+=head2 create_table - Postgres-specific create_table
 
 =head2 types - the whole type map
 
