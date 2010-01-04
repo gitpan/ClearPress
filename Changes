@@ -6,13 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
-343 - patch to allow multiple settings in config.ini, e.g.
-        stylesheet=/css/foo.css,/css/bar.css
-    - patch to fix DBI's warning about "rollback without explicit disconnect"
-
-339 - override STDIN in t::request to account for changes in CGI.pm v3.44 (reported by Slaven)
-    - attempted a PostgreSQL adapter - could do with someone to test it
-    - updated example
+335 - 0 => "0" bugfix for js_string and xml_filter.
+      Adjusted t::request for CGI 3.48
 
 334 - sessions saved after processing request, not during
 

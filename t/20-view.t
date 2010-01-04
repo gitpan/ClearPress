@@ -13,7 +13,7 @@ use Carp;
 
 eval {
   require DBD::SQLite;
-  plan tests => 72;
+  plan tests => 75;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -409,4 +409,17 @@ my $util = t::util->new();
   like($view->render(), qr/Updated/smx, 'submit-xml render ok');
   is($model->test_pk(),    'one', 'key population from param not xml');
   is($model->test_field(), 'bar', 'field population from xml');
+}
+
+{
+  delete $util->{tt};
+  my $view  = ClearPress::view->new({
+				     util => $util,
+				    });
+  my $tt    = $view->tt; # initialise filters
+  my $xml_f = $view->tt_filters->{xml_entity};
+
+  is($xml_f->(0),     q[0]);
+  is($xml_f->(q[]),   q[]);
+  is($xml_f->(undef), q[]);
 }

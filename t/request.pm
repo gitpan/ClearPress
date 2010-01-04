@@ -6,7 +6,6 @@ use Carp;
 use CGI;
 use t::util;
 use ClearPress::controller;
-use IO::Scalar;
 
 sub new {
   my ($class, $ref) = @_;
@@ -25,11 +24,13 @@ sub new {
   $ENV{PATH_INFO}       = $ref->{PATH_INFO};
   $ENV{REQUEST_URI}     = "/clearpress-test$ref->{PATH_INFO}";
 
+  my $util = $ref->{util} || t::util->new({
+					   fixtures => 1,
+					  });
+
   my $stdin = q[];
   tie *STDIN, 'IO::Scalar', \$stdin;
-  my $util  = $ref->{util} || t::util->new({
-					    fixtures => 1,
-					   });
+
   $util->cgi(CGI->new());
   my $cgi = $util->cgi();
 
@@ -44,11 +45,11 @@ sub new {
 
   $ref->{util} = $util;
 
-  my $stdout;
-  tie *STDOUT, 'IO::Scalar', \$stdout;
+  my $str;
+  my $io = tie *STDOUT, 'IO::Scalar', \$str;
 
   ClearPress::controller->handler($util);
-  return $stdout;
+  return $str;
 }
 
 1;

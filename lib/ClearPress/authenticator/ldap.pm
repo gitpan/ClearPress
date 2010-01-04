@@ -1,9 +1,9 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2009-08-03 00:05:09 +0100 (Mon, 03 Aug 2009) $
-# Id:            $Id: ldap.pm 339 2009-08-02 23:05:09Z zerojinx $
+# Last Modified: $Date$
+# Id:            $Id$
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/lib/ClearPress/authenticator/ldap.pm $
+# $HeadURL$
 #
 package ClearPress::authenticator::ldap;
 use strict;
@@ -13,7 +13,7 @@ use Net::LDAP;
 use Readonly;
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision: 339 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 740 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $DEFAULT_SERVER    => 'ldaps://ldap.local:636';
 Readonly::Scalar our $DEFAULT_AD_DOMAIN => 'WORKGROUP';
@@ -90,7 +90,7 @@ ClearPress::authenticator::ldap
 
 =head1 VERSION
 
-$LastChangedRevision: 339 $
+$LastChangedRevision: 740 $
 
 =head1 SYNOPSIS
 

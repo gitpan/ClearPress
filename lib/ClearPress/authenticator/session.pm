@@ -1,9 +1,9 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2009-08-03 00:05:09 +0100 (Mon, 03 Aug 2009) $
-# Id:            $Id: session.pm 339 2009-08-02 23:05:09Z zerojinx $
+# Last Modified: $Date$
+# Id:            $Id$
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/lib/ClearPress/authenticator/session.pm $
+# $HeadURL$
 #
 package ClearPress::authenticator::session;
 use strict;
@@ -15,7 +15,7 @@ use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 use YAML::Tiny qw(Load Dump);
 
-our $VERSION = do { my ($r) = q$Revision: 339 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 740 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $KEY => q[topsecretkey];
 
@@ -102,7 +102,7 @@ ClearPress::authenticator::session
 
 =head1 VERSION
 
-$LastChangedRevision: 339 $
+$LastChangedRevision: 740 $
 
 =head1 SYNOPSIS
 

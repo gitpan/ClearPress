@@ -3,23 +3,21 @@
 use warnings;
 use strict;
 use lib qw(lib);
+use ClearPress::util;
 use ClearPress::controller;
 
-use GrandKids::util;
-use GrandKids::view::error;
 
 use GrandKids::view::child;
 use GrandKids::model::child;
 use GrandKids::view::family;
 use GrandKids::model::family;
-
-our $VERSION = do { my ($r) = q$LastChangedRevision: 339 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/mx; $r; };
 
 main();
 0;
 
 sub main {
-  my $util = GrandKids::util->new();
+  my $util = ClearPress::util->new();
   ClearPress::controller->handler($util);
 }
  

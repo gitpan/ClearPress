@@ -3,31 +3,22 @@
 use warnings;
 use strict;
 use lib qw(lib);
-use Getopt::Long;
-use Readonly;
 
 BEGIN {
   $ENV{DOCUMENT_ROOT} = './htdocs';
 }
 
+use ClearPress::util;
 use ClearPress::controller;
-
-use GrandKids::view::error;
-use GrandKids::util;
 
 use GrandKids::view::child;
 use GrandKids::model::child;
 use GrandKids::view::family;
 use GrandKids::model::family;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 339 $ =~ /(\d+)/smx; $r; };
-Readonly::Scalar our $PORT => 8080;
+our $VERSION = do { my ($r) = q$LastChangedRevision: 300 $ =~ /(\d+)/mx; $r; };
 
-my $opts = {};
-GetOptions($opts, qw(port=s));
-my ($port) = ($opts->{port} || $PORT) =~ /(\d+)/smx;
-
-GrandKids::sa->new($port)->run;
+GrandKids::sa->new->run();
 
 0;
 
@@ -42,6 +33,8 @@ use English qw(-no_match_vars);
 sub handle_request {
   my ($self, $cgi) = @_;
 
+#  print {*STDERR} Dumper($cgi);
+#  print {*STDERR} Dumper(%ENV);
   my $EXTN = {
 	      css  => 'text/css',
 	      xml  => 'text/xml',
@@ -50,19 +43,18 @@ sub handle_request {
 	      jpg  => 'image/jpeg',
 	      txt  => 'text/plain',
 	      html => 'text/html',
-              js   => 'text/javascript',
 	     };
 
-  my $util = GrandKids::util->new({
-					   cgi => $cgi,
-					  });
+  my $util = ClearPress::util->new({
+				    cgi => $cgi,
+				   });
   print "HTTP/1.0 200 OK\n";
 
-  my ($fn) = "htdocs$ENV{REQUEST_URI}" =~ m|([a-z\d_/\.\-%]+)|mix;
-  $fn      =~ s|\.\./||smxg;
+  my ($fn) = "htdocs$ENV{REQUEST_URI}" =~ m|([a-z\d_/\.%]+)|mix;
+  $fn      =~ s|\.\./||mxg;
 
   if(-f $fn) {
-    my ($ext) = $fn =~ /\.([^\.]+)$/smx;
+    my ($ext) = $fn =~ /\.([^\.]+)$/mx;
 
     my $type  = $EXTN->{lc $ext} || 'application/octet-stream';
     print qq(Content-type: $type\n\n);
@@ -72,19 +64,18 @@ sub handle_request {
       print;
     }
     close $fh or croak "Closing $fn: $ERRNO";
-
   } else {
     ClearPress::controller->handler($util);
   }
 
-  return 1;
+  return;
 }
 
 sub print_banner {
   my $self = shift;
-  print q[GrandKids development server up and running at http://localhost:].$self->port()."/\n";
-  return 1;
+  print q[ClearPress development server up and running at http://localhost:].$self->port()."/\n";
+  return;
 }
-
+ 
 1;
  

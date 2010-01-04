@@ -9,7 +9,7 @@ Content-type: text/html; charset=iso8859-1
     <meta name="version"     content="123" />
     <meta name="description" content="" />
     <meta name="keywords"    content="clearpress" />
-    <title>ClearPress Application</title>
+    <title>ClearPress</title>
     <script type="text/javascript" src="/foo.js"></script>
   </head>
   <body>

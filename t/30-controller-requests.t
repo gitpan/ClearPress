@@ -9,11 +9,11 @@ eval {
   plan skip_all => 'DBD::SQLite not installed';
 };
 
+use t::util qw(is_rendered_xml is_rendered_js);
 use t::model::derived;
 use t::view::derived;
 use t::view::error;
 use t::request;
-use t::util qw(is_rendered_xml is_rendered_js);
 
 my $util = t::util->new();
 

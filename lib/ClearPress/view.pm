@@ -2,10 +2,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-06-09 20:17:59 +0100 (Tue, 09 Jun 2009) $
-# Id:            $Id: view.pm 338 2009-06-09 19:17:59Z zerojinx $
+# Last Modified: $Date: 2010-01-04 12:41:14 +0000 (Mon, 04 Jan 2010) $
+# Id:            $Id: view.pm 346 2010-01-04 12:41:14Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/branches/prerelease-1.26/lib/ClearPress/view.pm $
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$LastChangedRevision: 338 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$LastChangedRevision: 346 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -490,7 +490,9 @@ sub tt {
   if(!$util->{tt}) {
     $self->add_tt_filter('js_string', sub {
 			                   my $string = shift;
-					   $string  ||= q[];
+					   if(!defined $string) {
+					     $string = q[];
+					   }
 					   $string    =~ s/\r/\\r/smxg;
 					   $string    =~ s/\n/\\n/smxg;
 					   $string    =~ s/"/\\"/smxg;
@@ -499,7 +501,9 @@ sub tt {
 					 });
     $self->add_tt_filter('xml_entity', sub {
 					    my $string = shift;
-					    $string  ||= q[];
+					    if(!defined $string) {
+					      $string = q[];
+					    }
 					    return encode_entities_numeric($string),
 					  });
 
@@ -672,7 +676,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$LastChangedRevision: 338 $
+$LastChangedRevision: 346 $
 
 =head1 SYNOPSIS
 

@@ -1,15 +1,14 @@
 package t::util;
 use strict;
 use warnings;
-use base qw(ClearPress::util);
+use base qw(Exporter ClearPress::util);
 use Carp;
-use base qw(Exporter);
 use Readonly;
 use XML::Simple qw(XMLin);
 use JSON;
 use English qw(-no_match_vars);
 
-Readonly::Array our @EXPORT_OK => qw(is_rendered_xml is_rendered_js);
+our @EXPORT_OK = qw(is_rendered_xml is_rendered_js);
 
 $ENV{dev} = q[test];
 

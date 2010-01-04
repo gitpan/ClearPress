@@ -1,7 +1,0 @@
-
-[% IF view.warnings %]
-<ul class="warnings">[% FOREACH warning = view.warnings %]
- <li></li>[% END %]
-</ul>
-[% END %]
- 
