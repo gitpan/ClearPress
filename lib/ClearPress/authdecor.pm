@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: authdecor.pm 348 2010-01-04 13:02:42Z zerojinx $
+# Last Modified: $Date: 2010-01-04 14:37:33 +0000 (Mon, 04 Jan 2010) $
+# Id:            $Id: authdecor.pm 349 2010-01-04 14:37:33Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authdecor.pm $
 #
@@ -12,7 +12,7 @@ use base qw(ClearPress::decorator Exporter);
 use ClearPress::authenticator::session;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 751 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 349 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DOMAIN      => 'mysite.com';
 Readonly::Scalar our $AUTH_COOKIE => 'mysite_sso';
 Readonly::Array  our @EXPORT_OK   => qw($AUTH_COOKIE);
@@ -154,7 +154,7 @@ ClearPress::authdecor
 
 =head1 VERSION
 
-$Revision: 348 $
+$Revision: 349 $
 
 =head1 SYNOPSIS
 

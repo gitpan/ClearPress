@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-01-04 12:41:14 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: view.pm 346 2010-01-04 12:41:14Z zerojinx $
+# Last Modified: $Date: 2010-01-04 14:37:33 +0000 (Mon, 04 Jan 2010) $
+# Id:            $Id: view.pm 349 2010-01-04 14:37:33Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$Revision: 346 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 349 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -676,7 +676,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 346 $
+$Revision: 349 $
 
 =head1 SYNOPSIS
 

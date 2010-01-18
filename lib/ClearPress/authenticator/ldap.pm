@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: ldap.pm 348 2010-01-04 13:02:42Z zerojinx $
+# Last Modified: $Date: 2010-01-18 11:26:22 +0000 (Mon, 18 Jan 2010) $
+# Id:            $Id: ldap.pm 352 2010-01-18 11:26:22Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authenticator/ldap.pm $
 #
@@ -9,11 +9,10 @@ package ClearPress::authenticator::ldap;
 use strict;
 use warnings;
 use base qw(ClearPress::authenticator);
-use Net::LDAP;
 use Readonly;
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision: 751 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 352 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $DEFAULT_SERVER    => 'ldaps://ldap.local:636';
 Readonly::Scalar our $DEFAULT_AD_DOMAIN => 'WORKGROUP';
@@ -46,6 +45,8 @@ sub ad_domain {
 
 sub _ldap {
   my $self = shift;
+
+  $self->_dyn_use('Net::LDAP');
 
   if(!$self->{_ldap}) {
     $self->{_ldap} = Net::LDAP->new($self->server);
@@ -90,7 +91,7 @@ ClearPress::authenticator::ldap
 
 =head1 VERSION
 
-$LastChangedRevision: 348 $
+$LastChangedRevision: 352 $
 
 =head1 SYNOPSIS
 

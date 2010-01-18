@@ -1,15 +1,17 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: authenticator.pm 348 2010-01-04 13:02:42Z zerojinx $
+# Last Modified: $Date: 2010-01-18 11:26:22 +0000 (Mon, 18 Jan 2010) $
+# Id:            $Id: authenticator.pm 352 2010-01-18 11:26:22Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authenticator.pm $
 #
 package ClearPress::authenticator;
 use strict;
 use warnings;
+use Carp;
+use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$Revision: 751 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 352 $ =~ /(\d+)/smx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -23,6 +25,24 @@ sub new {
   return $ref;
 }
 
+sub _dyn_use {
+  my( $self, $classname ) = @_;
+  my( $parent_namespace, $module ) = $classname =~ /^(.*?)([^:]+)$/smx ? ($1, $2) : (q[::], $classname);
+
+#  {
+#    no strict 'refs'; ## no critic (ProhibitNoStrict)
+#    if($parent_namespace->{$module.q[::]}) {
+#carp qq[$classname already loaded (${module}:: in $parent_namespace)];
+#      return 1;
+#    }
+#  }
+
+  eval "require $classname" or do { croak $EVAL_ERROR };  ## no critic qw(ProhibitStringyEval)
+  $classname->import();
+
+  return 1;
+}
+
 1;
 __END__
 
@@ -32,7 +52,7 @@ ClearPress::authenticator
 
 =head1 VERSION
 
-$Revision: 348 $
+$Revision: 352 $
 
 =head1 SYNOPSIS
 

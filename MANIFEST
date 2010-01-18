@@ -36,6 +36,7 @@ examples/GrandKids/lib/GrandKids/view/family.pm
 lib/ClearPress.pm
 lib/ClearPress/authdecor.pm
 lib/ClearPress/authenticator.pm
+lib/ClearPress/authenticator/db.pm
 lib/ClearPress/authenticator/ldap.pm
 lib/ClearPress/authenticator/passwd.pm
 lib/ClearPress/authenticator/session.pm
@@ -67,6 +68,8 @@ t/40-driver-mysql.t
 t/40-driver-sqlite.t
 t/40-driver.t
 t/50-clearpress.t
+t/60-authenticator-db-sha1.t
+t/60-authenticator-db.t
 t/60-authenticator-passwd.t
 t/60-authenticator-session.t
 t/60-authenticator.t

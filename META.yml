@@ -1,6 +1,6 @@
 ---
 name: ClearPress
-version: 349
+version: 350
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
@@ -15,7 +15,7 @@ build_requires:
   Test::Distribution: 0
   Test::More: 0.8
   Test::Perl::Critic: 0
-  Test::Trap: v0.1.1
+  Test::Trap: 0
   XML::LibXML: 1.66
   XML::Simple: 2.18
   XML::TreeBuilder: 3.09
@@ -43,24 +43,30 @@ requires:
   strict: 1.03
   warnings: 1.05
 recommends:
+  Crypt::MySQL: 0.04
   DBD::SQLite: 1.14
   DBD::mysql: 4.007
+  Digest::MD5: 2.39
+  Digest::SHA: 5.47
   Net::LDAP: 0.39
 configure_requires:
   Module::Build: 0.35
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 349
+    version: 350
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
-    version: 751
+    version: 349
   ClearPress::authenticator:
     file: lib/ClearPress/authenticator.pm
+    version: 352
+  ClearPress::authenticator::db:
+    file: lib/ClearPress/authenticator/db.pm
     version: 751
   ClearPress::authenticator::ldap:
     file: lib/ClearPress/authenticator/ldap.pm
-    version: 751
+    version: 352
   ClearPress::authenticator::passwd:
     file: lib/ClearPress/authenticator/passwd.pm
     version: 751
@@ -69,13 +75,13 @@ provides:
     version: 751
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
-    version: 348
+    version: 349
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
     version: 348
   ClearPress::driver:
     file: lib/ClearPress/driver.pm
-    version: 348
+    version: 349
   ClearPress::driver::Pg:
     file: lib/ClearPress/driver/Pg.pm
     version: 348
@@ -87,13 +93,13 @@ provides:
     version: 348
   ClearPress::model:
     file: lib/ClearPress/model.pm
-    version: 348
+    version: 349
   ClearPress::util:
     file: lib/ClearPress/util.pm
-    version: 348
+    version: 349
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 346
+    version: 349
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
     version: 320
