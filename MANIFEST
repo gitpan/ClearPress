@@ -1,6 +1,7 @@
 Changes
 LICENSE
 MANIFEST
+MANIFEST.SKIP
 README
 bin/clearpress
 cgi-bin/application
@@ -111,6 +112,5 @@ t/user/basic.pm
 t/util.pm
 t/view/derived.pm
 t/view/error.pm
-Makefile.PL
 Build.PL
 META.yml

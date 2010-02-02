@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-01-04 14:37:33 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: view.pm 349 2010-01-04 14:37:33Z zerojinx $
+# Last Modified: $Date: 2010-02-01 23:19:22 +0000 (Mon, 01 Feb 2010) $
+# Id:            $Id: view.pm 354 2010-02-01 23:19:22Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$Revision: 349 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 354 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -222,7 +222,9 @@ sub render {
   if($self->decor()) {
     $actions  = $self->actions();
     eval {
-      $self->process_template('warnings.tt2', {}, \$warnings);
+      $self->process_template('warnings.tt2', {
+					       warnings => $self->warnings,
+					      }, \$warnings);
 
     } or do {
       #########
@@ -676,7 +678,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 349 $
+$Revision: 354 $
 
 =head1 SYNOPSIS
 

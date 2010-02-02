@@ -1,12 +1,7 @@
 ---
-name: ClearPress
-version: 350
+abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
-abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
 build_requires:
   CPAN: 1.9205
   Cwd: 3.2701
@@ -19,42 +14,18 @@ build_requires:
   XML::LibXML: 1.66
   XML::Simple: 2.18
   XML::TreeBuilder: 3.09
-requires:
-  CGI: 3.20
-  Carp: 1.02
-  Class::Accessor: 0.31
-  Class::Singleton: 1.4
-  Config::IniFiles: 2.38
-  Crypt::Blowfish: 2.10
-  Crypt::CBC: 2.30
-  DBI: 1.51
-  English: 1.01
-  HTML::Entities: 1.35
-  IO::Scalar: 2.110
-  Lingua::EN::Inflect: 1.89
-  MIME::Base64: 3.07
-  POSIX: 1.09
-  Readonly: 1.03
-  Template: 2.19
-  Template::Filters: 2.86
-  XML::Simple: 2.18
-  YAML::Tiny: 1.36
-  base: 2.13
-  strict: 1.03
-  warnings: 1.05
-recommends:
-  Crypt::MySQL: 0.04
-  DBD::SQLite: 1.14
-  DBD::mysql: 4.007
-  Digest::MD5: 2.39
-  Digest::SHA: 5.47
-  Net::LDAP: 0.39
 configure_requires:
-  Module::Build: 0.35
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 350
+    version: 356
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 349
@@ -63,7 +34,7 @@ provides:
     version: 352
   ClearPress::authenticator::db:
     file: lib/ClearPress/authenticator/db.pm
-    version: 751
+    version: 356
   ClearPress::authenticator::ldap:
     file: lib/ClearPress/authenticator/ldap.pm
     version: 352
@@ -96,14 +67,43 @@ provides:
     version: 349
   ClearPress::util:
     file: lib/ClearPress/util.pm
-    version: 349
+    version: 355
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 349
+    version: 354
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
     version: 320
-generated_by: Module::Build version 0.35
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+recommends:
+  Crypt::MySQL: 0.04
+  DBD::SQLite: 1.14
+  DBD::mysql: 4.007
+  Digest::MD5: 2.39
+  Digest::SHA: 5.47
+  Net::LDAP: 0.39
+requires:
+  CGI: 3.20
+  Carp: 1.02
+  Class::Accessor: 0.31
+  Class::Singleton: 1.4
+  Config::IniFiles: 2.38
+  Crypt::Blowfish: 2.10
+  Crypt::CBC: 2.30
+  DBI: 1.51
+  English: 1.01
+  HTML::Entities: 1.35
+  IO::Scalar: 2.110
+  Lingua::EN::Inflect: 1.89
+  MIME::Base64: 3.07
+  POSIX: 1.09
+  Readonly: 1.03
+  Template: 2.19
+  Template::Filters: 2.86
+  XML::Simple: 2.18
+  YAML::Tiny: 1.36
+  base: 2.13
+  strict: 1.03
+  warnings: 1.05
+resources:
+  license: http://dev.perl.org/licenses/
+version: 356

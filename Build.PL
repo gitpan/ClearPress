@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
 				 module_name         => 'ClearPress',
 				 dist_author         => 'Roger M Pettett <rpettett@cpan.org>',
-				 dist_version        => do { require 'lib/ClearPress.pm'; $ClearPress::VERSION; },
+				 dist_version_from   => 'lib/ClearPress.pm',
 				 dist_abstract       => q[ClearPress - Simple, fresh & fruity MVC framework],
 				 license             => 'perl',
 				 requires            => {
@@ -57,7 +57,6 @@ my $builder = Module::Build->new(
 							 'Test::Distribution'  => '0',
 							 'Test::Perl::Critic'  => '0',
 							},
-				 create_makefile_pl  => 'passthrough',
 				 script_files        => [qw(bin/clearpress)],
 				);
 

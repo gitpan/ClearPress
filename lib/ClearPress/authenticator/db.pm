@@ -1,9 +1,9 @@
 #########
 # Author:        rmp
-# Last Modified: $Date$
-# Id:            $Id$
+# Last Modified: $Date: 2010-02-02 14:51:00 +0000 (Tue, 02 Feb 2010) $
+# Id:            $Id: db.pm 356 2010-02-02 14:51:00Z zerojinx $
 # Source:        $Source$
-# $HeadURL$
+# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authenticator/db.pm $
 #
 package ClearPress::authenticator::db;
 use strict;
@@ -13,7 +13,7 @@ use Readonly;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$Revision: 751 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 356 $ =~ /(\d+)/smx; $r; };
 
 __PACKAGE__->mk_accessors(qw(dbh));
 
@@ -128,7 +128,7 @@ ClearPress::authenticator::db
 
 =head1 VERSION
 
-$LastChangedRevision: 348 $
+$LastChangedRevision: 356 $
 
 =head1 SYNOPSIS
 

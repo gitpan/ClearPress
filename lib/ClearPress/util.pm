@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2010-01-04 14:37:33 +0000 (Mon, 04 Jan 2010) $
+# Last Modified: $Date: 2010-02-01 23:20:26 +0000 (Mon, 01 Feb 2010) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 349 2010-01-04 14:37:33Z zerojinx $
+# Id:            $Id: util.pm 355 2010-02-01 23:20:26Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$Revision: 349 $ =~ /(\d+)/smx; $r; };
+our $VERSION              = do { my ($r) = q$Revision: 355 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
@@ -176,6 +176,44 @@ sub cleanup {
   return 1;
 }
 
+sub db_credentials {
+  my $self      = shift;
+  my $cfg       = $self->config();
+  my $dbsection = $self->dbsection();
+  my $ref       = {};
+
+  for my $field (qw(dbuser dbpass dbhost dbport dbname)) {
+    $ref->{$field} = $cfg->val($dbsection, $field);
+  }
+
+  return $ref;
+}
+
+sub dbname {
+  my $self = shift;
+  return $self->db_credentials->{dbname};
+}
+
+sub dbuser {
+  my $self = shift;
+  return $self->db_credentials->{dbuser};
+}
+
+sub dbpass {
+  my $self = shift;
+  return $self->db_credentials->{dbpass};
+}
+
+sub dbhost {
+  my $self = shift;
+  return $self->db_credentials->{dbhost};
+}
+
+sub dbport {
+  my $self = shift;
+  return $self->db_credentials->{dbport};
+}
+
 1;
 
 __END__
@@ -186,7 +224,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$Revision: 349 $
+$Revision: 355 $
 
 =head1 SYNOPSIS
 
@@ -278,6 +316,30 @@ $Revision: 349 $
 =head2 cleanup - housekeeping stub for subclasses - called when response has completed processing
 
   $oUtil->cleanup();
+
+=head2 db_credentials - hashref of database connection info from the current dbsection
+
+  my $hrDBHInfo = $oUtil->db_credentials();
+
+=head2 dbname - database name from db_credentials
+
+  my $sDBName = $oUtil->dbname();
+
+=head2 dbuser - database user from db_credentials
+
+  my $sDBUser = $oUtil->dbuser();
+
+=head2 dbpass - database pass from db_credentials
+
+  my $sDBPass = $oUtil->dbpass();
+
+=head2 dbhost - database host from db_credentials
+
+  my $sDBHost = $oUtil->dbhost();
+
+=head2 dbport - database port from db_credentials
+
+  my $sDBPort = $oUtil->dbport();
 
 =head1 DIAGNOSTICS
 
