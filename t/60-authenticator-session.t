@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More tests => 12;
 use MIME::Base64 qw(encode_base64);
+use Test::Trap;
 
 our $PKG = 'ClearPress::authenticator::session';
 
@@ -59,8 +60,11 @@ can_ok($PKG, qw(authen_token));
   my $auth    = $PKG->new();
   my $encoded = encode_base64('corruption');
 
-  is($auth->authen_token($encoded), undef, 'failed decrypt');
+  trap {
+    is($auth->authen_token($encoded), undef, 'failed decrypt');
+  };
 }
+
 
 {
   my $auth      = $PKG->new();
@@ -68,5 +72,8 @@ can_ok($PKG, qw(authen_token));
   my $encrypted = $cipher->encrypt('corruption');
   my $encoded   = encode_base64($encrypted);
 
-  is($auth->authen_token($encoded), undef, 'failed deyaml');
+  trap {
+    is($auth->authen_token($encoded), undef, 'failed deyaml');
+  };
 }
+

@@ -69,10 +69,12 @@ my $util = t::util->new();
   bless $derived, q[testfoo];
   @testfoo::ISA = qw(ClearPress::model);
 
-  eval {
+  local $trap;
+  trap {
     $derived->util();
   };
-  like($EVAL_ERROR, qr/No\ such\ file/mx, 'die if config.ini unavailable');
+
+  like($trap->die, qr/No\ such\ file/mx, 'die if config.ini unavailable');
 }
 
 {
