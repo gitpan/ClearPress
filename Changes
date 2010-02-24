@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+360 - Error messages escaped for HTML, JSON, XML
+
 357 - Minor tweaks to build-process; adjusted some test data.
 
 351 - Added basic database-backed authenticator. Needs examples.

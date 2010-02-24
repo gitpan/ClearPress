@@ -1,16 +1,18 @@
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More;
 use t::util;
 use English qw(-no_match_vars);
 
 eval {
   require Digest::SHA;
-};
+  require DBD::SQLite;
+  plan tests => 3;
 
-if($EVAL_ERROR) {
-  plan skip_all => 'Digest::SHA not installed';
-}
+} or do {
+
+  plan skip_all => 'Digest::SHA or DBD::SQLite not installed';
+};
 
 our $PKG = 'ClearPress::authenticator::db';
 use ClearPress::authenticator::db;

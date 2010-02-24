@@ -42,7 +42,7 @@ my $util = t::util->new();
 {
   my $view = ClearPress::view::error->new({
 					   aspect => q[read_xml],
-					   errstr => 'test',
+					   errstr => q[test & @ ' ; "],
 					   util   => $util,
 					  });
   trap {
@@ -54,11 +54,11 @@ my $util = t::util->new();
 {
   my $view = ClearPress::view::error->new({
 					   aspect => q[read_json],
-					   errstr => 'test',
+					   errstr => q[test & @ ' ; "],
 					   util   => $util,
 					  });
   trap {
-    is($view->render(), q[{error:"Error: test"}]);
+    is($view->render(), q[{"error":"Error: test & @ \' ; \""}]);
   };
   like($trap->stderr(), qr/Serving\ error/mix, 'warn to console');
 }

@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
-# Id:            $Id: error.pm 320 2009-02-24 18:15:24Z zerojinx $
+# Last Modified: $Date: 2010-02-24 10:35:34 +0000 (Wed, 24 Feb 2010) $
+# Id:            $Id: error.pm 361 2010-02-24 10:35:34Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
@@ -16,7 +16,7 @@ use Carp;
 
 __PACKAGE__->mk_accessors(qw(errstr));
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 361 $ =~ /(\d+)/smx; $r; };
 
 sub render {
   my $self   = shift;
@@ -34,15 +34,25 @@ sub render {
   $errstr =~ s/[ ]at[ ]S+[ ]line[ ][[:digit:]]+//smxg;
   $errstr =~ s/\s+$//smx;
 
+  #########
+  # initialise tt_filters by resetting tt
+  #
+  my $util = $self->util;
+  delete $util->{tt};
+  my $tt = $self->tt;
+
   if($aspect =~ /(?:ajax|xml|rss|atom)$/smx) {
-    return qq[<error>$errstr</error>];
+    my $escaped = $self->tt_filters->{xml_entity}->($errstr);
+    return qq[<?xml version='1.0'?>\n<error>$escaped</error>];
   }
 
   if($aspect =~ /json$/smx) {
-    return qq[{error:"$errstr"}];
+    my $escaped = $self->tt_filters->{js_string}->($errstr);
+    return qq[{"error":"$escaped"}];
   }
 
-  return q(<div id="main"><h2>An Error Occurred</h2>) .  $self->actions() . q(<p>) . $errstr . q(</p></div>);
+  my $escaped = $self->tt_filters->{xml_entity}->($errstr);
+  return q(<div id="main"><h2>An Error Occurred</h2>) .  $self->actions() . q(<p>) . $escaped . q(</p></div>);
 }
 
 1;
@@ -55,7 +65,7 @@ ClearPress::view::error - specialised view for error handling
 
 =head1 VERSION
 
-$LastChangedRevision: 320 $
+$LastChangedRevision: 361 $
 
 =head1 SYNOPSIS
 
