@@ -3,10 +3,11 @@ use warnings;
 use Test::More;
 use t::util;
 use English qw(-no_match_vars);
+use Test::Trap;
 
 eval {
   require DBD::SQLite;
-  plan tests => 44;
+  plan tests => 45;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -629,3 +630,16 @@ my $util = t::util->new();
   like($EVAL_ERROR, qr/Bad\ request/mx, q[trap inconsistent add with id]);
 }
 
+{
+  local %ENV = (
+		DOCUMENT_ROOT  => 't/htdocs',
+		REQUEST_METHOD => 'GET',
+		QUERY_STRING   => q[],
+		PATH_INFO      => '/thing/10',
+	       );
+  trap {
+    $CTRL->handler($util);
+  };
+
+  like($trap->stdout, qr/charset=UTF-8/smx, 'header is UTF-8 by default');
+}

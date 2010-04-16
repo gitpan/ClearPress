@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 22;
 use English qw(-no_match_vars);
 
 use_ok('ClearPress::decorator');
@@ -91,6 +91,22 @@ use_ok('ClearPress::decorator');
   my $dec = ClearPress::decorator->new();
   $ENV{'SCRIPT_NAME'} = '/foo';
   is($dec->http_header(), from_file(q(header-2.frag)), 'header w/script_name is ok');
+}
+
+{
+  my $dec = ClearPress::decorator->new();
+  is($dec->charset, 'iso8859-1', 'default charset');
+}
+
+{
+  my $dec = ClearPress::decorator->new({charset=>'UTF-8'});
+  is($dec->charset, 'UTF-8', 'constructor charset');
+}
+
+{
+  my $dec = ClearPress::decorator->new();
+  $dec->charset('UTF-8');
+  is($dec->charset, 'UTF-8', 'accessor-set charset');
 }
 
 sub from_file {

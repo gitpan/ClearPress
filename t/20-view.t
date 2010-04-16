@@ -13,7 +13,7 @@ use Carp;
 
 eval {
   require DBD::SQLite;
-  plan tests => 75;
+  plan tests => 78;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -422,4 +422,20 @@ my $util = t::util->new();
   is($xml_f->(0),     q[0]);
   is($xml_f->(q[]),   q[]);
   is($xml_f->(undef), q[]);
+}
+
+{
+  my $view = ClearPress::view->new();
+  is($view->charset(), 'UTF-8', 'default charset');
+}
+
+{
+  my $view = ClearPress::view->new({charset => 'iso8859-1'});
+  is($view->charset(), 'iso8859-1', 'constructor charset');
+}
+
+{
+  my $view = ClearPress::view->new();
+  $view->charset('koir-8');
+  is($view->charset(), 'koir-8', 'accessor charset');
 }

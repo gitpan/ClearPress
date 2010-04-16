@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: decorator.pm 348 2010-01-04 13:02:42Z zerojinx $
+# Last Modified: $Date: 2010-04-16 21:00:31 +0100 (Fri, 16 Apr 2010) $
+# Id:            $Id: decorator.pm 367 2010-04-16 20:00:31Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/decorator.pm $
 #
@@ -13,7 +13,7 @@ use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 348 $ =~ /(\d+)/smx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 367 $ =~ /(\d+)/smx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => '0.1',
@@ -21,6 +21,7 @@ our $DEFAULTS = {
 		 'meta_author'       => q$Author: zerojinx $,
 		 'meta_keywords'     => q[clearpress],
 		 'username'          => q[],
+		 'charset'           => q[iso8859-1],
 		};
 
 our $ARRAY_FIELDS = {
@@ -36,7 +37,7 @@ sub fields {
   return qw(title stylesheet style jsfile script atom rss
             meta_keywords meta_description meta_author meta_version
             meta_refresh meta_cookie meta_content_type meta_expires
-            onload onunload onresize username)
+            onload onunload onresize username charset);
 }
 
 sub get {
@@ -87,7 +88,8 @@ sub cookie {
 sub http_header {
   my $self    = shift;
   my @cookies = grep { $_ } ($self->cookie());
-  my @headers = (q(Content-type: text/html; charset=iso8859-1),
+  my $charset = $self->charset;
+  my @headers = (qq[Content-type: text/html; charset=$charset],
                  map {
                    "Set-Cookie: $_";
                  } @cookies);

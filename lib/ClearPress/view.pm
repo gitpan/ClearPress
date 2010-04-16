@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-02-01 23:19:22 +0000 (Mon, 01 Feb 2010) $
-# Id:            $Id: view.pm 354 2010-02-01 23:19:22Z zerojinx $
+# Last Modified: $Date: 2010-04-16 21:00:31 +0100 (Fri, 16 Apr 2010) $
+# Id:            $Id: view.pm 367 2010-04-16 20:00:31Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -20,11 +20,11 @@ use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 
-our $VERSION        = do { my ($r) = q$Revision: 354 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 367 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
-__PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape));
+__PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape charset));
 
 sub new {
   my ($class, $self)    = @_;
@@ -52,6 +52,8 @@ sub new {
   $self->init();
 
   $self->{content_type} ||= 'text/html';
+
+  $self->{charset}      ||= 'UTF-8';
 
   return $self;
 }
@@ -678,7 +680,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 354 $
+$Revision: 367 $
 
 =head1 SYNOPSIS
 
@@ -815,6 +817,11 @@ View superclass for the ClearPress framework
 
   $oView->content_type($sContentType);
   my $sContentType = $oView->content_type();
+
+=head2 charset - get/set accessor for content charset (Content-Type header charset) - default UTF-8
+
+  $oView->charset($sCharSet);
+  my $sCharSet = $oView->charset();
 
 =head2 decor - get/set accessor for page decoration toggle
 
