@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: mysql.pm 348 2010-01-04 13:02:42Z zerojinx $
+# Last Modified: $Date: 2010-04-15 16:05:45 +0100 (Thu, 15 Apr 2010) $
+# Id:            $Id: mysql.pm 363 2010-04-15 15:05:45Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/mysql.pm $
 #
@@ -15,7 +15,7 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 348 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 363 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'bigint unsigned not null auto_increment primary key',
@@ -38,8 +38,11 @@ sub dbh {
       $self->{dbh} = DBI->connect($dsn,
 				  $self->{dbuser} || q[],
 				  $self->{dbpass},
-				  {RaiseError => 1,
-				   AutoCommit => 0});
+				  {
+				   RaiseError => 1,
+				   AutoCommit => 0,
+				   mysql_enable_utf8 => 1,
+				  });
 
     } or do {
       croak qq[Failed to connect to $dsn using @{[$self->{dbuser}||q['']]}\n$EVAL_ERROR];
@@ -94,7 +97,7 @@ ClearPress::driver::mysql - MySQL-specific implementation of the database abstra
 
 =head1 VERSION
 
-$LastChangedRevision: 348 $
+$LastChangedRevision: 363 $
 
 =head1 SYNOPSIS
 

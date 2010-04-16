@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+361 - UTF8 support enabled by default in MySQL driver
+
 360 - Error messages escaped for HTML, JSON, XML
 
 357 - Minor tweaks to build-process; adjusted some test data.
