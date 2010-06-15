@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+368 - corrected cleaning of error message to not expose module & line number in responses
+
 363 - Default to serving Content-type header with charset=UTF-8
 
 361 - UTF8 support enabled by default in MySQL driver

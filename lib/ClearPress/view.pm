@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-04-16 21:00:31 +0100 (Fri, 16 Apr 2010) $
-# Id:            $Id: view.pm 367 2010-04-16 20:00:31Z zerojinx $
+# Last Modified: $Date: 2010-06-15 18:22:27 +0100 (Tue, 15 Jun 2010) $
+# Id:            $Id: view.pm 375 2010-06-15 17:22:27Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -19,8 +19,9 @@ use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
+use utf8;
 
-our $VERSION        = do { my ($r) = q$Revision: 367 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 375 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -344,7 +345,11 @@ sub _populate_from_cgi {
   }
 
   my $params = {
-		map { $_ => $cgi->param($_) } $cgi->param()
+		map { ## no critic (ProhibitComplexMappings)
+		      my $p = $cgi->param($_);
+		      utf8::decode($p);
+		      $_ => $p;
+		    } $cgi->param()
 	       };
 
   #########
@@ -352,6 +357,7 @@ sub _populate_from_cgi {
   #
   my $xmlpost = $cgi->param('POSTDATA');
   if($xmlpost) {
+    utf8::decode($xmlpost);
     eval {
       $params = XMLin($xmlpost);
       for my $k (%{$params}) {
@@ -375,6 +381,7 @@ sub _populate_from_cgi {
   #
   my $xml = $cgi->param('XForms:Model');
   if($xml) {
+    utf8::decode($xml);
     $params = XMLin($xml);
     for my $k (%{$params}) {
       if(ref $params->{$k} &&
@@ -680,7 +687,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 367 $
+$Revision: 375 $
 
 =head1 SYNOPSIS
 

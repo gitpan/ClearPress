@@ -25,7 +25,7 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 368
+    version: 372
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 349
@@ -46,7 +46,7 @@ provides:
     version: 751
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
-    version: 367
+    version: 375
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
     version: 367
@@ -61,7 +61,7 @@ provides:
     version: 320
   ClearPress::driver::mysql:
     file: lib/ClearPress/driver/mysql.pm
-    version: 363
+    version: 375
   ClearPress::model:
     file: lib/ClearPress/model.pm
     version: 349
@@ -70,10 +70,10 @@ provides:
     version: 355
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 367
+    version: 375
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
-    version: 361
+    version: 373
 recommends:
   Crypt::MySQL: 0.04
   DBD::SQLite: 1.14
@@ -106,4 +106,4 @@ requires:
   warnings: 1.05
 resources:
   license: http://dev.perl.org/licenses/
-version: 368
+version: 372

@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-02-24 10:35:34 +0000 (Wed, 24 Feb 2010) $
-# Id:            $Id: error.pm 361 2010-02-24 10:35:34Z zerojinx $
+# Last Modified: $Date: 2010-06-15 15:20:18 +0100 (Tue, 15 Jun 2010) $
+# Id:            $Id: error.pm 373 2010-06-15 14:20:18Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
@@ -16,7 +16,7 @@ use Carp;
 
 __PACKAGE__->mk_accessors(qw(errstr));
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 361 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 373 $ =~ /(\d+)/smx; $r; };
 
 sub render {
   my $self   = shift;
@@ -30,8 +30,8 @@ sub render {
 #  if($EVAL_ERROR) {
 #    $errstr .= q(Eval Error: ) . $EVAL_ERROR;
 #  }
-  carp "Serving error: $errstr";
-  $errstr =~ s/[ ]at[ ]S+[ ]line[ ][[:digit:]]+//smxg;
+  print {*STDERR} "Serving error: $errstr\n" or croak $ERRNO;
+  $errstr =~ s/[ ]at[ ]\S+[ ]line[ ][[:digit:]]+//smxg;
   $errstr =~ s/\s+$//smx;
 
   #########
@@ -65,7 +65,7 @@ ClearPress::view::error - specialised view for error handling
 
 =head1 VERSION
 
-$LastChangedRevision: 361 $
+$LastChangedRevision: 373 $
 
 =head1 SYNOPSIS
 

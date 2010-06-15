@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-04-16 21:00:31 +0100 (Fri, 16 Apr 2010) $
-# Id:            $Id: controller.pm 367 2010-04-16 20:00:31Z zerojinx $
+# Last Modified: $Date: 2010-06-15 18:22:27 +0100 (Tue, 15 Jun 2010) $
+# Id:            $Id: controller.pm 375 2010-06-15 17:22:27Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$Revision: 367 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 375 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -425,8 +425,14 @@ sub handler {
   my $decor = $viewobject->decor();
 
   if($decor) {
-    if($viewobject->charset) {
+    if($viewobject->charset && $decorator->can('charset')) {
       $decorator->charset($viewobject->charset);
+    }
+
+    my $content_type = $viewobject->content_type();
+    my $charset      = $viewobject->charset();
+    if($content_type =~ /text/smx && $charset =~ /utf-?8/smix) {
+      binmode STDOUT, q[:utf8];
     }
 
     $viewobject->output_buffer($decorator->header());
@@ -580,7 +586,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$Revision: 367 $
+$Revision: 375 $
 
 =head1 SYNOPSIS
 

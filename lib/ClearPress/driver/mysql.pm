@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2010-04-15 16:05:45 +0100 (Thu, 15 Apr 2010) $
-# Id:            $Id: mysql.pm 363 2010-04-15 15:05:45Z zerojinx $
+# Last Modified: $Date: 2010-06-15 18:22:27 +0100 (Tue, 15 Jun 2010) $
+# Id:            $Id: mysql.pm 375 2010-06-15 17:22:27Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/mysql.pm $
 #
@@ -15,7 +15,7 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 363 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 375 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'bigint unsigned not null auto_increment primary key',
@@ -43,6 +43,21 @@ sub dbh {
 				   AutoCommit => 0,
 				   mysql_enable_utf8 => 1,
 				  });
+
+      # 2010-05-12 post-connect SET NAMES utf8 demonstrated to work a lot better than connect with mysql_enable_utf8 => 1
+      #
+      # Using test data: update run set payload='{"comment":"abc øéü"}' where id_run=2;
+      #
+      # this works on OSX MacPorts MySQL 5.1 but not on CentOS 5.4 MySQL 5.0
+      # perl -MDBI -e 'my $dbh  = DBI->connect("DBI:mysql:host=localhost;dbname=ontrackt", "root", "", {RaiseError=>1});$dbh->do(q[update run set payload=? where id_run=2],{},q[abc øéµ]);print $dbh->selectall_arrayref(q[SELECT payload FROM run WHERE id_run=2])->[0]->[0],"\n";'
+      #
+      # this works on OSX and CentOS:
+      # perl -MDBI -e 'my $dbh  = DBI->connect("DBI:mysql:host=localhost;dbname=ontrackt", "root", "", {RaiseError=>1});$dbh->do(q[SET NAMES utf8]);$dbh->do(q[update run set payload=? where id_run=2],{},q[abc øéµ]);print $dbh->selectall_arrayref(q[SELECT payload FROM run WHERE id_run=2])->[0]->[0],"\n";'
+      #
+      # this works on neither OSX nor CentOS
+      # perl -MDBI -e 'my $dbh  = DBI->connect("DBI:mysql:host=localhost;dbname=ontrackt", "root", "", {RaiseError=>1,mysql_enable_utf8 =>1});$dbh->do(q[update run set payload=? where id_run=2],{},q[abc øéµ]);print $dbh->selectall_arrayref(q[SELECT payload FROM run WHERE id_run=2])->[0]->[0],"\n";'
+
+      $self->{dbh}->do(q[SET NAMES utf8]);
 
     } or do {
       croak qq[Failed to connect to $dsn using @{[$self->{dbuser}||q['']]}\n$EVAL_ERROR];
@@ -97,7 +112,7 @@ ClearPress::driver::mysql - MySQL-specific implementation of the database abstra
 
 =head1 VERSION
 
-$LastChangedRevision: 363 $
+$LastChangedRevision: 375 $
 
 =head1 SYNOPSIS
 
