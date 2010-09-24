@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-06-15 15:20:18 +0100 (Tue, 15 Jun 2010) $
-# Id:            $Id: error.pm 373 2010-06-15 14:20:18Z zerojinx $
+# Last Modified: $Date: 2010-09-24 09:38:52 +0100 (Fri, 24 Sep 2010) $
+# Id:            $Id: error.pm 384 2010-09-24 08:38:52Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
@@ -16,7 +16,7 @@ use Carp;
 
 __PACKAGE__->mk_accessors(qw(errstr));
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 373 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 384 $ =~ /(\d+)/smx; $r; };
 
 sub render {
   my $self   = shift;
@@ -52,7 +52,7 @@ sub render {
   }
 
   my $escaped = $self->tt_filters->{xml_entity}->($errstr);
-  return q(<div id="main"><h2>An Error Occurred</h2>) .  $self->actions() . q(<p>) . $escaped . q(</p></div>);
+  return q(<div id="main"><h2 class="error">An Error Occurred</h2>) .  $self->actions() . q(<p class="error">) . $escaped . q(</p></div>);
 }
 
 1;
@@ -65,7 +65,7 @@ ClearPress::view::error - specialised view for error handling
 
 =head1 VERSION
 
-$LastChangedRevision: 373 $
+$LastChangedRevision: 384 $
 
 =head1 SYNOPSIS
 

@@ -5,11 +5,11 @@ author:
 build_requires:
   CPAN: 1.9205
   Cwd: 3.2701
+  File::Copy: 2.18
+  File::Path: 2.08_01
   File::Spec: 3.2701
   JSON: 2.12
-  Test::Distribution: 0
   Test::More: 0.8
-  Test::Perl::Critic: 0
   Test::Trap: 0
   XML::LibXML: 1.66
   XML::Simple: 2.18
@@ -25,7 +25,7 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 372
+    version: 384
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 349
@@ -40,16 +40,16 @@ provides:
     version: 352
   ClearPress::authenticator::passwd:
     file: lib/ClearPress/authenticator/passwd.pm
-    version: 751
+    version: 348
   ClearPress::authenticator::session:
     file: lib/ClearPress/authenticator/session.pm
-    version: 751
+    version: 348
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
-    version: 375
+    version: 380
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
-    version: 367
+    version: 380
   ClearPress::driver:
     file: lib/ClearPress/driver.pm
     version: 349
@@ -64,16 +64,16 @@ provides:
     version: 375
   ClearPress::model:
     file: lib/ClearPress/model.pm
-    version: 349
+    version: 382
   ClearPress::util:
     file: lib/ClearPress/util.pm
-    version: 355
+    version: 381
   ClearPress::view:
     file: lib/ClearPress/view.pm
     version: 375
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
-    version: 373
+    version: 384
 recommends:
   Crypt::MySQL: 0.04
   DBD::SQLite: 1.14
@@ -106,4 +106,4 @@ requires:
   warnings: 1.05
 resources:
   license: http://dev.perl.org/licenses/
-version: 372
+version: 384

@@ -10,6 +10,8 @@ use t::user::admin;
 use t::user::basic;
 use Test::Trap;
 use Carp;
+use File::Copy qw(copy);
+use File::Path qw(rmtree make_path);
 
 eval {
   require DBD::SQLite;
@@ -328,10 +330,9 @@ my $util = t::util->new();
 				    });
   my $fn  = "/tmp/data$pid/templates/$pid.tt2";
 
-  mkdir "/tmp/data$pid";
-  mkdir "/tmp/data$pid/templates";
+  make_path("/tmp/data$pid/templates") or croak $ERRNO;
 
-  `cp t/data/templates/cache.tt2 $fn`;
+  copy('t/data/templates/cache.tt2', $fn) or croak $ERRNO;
   ok(-f $fn, 'test file copied');
   my $result1 = q[];
   $view->process_template("$pid.tt2", {}, \$result1);
@@ -353,17 +354,20 @@ my $util = t::util->new();
 				    });
   my $fn  = "/tmp/data$pid/templates/$pid.tt2";
 
-  mkdir "/tmp/data$pid";
-  mkdir "/tmp/data$pid/templates";
+  my $err;
+  make_path("/tmp/data$pid/templates",{verbose=>1,error=>\$err});
+  if(scalar @{$err}) {
+    croak "Error in make_path: @{$err}";
+  }
 
-  `cp t/data/templates/actions.tt2 $fn`;
+  copy('t/data/templates/actions.tt2', $fn) or croak "Error in copy: $ERRNO";
   ok(-f $fn, 'test file copied');
   my $result2 = q[];
   $view->process_template("$pid.tt2", {}, \$result2);
 
   like($result2, qr/cached/mx, 'second process used cached template');
 
-  `rm -rf /tmp/data`;
+  rmtree('/tmp/data');
   $util->data_path(q[]);
 }
 

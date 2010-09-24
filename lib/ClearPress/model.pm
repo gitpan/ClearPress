@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2010-01-04 14:37:33 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: model.pm 349 2010-01-04 14:37:33Z zerojinx $
+# Last Modified: $Date: 2010-09-18 12:00:41 +0100 (Sat, 18 Sep 2010) $
+# Id:            $Id: model.pm 382 2010-09-18 11:00:41Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
 #
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 349 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 382 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
@@ -26,6 +26,9 @@ sub fields { return (); }
 sub primary_key {
   my $self = shift;
   return ($self->fields())[0];
+}
+
+sub secondary_key {
 }
 
 sub table {
@@ -44,8 +47,9 @@ sub new {
   my ($class, $ref) = @_;
   $ref ||= {};
 
+  my $pk = $class->primary_key();
+
   if(!ref $ref) {
-    my $pk = $class->primary_key();
     if($pk) {
       $ref = {
 	      $pk => $ref,
@@ -56,6 +60,24 @@ sub new {
   }
 
   bless $ref, $class;
+
+  my $sk   = $ref->secondary_key();
+  if($sk && $ref->{$sk} &&
+     !$ref->{$pk}) {
+
+    my $table = $ref->table;
+    my $util  = $ref->util;
+    my $dbh   = $util->dbh;
+    eval {
+      my $id   = $dbh->selectall_arrayref(qq[/* model::new */ SELECT $pk FROM $table WHERE $sk=?], {}, $ref->{$sk})->[0]->[0];
+      $ref->{$pk} = $id;
+      1;
+
+    } or do {
+      carp $EVAL_ERROR;
+      return;
+    };
+  }
 
   $ref->init($ref);
 
@@ -695,7 +717,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$Revision: 349 $
+$Revision: 382 $
 
 =head1 SYNOPSIS
 
@@ -718,7 +740,11 @@ $Revision: 349 $
 
 =head2 primary_key - usually the first element of fields();
 
-  my $sPrimaryKey = $oModel->fields();
+  my $sPrimaryKey = $oModel->primary_key();
+
+=head2 secondary_key - alternative key, usually a unique, non-numeric name to complement the primary_key
+
+  my $sSecondaryKey = $oModel->secondary_key();
 
 =head2 table - database table name this class represents
 

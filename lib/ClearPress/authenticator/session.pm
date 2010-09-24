@@ -15,7 +15,7 @@ use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 use YAML::Tiny qw(Load Dump);
 
-our $VERSION = do { my ($r) = q$Revision: 751 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 348 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $KEY => q[topsecretkey];
 

@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2010-02-01 23:20:26 +0000 (Mon, 01 Feb 2010) $
+# Last Modified: $Date: 2010-09-18 12:00:16 +0100 (Sat, 18 Sep 2010) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 355 2010-02-01 23:20:26Z zerojinx $
+# Id:            $Id: util.pm 381 2010-09-18 11:00:16Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$Revision: 355 $ =~ /(\d+)/smx; $r; };
+our $VERSION              = do { my ($r) = q$Revision: 381 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
@@ -144,8 +144,8 @@ sub driver {
     my $drivername = $config->val($dbsection, 'driver') || $DEFAULT_DRIVER;
     my $ref        = {};
 
-    for my $field ($config->Parameters($dbsection)) {
-      $ref->{$field} = $config->val($dbsection, $field);
+    for my $field (qw(dbname dbhost dbport dbuser dbpass)) {
+      $ref->{$field} = $self->$field()
     }
 
     $self->{driver} = ClearPress::driver->new_driver($drivername, $ref);
@@ -224,7 +224,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$Revision: 355 $
+$Revision: 381 $
 
 =head1 SYNOPSIS
 

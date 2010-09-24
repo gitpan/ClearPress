@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-06-15 18:22:27 +0100 (Tue, 15 Jun 2010) $
-# Id:            $Id: controller.pm 375 2010-06-15 17:22:27Z zerojinx $
+# Last Modified: $Date: 2010-09-17 15:33:13 +0100 (Fri, 17 Sep 2010) $
+# Id:            $Id: controller.pm 380 2010-09-17 14:33:13Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$Revision: 375 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 380 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -151,6 +151,8 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my ($dummy, $aspect_extra, $id) = $pi =~ m{^/$entity(/(.*))?/([[:lower:]:,\-_[:digit:]%@.+\s]+)}smix;
 
   my ($aspect)      = $pi =~ m{;(\S+)}smx;
+  my $hxrw          = $ENV{HTTP_X_REQUESTED_WITH} || q[];
+  my $xhr           = ($hxrw =~ /XMLHttpRequest/smix);
 
   if($action eq 'read' && !$id && !$aspect) {
     $aspect = 'list';
@@ -159,9 +161,11 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   if($action eq 'create' && $id) {
     if(!$aspect || $aspect =~ /^update/smx) {
       $action = 'update';
+#carp qq[0b: action=$action aspect=$aspect];
 
     } elsif($aspect =~ /^delete/smx) {
       $action = 'delete';
+#carp qq[0c: action=$action aspect=$aspect];
     }
   }
 
@@ -186,8 +190,7 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   # check existence of X-Requested-With (XHR) (jquery, prototype and similar ajax requests)
   # TODO: make process_request_headers more generic and move this into there
   #
-  my $hxrw = $ENV{HTTP_X_REQUESTED_WITH} || q[];
-  if($hxrw =~ /XMLHttpRequest/smix &&
+  if($xhr &&
     $aspect !~ /(?:_ajax|_json|_xml)$/smx) {
     $aspect .= q[_ajax];
   }
@@ -244,10 +247,13 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
     #
 
     my $tmp = $aspect;
+
     if($tmp =~ /_/smx) {
       $tmp =~ s/_/_${id}_/smx;
+
     } else {
       $tmp = "${action}_$id";
+
     }
 
     $tmp =~ s/^read/list/smx;
@@ -301,6 +307,19 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
     }
     $aspect = $action_extended . ($aspect?"_$aspect":q[]);
   }
+
+##carp qq[10a: action=$action aspect=$aspect id=$id];
+#  if($action eq 'create' && $id) {
+#    if(!$aspect || $aspect =~ /^create/smx) {
+#      $action = 'update';
+##      $aspect =~ s/'update';
+##      carp qq[10b: action=$action aspect=$aspect id=$id];
+#
+#    } elsif($aspect =~ /^delete/smx) {
+#      $action = 'delete';
+##carp qq[10c: action=$action aspect=$aspect id=$id];
+#    }
+#  }
 
   #########
   # sanity checks
@@ -405,14 +424,15 @@ sub handler {
   if(!ref $self) {
     $self = $self->new({util => $util});
   }
+
+  my $cgi           = $util->cgi();
   my $decorator     = $self->decorator($util);
   my $namespace     = $self->namespace($util);
-  my $cgi           = $decorator->cgi();
+
   my ($action, $entity, $aspect, $id) = $self->process_request($util);
 
   $util->username($decorator->username());
   $util->session($self->session($util));
-  $util->cgi($cgi);
 
   my $viewobject = $self->dispatch({
 				    util   => $util,
@@ -586,7 +606,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$Revision: 375 $
+$Revision: 380 $
 
 =head1 SYNOPSIS
 

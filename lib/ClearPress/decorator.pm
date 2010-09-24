@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2010-04-16 21:00:31 +0100 (Fri, 16 Apr 2010) $
-# Id:            $Id: decorator.pm 367 2010-04-16 20:00:31Z zerojinx $
+# Last Modified: $Date: 2010-09-17 15:33:13 +0100 (Fri, 17 Sep 2010) $
+# Id:            $Id: decorator.pm 380 2010-09-17 14:33:13Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/decorator.pm $
 #
@@ -13,7 +13,7 @@ use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 367 $ =~ /(\d+)/smx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 380 $ =~ /(\d+)/smx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => '0.1',
@@ -235,7 +235,7 @@ i.e. </body></html> by default
 
 =head2 session - Placeholder for a session hashref
 
-  my $hrSession = $oUtil->session();
+  my $hrSession = $oDecorator->session();
 
  This will not do any session handling until subclassed and overridden for a specific environment/service.
 

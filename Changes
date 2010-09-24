@@ -6,6 +6,16 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+384 - Provides DOM handles for error view's h2 & paragraph.  Without
+      needing to override view::error::render, a useful piece of
+      jQuery might be:
+
+      $('.warnings').detach().insertAfter('#actions').effect('highlight', 3000);
+      $('h2.error').detach().insertAfter('#actions');
+
+380 - Correction to order of initialisation of CGI object (from util, passed to decorator).
+    - Provides model::secondary_key support in model::init, allowing load-by-<secondary-field> for most models.
+
 368 - corrected cleaning of error message to not expose module & line number in responses
 
 363 - Default to serving Content-type header with charset=UTF-8

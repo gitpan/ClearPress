@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
 # Last Modified: $Date: 2009-02-24 10:36:40 +0000 (Tue, 24 Feb 2009) $ $Author: zerojinx $
-# Id:            $Id: ClearPress.pm 318 2009-02-24 10:36:40Z zerojinx $
+# Id:            $Id: ClearPress.pm 384 2009-02-24 10:36:40Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress.pm $
 #
@@ -13,7 +13,7 @@ use ClearPress::view;
 use ClearPress::controller;
 use ClearPress::util;
 
-our $VERSION = do { my ($r) = q$Revision: 372 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 384 $ =~ /(\d+)/smx; $r; };
 
 1;
 __END__
