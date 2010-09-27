@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+387 - Fixed some failing tests
+
 384 - Provides DOM handles for error view's h2 & paragraph.  Without
       needing to override view::error::render, a useful piece of
       jQuery might be:

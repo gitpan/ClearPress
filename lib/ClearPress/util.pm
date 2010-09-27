@@ -2,9 +2,9 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2010-09-18 12:00:16 +0100 (Sat, 18 Sep 2010) $
+# Last Modified: $Date: 2010-09-27 09:38:41 +0100 (Mon, 27 Sep 2010) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 381 2010-09-18 11:00:16Z zerojinx $
+# Id:            $Id: util.pm 388 2010-09-27 08:38:41Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
@@ -18,7 +18,7 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$Revision: 381 $ =~ /(\d+)/smx; $r; };
+our $VERSION              = do { my ($r) = q$Revision: 388 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
@@ -37,7 +37,7 @@ sub new {
   return $self;
 }
 
-sub _new_instance {
+sub _new_instance { ## no critic (ProhibitUnusedPrivateSubroutines)
   my ($class, $ref) = @_;
   $ref ||= {};
 
@@ -121,7 +121,7 @@ sub quote {
   return $self->dbh->quote($str);
 }
 
-sub _accessor {
+sub _accessor { ## no critic (ProhibitUnusedPrivateSubroutines)
   my ($self, $field, $val) = @_;
   carp q[_accessor is deprecated. Use __PACKAGE__->mk_accessors(...) instead];
   if(defined $val) {
@@ -224,7 +224,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$Revision: 381 $
+$Revision: 388 $
 
 =head1 SYNOPSIS
 

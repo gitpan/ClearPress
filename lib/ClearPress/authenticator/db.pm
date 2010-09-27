@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2010-02-02 14:51:00 +0000 (Tue, 02 Feb 2010) $
-# Id:            $Id: db.pm 356 2010-02-02 14:51:00Z zerojinx $
+# Last Modified: $Date: 2010-09-27 09:38:41 +0100 (Mon, 27 Sep 2010) $
+# Id:            $Id: db.pm 388 2010-09-27 08:38:41Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authenticator/db.pm $
 #
@@ -13,19 +13,19 @@ use Readonly;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$Revision: 356 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 388 $ =~ /(\d+)/smx; $r; };
 
 __PACKAGE__->mk_accessors(qw(dbh));
 
 our $SUPPORTED_CIPHERS = {
-			  mysql   => sub { my ($self, $str) = @_; $self->_dyn_use('Crypt::MySQL'); return Crypt::MySQL::password($str); },
-			  mysql41 => sub { my ($self, $str) = @_; $self->_dyn_use('Crypt::MySQL'); return Crypt::MySQL::password41($str); },
-			  sha1    => sub { my ($self, $str) = @_; $self->_dyn_use('Digest::SHA');  return Digest::SHA::sha1_hex($str); },
-			  sha128  => sub { my ($self, $str) = @_; $self->_dyn_use('Digest::SHA');  return Digest::SHA::sha128_hex($str); },
-			  sha256  => sub { my ($self, $str) = @_; $self->_dyn_use('Digest::SHA');  return Digest::SHA::sha256_hex($str); },
-			  sha384  => sub { my ($self, $str) = @_; $self->_dyn_use('Digest::SHA');  return Digest::SHA::sha384_hex($str); },
-			  sha512  => sub { my ($self, $str) = @_; $self->_dyn_use('Digest::SHA');  return Digest::SHA::sha512_hex($str); },
-			  md5     => sub { my ($self, $str) = @_; $self->_dyn_use('Digest::MD5');  return Digest::MD5::md5_hex($str); },
+			  mysql   => sub { my ($self, $str) = @_; $self->dyn_use('Crypt::MySQL'); return Crypt::MySQL::password($str); },
+			  mysql41 => sub { my ($self, $str) = @_; $self->dyn_use('Crypt::MySQL'); return Crypt::MySQL::password41($str); },
+			  sha1    => sub { my ($self, $str) = @_; $self->dyn_use('Digest::SHA');  return Digest::SHA::sha1_hex($str); },
+			  sha128  => sub { my ($self, $str) = @_; $self->dyn_use('Digest::SHA');  return Digest::SHA::sha128_hex($str); },
+			  sha256  => sub { my ($self, $str) = @_; $self->dyn_use('Digest::SHA');  return Digest::SHA::sha256_hex($str); },
+			  sha384  => sub { my ($self, $str) = @_; $self->dyn_use('Digest::SHA');  return Digest::SHA::sha384_hex($str); },
+			  sha512  => sub { my ($self, $str) = @_; $self->dyn_use('Digest::SHA');  return Digest::SHA::sha512_hex($str); },
+			  md5     => sub { my ($self, $str) = @_; $self->dyn_use('Digest::MD5');  return Digest::MD5::md5_hex($str); },
 			 };
 Readonly::Scalar our $DEFAULT_TABLE          => 'user';
 Readonly::Scalar our $DEFAULT_USERNAME_FIELD => 'username';
@@ -128,7 +128,7 @@ ClearPress::authenticator::db
 
 =head1 VERSION
 
-$LastChangedRevision: 356 $
+$LastChangedRevision: 388 $
 
 =head1 SYNOPSIS
 

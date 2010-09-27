@@ -25,16 +25,16 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 384
+    version: 387
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 349
   ClearPress::authenticator:
     file: lib/ClearPress/authenticator.pm
-    version: 352
+    version: 388
   ClearPress::authenticator::db:
     file: lib/ClearPress/authenticator/db.pm
-    version: 356
+    version: 388
   ClearPress::authenticator::ldap:
     file: lib/ClearPress/authenticator/ldap.pm
     version: 352
@@ -67,10 +67,10 @@ provides:
     version: 382
   ClearPress::util:
     file: lib/ClearPress/util.pm
-    version: 381
+    version: 388
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 375
+    version: 388
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
     version: 384
@@ -106,4 +106,4 @@ requires:
   warnings: 1.05
 resources:
   license: http://dev.perl.org/licenses/
-version: 384
+version: 387

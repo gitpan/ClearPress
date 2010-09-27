@@ -1,7 +1,7 @@
 #########
 # Author:        rmp
-# Last Modified: $Date: 2010-01-18 11:26:22 +0000 (Mon, 18 Jan 2010) $
-# Id:            $Id: authenticator.pm 352 2010-01-18 11:26:22Z zerojinx $
+# Last Modified: $Date: 2010-09-27 09:38:41 +0100 (Mon, 27 Sep 2010) $
+# Id:            $Id: authenticator.pm 388 2010-09-27 08:38:41Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authenticator.pm $
 #
@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$Revision: 352 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 388 $ =~ /(\d+)/smx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -25,7 +25,7 @@ sub new {
   return $ref;
 }
 
-sub _dyn_use {
+sub dyn_use {
   my( $self, $classname ) = @_;
   my( $parent_namespace, $module ) = $classname =~ /^(.*?)([^:]+)$/smx ? ($1, $2) : (q[::], $classname);
 
@@ -52,7 +52,7 @@ ClearPress::authenticator
 
 =head1 VERSION
 
-$Revision: 352 $
+$Revision: 388 $
 
 =head1 SYNOPSIS
 
@@ -61,6 +61,10 @@ $Revision: 352 $
 =head1 SUBROUTINES/METHODS
 
 =head2 new
+
+=head2 dyn_use - (subclass helper) dynamic require of modules
+
+  $oAuthen->dyn_use($sPackageName);
 
 =head1 DIAGNOSTICS
 

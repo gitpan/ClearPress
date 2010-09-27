@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-06-15 18:22:27 +0100 (Tue, 15 Jun 2010) $
-# Id:            $Id: view.pm 375 2010-06-15 17:22:27Z zerojinx $
+# Last Modified: $Date: 2010-09-27 09:38:41 +0100 (Mon, 27 Sep 2010) $
+# Id:            $Id: view.pm 388 2010-09-27 08:38:41Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -21,7 +21,7 @@ use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 use utf8;
 
-our $VERSION        = do { my ($r) = q$Revision: 375 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 388 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -74,7 +74,7 @@ sub warnings {
   return $self->{warnings};
 }
 
-sub _accessor {
+sub _accessor { ## no critic (ProhibitUnusedPrivateSubroutines)
   my ($self, $field, $val) = @_;
   carp q[_accessor is deprecated. Use __PACKAGE__->mk_accessors(...) instead];
   if(defined $val) {
@@ -687,7 +687,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 375 $
+$Revision: 388 $
 
 =head1 SYNOPSIS
 

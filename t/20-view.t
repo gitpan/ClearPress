@@ -122,8 +122,8 @@ my $util = t::util->new();
   my $view = ClearPress::view->new({
 				    util => $util,
 				   });
-
-  my $io     = IO::Scalar->new();
+  my $str    = q[];
+  my $io     = IO::Scalar->new(\$str);
   my $stdout = select $io;
 
   $view->output_buffer("Content-type: text/html\n\n");
@@ -134,7 +134,7 @@ my $util = t::util->new();
 
   select $stdout;
 
-  is($io, "Content-type: text/plain\n\n", 'output buffer ok without debugging');
+  is($str, "Content-type: text/plain\n\n", 'output buffer ok without debugging');
 }
 
 {
@@ -144,7 +144,8 @@ my $util = t::util->new();
 
   $ClearPress::view::DEBUG_OUTPUT = 1;
 
-  my $io     = IO::Scalar->new();
+  my $str    = q[];
+  my $io     = IO::Scalar->new(\$str);
   my $stdout = select $io;
 
   trap {
@@ -157,7 +158,7 @@ my $util = t::util->new();
   like($trap->stderr, qr/output_/mx, 'output buffer debugging');
   select $stdout;
 
-  is($io, "Content-type: text/plain\n\n", 'output buffer ok with debugging');
+  is($str, "Content-type: text/plain\n\n", 'output buffer ok with debugging');
 }
 
 {

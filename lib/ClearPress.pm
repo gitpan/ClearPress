@@ -13,7 +13,7 @@ use ClearPress::view;
 use ClearPress::controller;
 use ClearPress::util;
 
-our $VERSION = do { my ($r) = q$Revision: 384 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 387 $ =~ /(\d+)/smx; $r; };
 
 1;
 __END__
@@ -24,7 +24,7 @@ ClearPress - Simple, fresh & fruity MVC framework - http://clearpress.net/
 
 =head1 VERSION
 
-$Revision: 318 $
+$Revision: 387 $
 
 =head1 SYNOPSIS
 
