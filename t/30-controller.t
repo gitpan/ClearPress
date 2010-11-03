@@ -7,7 +7,7 @@ use Test::Trap;
 
 eval {
   require DBD::SQLite;
-  plan tests => 51;
+  plan tests => 67;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -34,6 +34,26 @@ my $T = [
 	 ['GET', '/thing;add',                 '', {}, 'read',   'thing', 'add',      0],
 	 ['GET', '/thing;add_xml',             '', {}, 'read',   'thing', 'add_xml',  0],
 	 ['GET', '/thing.xml;add',             '', {}, 'read',   'thing', 'add_xml',  0],
+
+	 ['GET', '/thing/1;edit',              '', {}, 'read',   'thing', 'edit',     1],
+	 ['GET', '/thing/edit/1',              '', {}, 'read',   'thing', 'edit',     1],
+
+	 ['GET', '/thing/edit/1.ajax',         '', {}, 'read',   'thing', 'edit_ajax', 1],
+	 ['GET', '/thing/edit_ajax/1',         '', {}, 'read',   'thing', 'edit_ajax', 1],
+
+	 ['GET', '/thing/edit_batch/1',        '', {}, 'read',   'thing', 'edit_batch', 1],
+	 ['GET', '/thing/edit_batch/1.ajax',   '', {}, 'read',   'thing', 'edit_batch_ajax', 1],
+	 ['GET', '/thing/edit_batch_ajax/1',   '', {}, 'read',   'thing', 'edit_batch_ajax', 1],
+	 ['GET', '/thing/1.ajax;edit_batch',   '', {}, 'read',   'thing', 'edit_batch_ajax', 1],
+	 ['GET', '/thing/1;edit_batch_ajax',   '', {}, 'read',   'thing', 'edit_batch_ajax', 1],
+
+	 ['POST', '/thing/batch/1',             '', {}, 'update', 'thing', 'update_batch', 1],
+	 ['POST', '/thing/batch/1.ajax',        '', {}, 'update', 'thing', 'update_batch_ajax', 1],
+	 ['POST', '/thing/update_batch/1',      '', {}, 'update', 'thing', 'update_batch', 1],
+	 ['POST', '/thing/batch/1.ajax',        '', {}, 'update', 'thing', 'update_batch_ajax', 1],
+	 ['POST', '/thing/1.ajax;update_batch', '', {}, 'update', 'thing', 'update_batch_ajax', 1],
+	 ['POST', '/thing/1;update_batch_ajax', '', {}, 'update', 'thing', 'update_batch_ajax', 1],
+
 	 ['GET', '/thing/released/cluster.xml', '', {}, 'read', 'thing', 'read_released_xml', 'cluster'],
 
 	 ['GET', '/user/me@example.com;edit',  '', {}, 'read',   'user',   'edit', 'me@example.com'],
@@ -49,6 +69,7 @@ my $T = [
 	 ['POST', '/thing/10',                 '', {}, 'update', 'thing', 'update', 10],
 	 ['POST', '/thing/10.xml',             '', {}, 'update', 'thing', 'update_xml', 10],
 	 ['POST', '/thing/10;update_xml',      '', {}, 'update', 'thing', 'update_xml', 10],
+	 ['POST', '/thing/update/10.xml',      '', {}, 'update', 'thing', 'update_xml', 10],
 	 ['POST', '/thing10/heatmap.png',      '', {}, 'create', 'thing10', 'create_heatmap_png', 0],
 
 	 ['POST', '/thing6/batch.xml',         '', {}, 'create', 'thing6', 'create_batch_xml', 0],

@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-09-17 15:33:13 +0100 (Fri, 17 Sep 2010) $
-# Id:            $Id: controller.pm 380 2010-09-17 14:33:13Z zerojinx $
+# Last Modified: $Date: 2010-11-03 15:10:29 +0000 (Wed, 03 Nov 2010) $
+# Id:            $Id: controller.pm 389 2010-11-03 15:10:29Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$Revision: 380 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 389 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -296,8 +296,22 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   }
 
   #########
-  # fix up action
+  # fix up aspect
   #
+  my ($firstpart) = $aspect =~ /^${action}_([^_]+)_?/smx;
+  if($firstpart) {
+    my $restpart = $REST->{$firstpart};
+    if($restpart) {
+      ($restpart) = $restpart =~ /^([^|]+)/smx;
+      if($restpart) {
+	my ($crudpart) = $CRUD->{$restpart};
+	if($crudpart) {
+	  $aspect =~ s/^${crudpart}_//smx;
+	}
+      }
+    }
+  }
+
   if($aspect !~ /^(?:create|read|update|delete|add|list|edit)/smx) {
     my $action_extended = $action;
     if(!$id) {
@@ -307,19 +321,6 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
     }
     $aspect = $action_extended . ($aspect?"_$aspect":q[]);
   }
-
-##carp qq[10a: action=$action aspect=$aspect id=$id];
-#  if($action eq 'create' && $id) {
-#    if(!$aspect || $aspect =~ /^create/smx) {
-#      $action = 'update';
-##      $aspect =~ s/'update';
-##      carp qq[10b: action=$action aspect=$aspect id=$id];
-#
-#    } elsif($aspect =~ /^delete/smx) {
-#      $action = 'delete';
-##carp qq[10c: action=$action aspect=$aspect id=$id];
-#    }
-#  }
 
   #########
   # sanity checks
@@ -606,7 +607,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$Revision: 380 $
+$Revision: 389 $
 
 =head1 SYNOPSIS
 

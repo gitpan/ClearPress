@@ -6,6 +6,9 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+392 - /thing/edit/10.xml => 'thing_edit_xml' rather than 'thing_read_edit_xml'
+    - Tests for ldap authenticator
+
 387 - Fixed some failing tests
 
 384 - Provides DOM handles for error view's h2 & paragraph.  Without
