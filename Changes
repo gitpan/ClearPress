@@ -6,6 +6,10 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+394 - Downgraded requirements for File::Copy & File::Path - RT#62701
+
+393 - Removed empty 'data' dir
+
 392 - /thing/edit/10.xml => 'thing_edit_xml' rather than 'thing_read_edit_xml'
     - Tests for ldap authenticator
 

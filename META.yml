@@ -5,8 +5,8 @@ author:
 build_requires:
   CPAN: 1.9205
   Cwd: 3.2701
-  File::Copy: 2.18
-  File::Path: 2.08_01
+  File::Copy: 2.13
+  File::Path: 2.07_02
   File::Spec: 3.2701
   JSON: 2.12
   Test::More: 0.8
@@ -25,7 +25,7 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 393
+    version: 394
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 349
@@ -106,4 +106,4 @@ requires:
   warnings: 1.05
 resources:
   license: http://dev.perl.org/licenses/
-version: 393
+version: 394
