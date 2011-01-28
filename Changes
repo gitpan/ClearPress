@@ -6,6 +6,9 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+398 - gen_getall orders by secondary_key if specified - much more useful than id_x
+    - tweaks to handling for javascript blocks passed to decorator - may take comas
+
 394 - Downgraded requirements for File::Copy & File::Path - RT#62701
 
 393 - Removed empty 'data' dir

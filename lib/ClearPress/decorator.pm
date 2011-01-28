@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2010-09-17 15:33:13 +0100 (Fri, 17 Sep 2010) $
-# Id:            $Id: decorator.pm 380 2010-09-17 14:33:13Z zerojinx $
+# Last Modified: $Date: 2011-01-28 14:14:01 +0000 (Fri, 28 Jan 2011) $
+# Id:            $Id: decorator.pm 399 2011-01-28 14:14:01Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/decorator.pm $
 #
@@ -12,8 +12,9 @@ use strict;
 use warnings;
 use CGI qw(param);
 use base qw(Class::Accessor);
+use Readonly;
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 380 $ =~ /(\d+)/smx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 399 $ =~ /(\d+)/smx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => '0.1',
@@ -24,12 +25,14 @@ our $DEFAULTS = {
 		 'charset'           => q[iso8859-1],
 		};
 
+Readonly::Scalar our $PROCESS_COMMA_YES => 1;
+Readonly::Scalar our $PROCESS_COMMA_NO  => 2;
 our $ARRAY_FIELDS = {
-		     'jsfile'     => 1,
-		     'rss'        => 1,
-		     'atom'       => 1,
-		     'stylesheet' => 1,
-		     'script'     => 1,
+		     'jsfile'     => $PROCESS_COMMA_YES,
+		     'rss'        => $PROCESS_COMMA_YES,
+		     'atom'       => $PROCESS_COMMA_YES,
+		     'stylesheet' => $PROCESS_COMMA_YES,
+		     'script'     => $PROCESS_COMMA_NO,
 		    };
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 
@@ -48,7 +51,13 @@ sub get {
     if(!ref $val) {
       $val = [$val];
     }
-    return [map { split /,/smx, $_ } @{$val}];
+
+    if($ARRAY_FIELDS->{$field} == $PROCESS_COMMA_YES) {
+      return [map { split /,/smx, $_ } @{$val}];
+    } else {
+      return $val;
+    }
+
 
   } else {
     return $self->{$field} || $DEFAULTS->{$field};

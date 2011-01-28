@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2010-09-18 12:00:41 +0100 (Sat, 18 Sep 2010) $
-# Id:            $Id: model.pm 382 2010-09-18 11:00:41Z zerojinx $
+# Last Modified: $Date: 2010-12-01 11:49:57 +0000 (Wed, 01 Dec 2010) $
+# Id:            $Id: model.pm 398 2010-12-01 11:49:57Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
 #
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 382 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 398 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
@@ -197,9 +197,14 @@ sub gen_getall {
   }
 
   if(!$self->{$cachekey}) {
-    my $query = qq(SELECT   @{[join q(, ), $class->fields()]}
+    my $sortk = $self->secondary_key;
+    if(!$sortk) {
+      $sortk = $self->primary_key;
+    }
+    my $query = qq[/* model::gen_getall */
+                   SELECT   @{[join q(, ), $class->fields()]}
                    FROM     @{[$class->table()]}
-                   ORDER BY @{[$class->primary_key()]});
+                   ORDER BY $sortk];
     $self->{$cachekey} = $self->gen_getarray($class, $query);
   }
 
@@ -217,10 +222,11 @@ sub gen_getfriends {
 
   if(!$self->{$cachekey}) {
     my $link  = $self->primary_key();
-    my $query = qq(SELECT   @{[join q(, ), $class->fields()]}
+    my $query = qq[/* model::gen_getfriends */
+                   SELECT   @{[join q(, ), $class->fields()]}
                    FROM     @{[$class->table()]}
                    WHERE    $link=?
-                   ORDER BY $link);
+                   ORDER BY $link];
     $self->{$cachekey} = $self->gen_getarray($class, $query, $self->$link());
   }
 
@@ -241,13 +247,14 @@ sub gen_getfriends_through {
     $through_pkg     .= $through;
     my $through_key   = $self->primary_key();
     my $friend_key    = $class->primary_key();
-    my $query = qq(SELECT @{[join q(, ),
+    my $query = qq[/* model::gen_getfriends_through */
+                   SELECT @{[join q(, ),
                                   (map { "f.$_" } $class->fields()),
                                   (map { "t.$_" } $through_pkg->fields())]}
                    FROM   @{[$class->table()]} f,
                           $through             t
                    WHERE  t.$through_key = ?
-                   AND    t.$friend_key  = f.$friend_key);
+                   AND    t.$friend_key  = f.$friend_key];
     $self->{$cachekey} = $self->gen_getarray($class, $query, $self->$through_key());
   }
 
@@ -279,11 +286,12 @@ sub gen_getobj_through {
     #       - but $through class may not always be implemented
     my $through_key = q(id_).$through;
     my $friend_key  = $class->primary_key();
-    my $query = qq(SELECT @{[join q(, ), map { "f.$_" } $class->fields()]}
+    my $query = qq[/* model::gen_getobj_through */
+                   SELECT @{[join q(, ), map { "f.$_" } $class->fields()]}
                    FROM   @{[$class->table()]} f,
                           $through            t
                    WHERE  t.$through_key = ?
-                   AND    t.$friend_key  = f.$friend_key); # there should only ever be one of these
+                   AND    t.$friend_key  = f.$friend_key]; # there should only ever be one of these
     $self->{$cachekey} = $self->gen_getarray($class, $query, $self->$through_key())->[0];
   }
 
@@ -560,9 +568,10 @@ sub read { ## no critic (homonym)
 
   if(!$self->{_loaded}) {
     if(!$query) {
-      $query = qq(SELECT @{[join q(, ), $self->fields()]}
+      $query = qq[/* model::read */
+                  SELECT @{[join q(, ), $self->fields()]}
                   FROM   $table
-                  WHERE  $pk=?);
+                  WHERE  $pk=?];
       @args = ($self->{$pk});
     }
 
@@ -623,10 +632,10 @@ sub update {
                    SET    @{[join q(, ),
                                   map  { qq[$_ = ?] }
                                   @fields]}
-                   WHERE  $pk=@{[$self->$pk()]});
+                   WHERE  $pk=?);
 
   eval {
-    $dbh->do($query, {}, map { $self->$_() } @fields);
+    $dbh->do($query, {}, (map { $self->$_() } @fields), $self->$pk);
 
   } or do {
     $tr_state and $dbh->rollback();
@@ -717,7 +726,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$Revision: 382 $
+$Revision: 398 $
 
 =head1 SYNOPSIS
 

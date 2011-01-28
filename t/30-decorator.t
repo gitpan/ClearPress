@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 23;
 use English qw(-no_match_vars);
 
 use_ok('ClearPress::decorator');
@@ -49,6 +49,13 @@ use_ok('ClearPress::decorator');
   is_deeply($dec->jsfile(), [qw(foo.js bar.js)], 'returns given array for jsfile()');
 }
 
+{
+  my $dec = ClearPress::decorator->new({
+					script => q[foo.init({mode:"textareas",theme:"simple"});],
+				       });
+
+  is_deeply($dec->script(), [qw(foo.init({mode:"textareas",theme:"simple"});)], 'returns given array for jsfile()');
+}
 
 {
   $ClearPress::decorator::DEFAULTS->{meta_version} = 123;
