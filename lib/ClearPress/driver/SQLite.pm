@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2009-02-24 18:15:24 +0000 (Tue, 24 Feb 2009) $
-# Id:            $Id: SQLite.pm 320 2009-02-24 18:15:24Z zerojinx $
+# Last Modified: $Date: 2011-04-26 19:41:39 +0100 (Tue, 26 Apr 2011) $
+# Id:            $Id: SQLite.pm 403 2011-04-26 18:41:39Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/SQLite.pm $
 #
@@ -15,7 +15,7 @@ use Carp;
 use English qw(-no_match_vars);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 320 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 403 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'integer primary key autoincrement',
@@ -63,6 +63,18 @@ sub types {
   return $TYPES;
 }
 
+sub bounded_select {
+  my ($self, $query, $len, $start) = @_;
+
+  if(defined $start && defined $len) {
+    $query .= qq[ LIMIT $start, $len];
+  } elsif(defined $len) {
+    $query .= qq[ LIMIT $len];
+  }
+
+  return $query;
+}
+
 1;
 __END__
 
@@ -72,7 +84,7 @@ ClearPress::driver::SQLite - SQLite-specific implementation of the database abst
 
 =head1 VERSION
 
-$LastChangedRevision: 320 $
+$LastChangedRevision: 403 $
 
 =head1 SYNOPSIS
 

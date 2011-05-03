@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+402 - implemented bounded_select two-arg LIMIT in driver::SQLite
+
 398 - gen_getall orders by secondary_key if specified - much more useful than id_x
     - tweaks to handling for javascript blocks passed to decorator - may take comas
 

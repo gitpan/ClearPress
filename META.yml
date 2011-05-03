@@ -25,7 +25,7 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 398
+    version: 402
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 349
@@ -58,7 +58,7 @@ provides:
     version: 348
   ClearPress::driver::SQLite:
     file: lib/ClearPress/driver/SQLite.pm
-    version: 320
+    version: 403
   ClearPress::driver::mysql:
     file: lib/ClearPress/driver/mysql.pm
     version: 375
@@ -106,4 +106,4 @@ requires:
   warnings: 1.05
 resources:
   license: http://dev.perl.org/licenses/
-version: 398
+version: 402
