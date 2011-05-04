@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+405 - build_error_object falls back to ClearPress::view::error if ${ns}::view::error is not present
+
 402 - implemented bounded_select two-arg LIMIT in driver::SQLite
 
 398 - gen_getall orders by secondary_key if specified - much more useful than id_x

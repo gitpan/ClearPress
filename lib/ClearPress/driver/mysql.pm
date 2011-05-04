@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2010-06-15 18:22:27 +0100 (Tue, 15 Jun 2010) $
-# Id:            $Id: mysql.pm 375 2010-06-15 17:22:27Z zerojinx $
+# Last Modified: $Date: 2011-05-04 10:57:27 +0100 (Wed, 04 May 2011) $
+# Id:            $Id: mysql.pm 405 2011-05-04 09:57:27Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/mysql.pm $
 #
@@ -15,7 +15,7 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 375 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 405 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'bigint unsigned not null auto_increment primary key',
@@ -112,7 +112,7 @@ ClearPress::driver::mysql - MySQL-specific implementation of the database abstra
 
 =head1 VERSION
 
-$LastChangedRevision: 375 $
+$LastChangedRevision: 405 $
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,7 @@ $LastChangedRevision: 375 $
 
 =head2 types - the whole type map
 
-=head2 bounded_select - stub for select limited by number of rows and first-row position
+=head2 bounded_select - select limited by number of rows and first-row position
 
   my $bounded_select = $driver->bounded_select($unbounded_select, $rows, $start_row);
 

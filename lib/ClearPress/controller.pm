@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-11-03 15:10:29 +0000 (Wed, 03 Nov 2010) $
-# Id:            $Id: controller.pm 389 2010-11-03 15:10:29Z zerojinx $
+# Last Modified: $Date: 2011-05-04 10:57:27 +0100 (Wed, 04 May 2011) $
+# Id:            $Id: controller.pm 405 2011-05-04 09:57:27Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$Revision: 389 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 405 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -582,7 +582,8 @@ sub dispatch {
     1;
 
   } or do {
-    $viewobject = $self->build_error_object('ClearPress::view::error', $action, $aspect, $EVAL_ERROR);
+    my $namespace = $self->namespace($util);
+    $viewobject   = $self->build_error_object("${namespace}::view::error", $action, $aspect, $EVAL_ERROR);
   };
 
   return $viewobject;
@@ -590,12 +591,20 @@ sub dispatch {
 
 sub build_error_object {
   my ($self, $error_pkg, $action, $aspect, $eval_error) = @_;
-  return ($error_pkg->new({
-			   util   => $self->util(),
-			   errstr => $eval_error,
-			   aspect => $aspect,
-			   action => $action,
-			  }));
+  my $obj;
+  my $ref = {
+	     util   => $self->util(),
+	     errstr => $eval_error,
+	     aspect => $aspect,
+	     action => $action,
+	    };
+  eval {
+    $obj = $error_pkg->new($ref);
+  } or do {
+    $obj = ClearPress::view::error->new($ref);
+  };
+
+  return $obj;
 }
 
 1;
@@ -607,7 +616,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$Revision: 389 $
+$Revision: 405 $
 
 =head1 SYNOPSIS
 

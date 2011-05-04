@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2011-04-26 19:41:39 +0100 (Tue, 26 Apr 2011) $
-# Id:            $Id: SQLite.pm 403 2011-04-26 18:41:39Z zerojinx $
+# Last Modified: $Date: 2011-05-04 10:57:27 +0100 (Wed, 04 May 2011) $
+# Id:            $Id: SQLite.pm 405 2011-05-04 09:57:27Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/SQLite.pm $
 #
@@ -15,7 +15,7 @@ use Carp;
 use English qw(-no_match_vars);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 403 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 405 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'integer primary key autoincrement',
@@ -84,7 +84,7 @@ ClearPress::driver::SQLite - SQLite-specific implementation of the database abst
 
 =head1 VERSION
 
-$LastChangedRevision: 403 $
+$LastChangedRevision: 405 $
 
 =head1 SYNOPSIS
 
@@ -101,6 +101,10 @@ $LastChangedRevision: 403 $
 =head2 drop_table
 
 =head2 types - the whole type map
+
+=head2 bounded_select - select limited by number of rows and first-row position
+
+  my $bounded_select = $driver->bounded_select($unbounded_select, $rows, $start_row);
 
 =head1 DIAGNOSTICS
 
