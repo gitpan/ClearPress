@@ -5,7 +5,7 @@ setup:	manifest
 	perl Build.PL
 
 manifest: bin cgi-bin examples lib t Build.PL Makefile
-	find . -type f | grep -vE 'DS_Store|git|_build|META.yml|Build|cover_db|svn|blib|\~|\.old|CVS|build.tap|tap.harness' | sed 's/^\.\///' | sort > MANIFEST
+	find . -type f | grep -vE 'DS_Store|git|_build|META|Build|cover_db|svn|blib|\~|\.old|CVS|build.tap|tap.harness' | sed 's/^\.\///' | sort > MANIFEST
 	[ -f Build.PL ] && echo "Build.PL" >> MANIFEST
 
 clean:	setup

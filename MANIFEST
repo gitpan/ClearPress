@@ -117,3 +117,4 @@ t/view/derived.pm
 t/view/error.pm
 Build.PL
 META.yml
+META.json

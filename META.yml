@@ -15,8 +15,9 @@ build_requires:
   XML::Simple: 2.18
   XML::TreeBuilder: 3.09
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3603'
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +26,7 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 405
+    version: 408
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 349
@@ -70,7 +71,7 @@ provides:
     version: 388
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 388
+    version: 408
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
     version: 384
@@ -106,4 +107,4 @@ requires:
   warnings: 1.05
 resources:
   license: http://dev.perl.org/licenses/
-version: 405
+version: 408

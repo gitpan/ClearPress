@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-09-27 09:38:41 +0100 (Mon, 27 Sep 2010) $
-# Id:            $Id: view.pm 388 2010-09-27 08:38:41Z zerojinx $
+# Last Modified: $Date: 2011-07-13 18:16:57 +0100 (Wed, 13 Jul 2011) $
+# Id:            $Id: view.pm 408 2011-07-13 17:16:57Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -21,7 +21,7 @@ use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 use utf8;
 
-our $VERSION        = do { my ($r) = q$Revision: 388 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 408 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -240,12 +240,7 @@ sub render {
   #########
   # handle block (non-streamed) methods
   #
-  my $tmpl = $self->template_name();
-
-  for my $copy (qw(logged_in)) {
-    $model->{$copy} ||= $self->{$copy};
-  }
-
+  my $tmpl    = $self->template_name();
   my $cfg     = $util->config();
   my $content = q[];
 
@@ -687,7 +682,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 388 $
+$Revision: 408 $
 
 =head1 SYNOPSIS
 

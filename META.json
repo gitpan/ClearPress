@@ -1,0 +1,149 @@
+{
+   "abstract" : "ClearPress - Simple, fresh & fruity MVC framework",
+   "author" : [
+      "Roger M Pettett <rpettett@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ClearPress",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CPAN" : "1.9205",
+            "Cwd" : "3.2701",
+            "File::Copy" : "2.13",
+            "File::Path" : "2.07_02",
+            "File::Spec" : "3.2701",
+            "JSON" : "2.12",
+            "Test::More" : "0.8",
+            "Test::Trap" : 0,
+            "XML::LibXML" : "1.66",
+            "XML::Simple" : "2.18",
+            "XML::TreeBuilder" : "3.09"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Crypt::MySQL" : "0.04",
+            "DBD::SQLite" : "1.14",
+            "DBD::mysql" : "4.007",
+            "Digest::MD5" : "2.39",
+            "Digest::SHA" : "5.47",
+            "Net::LDAP" : "0.39"
+         },
+         "requires" : {
+            "CGI" : "3.20",
+            "Carp" : "1.02",
+            "Class::Accessor" : "0.31",
+            "Class::Singleton" : "1.4",
+            "Config::IniFiles" : "2.38",
+            "Crypt::Blowfish" : "2.10",
+            "Crypt::CBC" : "2.30",
+            "DBI" : "1.51",
+            "English" : "1.01",
+            "HTML::Entities" : "1.35",
+            "IO::Scalar" : "2.110",
+            "Lingua::EN::Inflect" : "1.89",
+            "MIME::Base64" : "3.07",
+            "POSIX" : "1.09",
+            "Readonly" : "1.03",
+            "Template" : "2.19",
+            "Template::Filters" : "2.86",
+            "XML::Simple" : "2.18",
+            "YAML::Tiny" : "1.36",
+            "base" : "2.13",
+            "strict" : "1.03",
+            "warnings" : "1.05"
+         }
+      }
+   },
+   "provides" : {
+      "ClearPress" : {
+         "file" : "lib/ClearPress.pm",
+         "version" : "408"
+      },
+      "ClearPress::authdecor" : {
+         "file" : "lib/ClearPress/authdecor.pm",
+         "version" : "349"
+      },
+      "ClearPress::authenticator" : {
+         "file" : "lib/ClearPress/authenticator.pm",
+         "version" : "388"
+      },
+      "ClearPress::authenticator::db" : {
+         "file" : "lib/ClearPress/authenticator/db.pm",
+         "version" : "388"
+      },
+      "ClearPress::authenticator::ldap" : {
+         "file" : "lib/ClearPress/authenticator/ldap.pm",
+         "version" : "390"
+      },
+      "ClearPress::authenticator::passwd" : {
+         "file" : "lib/ClearPress/authenticator/passwd.pm",
+         "version" : "348"
+      },
+      "ClearPress::authenticator::session" : {
+         "file" : "lib/ClearPress/authenticator/session.pm",
+         "version" : "348"
+      },
+      "ClearPress::controller" : {
+         "file" : "lib/ClearPress/controller.pm",
+         "version" : "405"
+      },
+      "ClearPress::decorator" : {
+         "file" : "lib/ClearPress/decorator.pm",
+         "version" : "399"
+      },
+      "ClearPress::driver" : {
+         "file" : "lib/ClearPress/driver.pm",
+         "version" : "349"
+      },
+      "ClearPress::driver::Pg" : {
+         "file" : "lib/ClearPress/driver/Pg.pm",
+         "version" : "348"
+      },
+      "ClearPress::driver::SQLite" : {
+         "file" : "lib/ClearPress/driver/SQLite.pm",
+         "version" : "405"
+      },
+      "ClearPress::driver::mysql" : {
+         "file" : "lib/ClearPress/driver/mysql.pm",
+         "version" : "405"
+      },
+      "ClearPress::model" : {
+         "file" : "lib/ClearPress/model.pm",
+         "version" : "398"
+      },
+      "ClearPress::util" : {
+         "file" : "lib/ClearPress/util.pm",
+         "version" : "388"
+      },
+      "ClearPress::view" : {
+         "file" : "lib/ClearPress/view.pm",
+         "version" : "408"
+      },
+      "ClearPress::view::error" : {
+         "file" : "lib/ClearPress/view/error.pm",
+         "version" : "384"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "408"
+}

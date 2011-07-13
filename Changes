@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+407 - Removed 'model.logged_in' data poking. Use view.logged_in in templates if you need to
+
 405 - build_error_object falls back to ClearPress::view::error if ${ns}::view::error is not present
 
 402 - implemented bounded_select two-arg LIMIT in driver::SQLite
