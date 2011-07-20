@@ -2,8 +2,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2011-05-04 10:57:27 +0100 (Wed, 04 May 2011) $
-# Id:            $Id: controller.pm 405 2011-05-04 09:57:27Z zerojinx $
+# Last Modified: $Date: 2011-07-19 12:56:14 +0100 (Tue, 19 Jul 2011) $
+# Id:            $Id: controller.pm 410 2011-07-19 11:56:14Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,7 +26,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$Revision: 405 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 410 $ =~ /(\d+)/smx; $r; };
 our $DEBUG   = 0;
 our $CRUD    = {
 		POST   => 'create',
@@ -541,6 +541,18 @@ sub namespace {
   return $ns;
 }
 
+sub is_valid_view {
+  my ($self, $ref, $viewname) = @_;
+  my $util     = $ref->{util};
+  my @entities = split /[,\s]+/smx, $util->config->val('application','views');
+
+  if(!scalar grep { $_ eq $viewname } @entities) {
+    return;
+  }
+
+  return 1;
+}
+
 sub dispatch {
   my ($self, $ref) = @_;
   my $util      = $ref->{util};
@@ -551,13 +563,12 @@ sub dispatch {
   my $viewobject;
 
   eval {
-    my @entities = split /[,\s]+/smx, $util->config->val('application','views');
-    if(!scalar grep { $_ eq $entity } @entities) {
+    my $state = $self->is_valid_view($ref, $entity);
+    if(!$state) {
       croak qq(No such view ($entity). Is it in your config.ini?);
     }
 
     my $entity_name = $entity;
-
     my $modelclass  = $self->packagespace('model', $entity, $util);
     my $viewclass   = $self->packagespace('view',  $entity, $util);
 
@@ -616,7 +627,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$Revision: 405 $
+$Revision: 410 $
 
 =head1 SYNOPSIS
 
@@ -681,6 +692,8 @@ $Revision: 405 $
   my $pNS = app::controller->packagespace('view',  'entity_type', $oUtil);
 
 =head2 dispatch - view generation
+
+=head2 is_valid_view - view-name validation
 
 =head2 build_error_object - builds an error view object
 
