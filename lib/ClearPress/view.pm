@@ -1,9 +1,11 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2011-07-13 18:16:57 +0100 (Wed, 13 Jul 2011) $
-# Id:            $Id: view.pm 408 2011-07-13 17:16:57Z zerojinx $
+# Last Modified: $Date: 2011-10-28 17:18:11 +0100 (Fri, 28 Oct 2011) $
+# Id:            $Id: view.pm 416 2011-10-28 16:18:11Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -21,7 +23,7 @@ use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 use utf8;
 
-our $VERSION        = do { my ($r) = q$Revision: 408 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 416 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -549,7 +551,7 @@ sub output_flush {
     #########
     # client stopped receiving (e.g. disconnect from lengthy streamed response)
     #
-    carp $EVAL_ERROR;
+    carp qq[Error flushing output_buffer: $EVAL_ERROR];
   };
 
   $self->output_reset();
@@ -682,7 +684,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 408 $
+$Revision: 416 $
 
 =head1 SYNOPSIS
 

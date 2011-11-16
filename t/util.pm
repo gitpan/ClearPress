@@ -1,3 +1,5 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 package t::util;
 use strict;
 use warnings;
@@ -8,7 +10,7 @@ use XML::Simple qw(XMLin);
 use JSON;
 use English qw(-no_match_vars);
 
-our @EXPORT_OK = qw(is_rendered_xml is_rendered_js);
+our @EXPORT_OK = qw(is_rendered_js);
 
 $ENV{dev} = q[test];
 
@@ -111,36 +113,6 @@ sub DESTROY {
     unlink 'test.db';
   }
   return 1;
-}
-
-sub is_rendered_xml {
-  my ($str, $fn, @args) = @_;
-  my ($received, $expected);
-
-  if($str =~ /Content-type/smix) {
-    #########
-    # Response headers have no place in a xml parser
-    #
-    $str =~ s/.*?\n\n//smx;
-  }
-
-  eval {
-    $received = XMLin($str);
-  } or do {
-    croak qq[Failed to parse received XML:\n].$str;
-  };
-
-  eval {
-    $expected = XMLin("t/data/rendered/$fn");
-  } or do {
-    croak q[Failed to parse expected XML];
-  };
-
-  my $result = Test::More::is_deeply($received, $expected, @args);
-  if(!$result) {
-    carp $str;
-  }
-  return $result;
 }
 
 sub is_rendered_js {

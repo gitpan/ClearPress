@@ -1,9 +1,11 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2011-07-19 12:56:14 +0100 (Tue, 19 Jul 2011) $
-# Id:            $Id: controller.pm 410 2011-07-19 11:56:14Z zerojinx $
+# Last Modified: $Date: 2011-10-11 16:22:56 +0100 (Tue, 11 Oct 2011) $
+# Id:            $Id: controller.pm 415 2011-10-11 15:22:56Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -26,8 +28,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$Revision: 410 $ =~ /(\d+)/smx; $r; };
-our $DEBUG   = 0;
+our $VERSION = do { my ($r) = q$Revision: 415 $ =~ /(\d+)/smx; $r; };
 our $CRUD    = {
 		POST   => 'create',
 		GET    => 'read',
@@ -54,9 +55,9 @@ sub accept_extensions {
 	  {'.js'   => q[_json]},
 	  {'.json' => q[_json]},
 	  {'.ical' => q[_ical]},
-	  {'.ajax' => q[_ajax]},
 	  {'.txt'  => q[_txt]},
 	  {'.xls'  => q[_xls]},
+	  {'.ajax' => q[_ajax]},
 	 ];
 }
 
@@ -106,12 +107,6 @@ sub util {
   return $self->{util};
 }
 
-sub process_uri {
-  my ($self, @args) = @_;
-  carp q(process_uri is deprecated. Use process_request());
-  return $self->process_request(@args);
-}
-
 sub packagespace {
   my ($self, $type, $entity, $util) = @_;
 
@@ -129,7 +124,6 @@ sub packagespace {
     #
     my $map = $util->config->val('packagemap', $entity);
     if($map) {
-      $DEBUG and carp qq[Remapping $entity to $map];
       $entity = $map;
     }
   }
@@ -146,13 +140,22 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my $pi            = $ENV{PATH_INFO}      || q();
   my $accept        = $ENV{HTTP_ACCEPT}    || q();
   my $qs            = $ENV{QUERY_STRING}   || q();
-  my ($entity)      = $pi =~ m{^/([^/;.]+)}smx;
-  $entity         ||= q[];
-  my ($dummy, $aspect_extra, $id) = $pi =~ m{^/$entity(/(.*))?/([[:lower:]:,\-_[:digit:]%@.+\s]+)}smix;
-
-  my ($aspect)      = $pi =~ m{;(\S+)}smx;
   my $hxrw          = $ENV{HTTP_X_REQUESTED_WITH} || q[];
   my $xhr           = ($hxrw =~ /XMLHttpRequest/smix);
+
+  if($xhr && $pi !~ /(?:ajax|json|xml)$/smx) {
+    if($pi =~ /[;]/smx) {
+      $pi .= q[_ajax];
+    } else {
+      $pi .= q[.ajax];
+    }
+  }
+
+  my ($entity)      = $pi =~ m{^/([^/;.]+)}smx;
+  $entity         ||= q[];
+  my ($dummy, $aspect_extra, $id) = $pi =~ m{^/$entity(/(.*))?/([[:lower:][:digit:]:,\-_%@.+\s]+)}smix;
+
+  my ($aspect)      = $pi =~ m{;(\S+)}smx;
 
   if($action eq 'read' && !$id && !$aspect) {
     $aspect = 'list';
@@ -161,11 +164,9 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   if($action eq 'create' && $id) {
     if(!$aspect || $aspect =~ /^update/smx) {
       $action = 'update';
-#carp qq[0b: action=$action aspect=$aspect];
 
     } elsif($aspect =~ /^delete/smx) {
       $action = 'delete';
-#carp qq[0c: action=$action aspect=$aspect];
     }
   }
 
@@ -178,23 +179,13 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my $uriaspect = $self->_process_request_extensions(\$pi, $aspect, $action) || q[];
   if($uriaspect ne $aspect) {
     $aspect = $uriaspect;
-    ($id)   = $pi =~ m{^/$entity/?$aspect_extra/([[:lower:]:,\-_[:digit:]%@.+\s]+)}smix;
+    ($id)   = $pi =~ m{^/$entity/?$aspect_extra/([[:lower:][:digit:]:,\-_%@.+\s]+)}smix;
   }
 
   #########
   # process HTTP 'Accept' header
   #
   $aspect   = $self->_process_request_headers(\$accept, $aspect, $action);
-
-  #########
-  # check existence of X-Requested-With (XHR) (jquery, prototype and similar ajax requests)
-  # TODO: make process_request_headers more generic and move this into there
-  #
-  if($xhr &&
-    $aspect !~ /(?:_ajax|_json|_xml)$/smx) {
-    $aspect .= q[_ajax];
-  }
-
   $entity ||= $util->config->val('application', 'default_view');
   $aspect ||= q[];
   $id       = CGI->unescape($id||'0');
@@ -204,7 +195,7 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   # pull the first one off the list
   #
   if(!$entity) {
-    my $views = $util->config->val('application', 'views');
+    my $views = $util->config->val('application', 'views') || q[];
     $entity   = (split /[\s,]+/smx, $views)[0];
   }
 
@@ -347,27 +338,25 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
 sub _process_request_extensions {
   my ($self, $pi, $aspect, $action) = @_;
 
-  $DEBUG and carp qq(pi=$pi);
+  my $extensions = join q[], reverse ${$pi} =~ m{([.][^;.]+)}smxg;
+
   for my $pair (@{$self->accept_extensions}) {
     my ($ext, $meth) = %{$pair};
     $ext =~ s/[.]/\\./smxg;
 
-    if(${$pi} =~ s/$ext(;.*)?$//smx) {
+    if($extensions =~ s{$ext$}{}smx) {
+      ${$pi}    =~ s{$ext}{}smx;
       $aspect ||= $action;
-      $aspect  =~ s/$meth$//smx;
-      $aspect .= $meth;
-      last;
+      $aspect   =~ s/$meth$//smx;
+      $aspect  .= $meth;
     }
   }
 
-  $DEBUG and carp qq(aspect=@{[$aspect||'undef']});
   return $aspect;
 }
 
 sub _process_request_headers {
   my ($self, $accept, $aspect, $action) = @_;
-
-  $DEBUG and carp qq(accept=$accept);
 
   for my $pair (@{$self->accept_headers()}) {
     my ($header, $meth) = %{$pair};
@@ -379,7 +368,6 @@ sub _process_request_headers {
     }
   }
 
-  $DEBUG and carp qq(aspect=@{[$aspect||'undef']});
   return $aspect;
 }
 
@@ -453,7 +441,7 @@ sub handler {
     my $content_type = $viewobject->content_type();
     my $charset      = $viewobject->charset();
     if($content_type =~ /text/smx && $charset =~ /utf-?8/smix) {
-      binmode STDOUT, q[:utf8];
+      binmode STDOUT, q[:encoding(UTF-8)];
     }
 
     $viewobject->output_buffer($decorator->header());
@@ -627,7 +615,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$Revision: 410 $
+$Revision: 415 $
 
 =head1 SYNOPSIS
 

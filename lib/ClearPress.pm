@@ -1,7 +1,9 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
-# Last Modified: $Date: 2009-02-24 10:36:40 +0000 (Tue, 24 Feb 2009) $ $Author: zerojinx $
-# Id:            $Id: ClearPress.pm 384 2009-02-24 10:36:40Z zerojinx $
+# Last Modified: $Date: 2011-10-11 14:19:40 +0100 (Tue, 11 Oct 2011) $ $Author: zerojinx $
+# Id:            $Id: ClearPress.pm 414 2011-10-11 13:19:40Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress.pm $
 #
@@ -13,7 +15,7 @@ use ClearPress::view;
 use ClearPress::controller;
 use ClearPress::util;
 
-our $VERSION = do { my ($r) = q$Revision: 410 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 414 $ =~ /(\d+)/smx; $r; };
 
 1;
 __END__
@@ -24,7 +26,7 @@ ClearPress - Simple, fresh & fruity MVC framework - http://clearpress.net/
 
 =head1 VERSION
 
-$Revision: 387 $
+$Revision: 414 $
 
 =head1 SYNOPSIS
 

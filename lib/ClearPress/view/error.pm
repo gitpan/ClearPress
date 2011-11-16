@@ -1,9 +1,11 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2010-09-24 09:38:52 +0100 (Fri, 24 Sep 2010) $
-# Id:            $Id: error.pm 384 2010-09-24 08:38:52Z zerojinx $
+# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
+# Id:            $Id: error.pm 413 2011-10-11 12:39:49Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view/error.pm $
 #
 package ClearPress::view::error;
@@ -16,7 +18,7 @@ use Carp;
 
 __PACKAGE__->mk_accessors(qw(errstr));
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 384 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 413 $ =~ /(\d+)/smx; $r; };
 
 sub render {
   my $self   = shift;
@@ -65,7 +67,7 @@ ClearPress::view::error - specialised view for error handling
 
 =head1 VERSION
 
-$LastChangedRevision: 384 $
+$LastChangedRevision: 413 $
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,5 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 use strict;
 use warnings;
 use Test::More;
@@ -7,7 +9,7 @@ use Test::Trap;
 
 eval {
   require DBD::SQLite;
-  plan tests => 67;
+  plan tests => 74;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -18,6 +20,7 @@ use_ok($CTRL);
 my $util = t::util->new();
 
 my $T = [
+	 ['GET', '/',                          '', {}, 'read',  'example', 'list', 0], #default_view
 	 ['GET', '/thing/method',              '', {}, 'read',  'thing', 'read', 'method'],
 	 ['GET', '/thing2/method',             '', {}, 'read',  'thing2', 'list_method', 0],
 	 ['GET', '/thing/method/50',           '', {}, 'read',  'thing', 'read_method', 50],
@@ -76,34 +79,43 @@ my $T = [
 	 ['POST', '/thing6/batch.xml',         '', {
 						    HTTP_ACCEPT => 'text/xml',
 						   }, 'create', 'thing6', 'create_batch_xml', 0],
-#	 ['POST', '/thing7/batch',             '', {
-#						    HTTP_X_REQUESTED_WITH => 'XMLHttpRequest',
-#						   },  'create', 'thing7', 'create_batch_ajax', 0], ###### fail
+	 ['POST', '/thing7/batch',             '', {
+						    HTTP_X_REQUESTED_WITH => 'XMLHttpRequest',
+						   },  'create', 'thing7', 'create_batch_ajax', 0], ###### fail
 	 ['POST', '/thing7;create_batch',      '', {
 						    HTTP_X_REQUESTED_WITH => 'XMLHttpRequest',
 						   },  'create', 'thing7', 'create_batch_ajax', 0],
 	 ['POST', '/thing7;create_batch_ajax', '', {}, 'create', 'thing7', 'create_batch_ajax', 0],
+	 ['POST', '/thing7.ajax;create_batch', '', {}, 'create', 'thing7', 'create_batch_ajax', 0],
 	 ['POST', '/thing8/batch.xml',         '', {
 						    HTTP_X_REQUESTED_WITH => 'XMLHttpRequest',
 						   },  'create', 'thing8', 'create_batch_xml', 0],
 	 ['DELETE', '/thing/10',               '', {}, 'delete', 'thing', 'delete', 10],
 	 ['POST',   '/thing/10;delete',        '', {}, 'delete', 'thing', 'delete', 10],
 
+         ['GET', '/thing11/overridden',        '', {
+                                                    HTTP_X_REQUESTED_WITH => 'XmlHttpRequest',
+                                                   }, 'read', 'thing11', 'list_overridden_ajax', 0],
+         ['GET', '/thing12.txt',               '', {
+                                                    HTTP_X_REQUESTED_WITH => 'XmlHttpRequest',
+                                                   }, 'read', 'thing12', 'list_txt_ajax', 0],
 	 ['GET', '/testmap/test.xml',          '', {}, 'read', 'testmap', 'list_test_xml', 0],
 	];
 
 {
   no warnings;
-  *{t::view::thing2::list_method}         = sub { return 1; };
-  *{t::view::thing3::list_avg_by_pos}     = sub { return 1; };
-  *{t::view::thing4::list_avg_by_pos_xml} = sub { return 1; };
-  *{t::view::thing5::list_heatmap_png}    = sub { return 1; };
-  *{t::view::thing6::create_batch_xml}    = sub { return 1; };
-  *{t::view::thing7::create_batch_ajax}   = sub { return 1; };
-  *{t::view::thing8::create_batch_xml}    = sub { return 1; };
-  *{t::view::thing9::list_heatmap}        = sub { return 1; };
-  *{t::view::thing10::create_heatmap_png} = sub { return 1; };
-  *{t::view::foo::test::list_test_xml}    = sub { return 1; }; # packagemapped
+  *{t::view::thing2::list_method}           = sub { return 1; };
+  *{t::view::thing3::list_avg_by_pos}       = sub { return 1; };
+  *{t::view::thing4::list_avg_by_pos_xml}   = sub { return 1; };
+  *{t::view::thing5::list_heatmap_png}      = sub { return 1; };
+  *{t::view::thing6::create_batch_xml}      = sub { return 1; };
+  *{t::view::thing7::create_batch_ajax}     = sub { return 1; };
+  *{t::view::thing8::create_batch_xml}      = sub { return 1; };
+  *{t::view::thing9::list_heatmap}          = sub { return 1; };
+  *{t::view::thing10::create_heatmap_png}   = sub { return 1; };
+  *{t::view::thing11::list_overridden_ajax} = sub { return 1; };
+  *{t::view::thing12::list_txt_ajax}        = sub { return 1; };
+  *{t::view::foo::test::list_test_xml}      = sub { return 1; }; # packagemapped
 }
 
 {
@@ -112,7 +124,8 @@ my $T = [
      'packagemapped space');
 }
 
-for my $t (@{$T}) {
+sub request_test {
+  my $t = shift;
   local %ENV = (
 		DOCUMENT_ROOT  => 't/htdocs',
 		REQUEST_METHOD => $t->[0],
@@ -129,8 +142,26 @@ for my $t (@{$T}) {
   };
 
   is((join q[,], @{$ref}),
-     (join q[,], @{$t}[4..7]),
+     (join q[,], grep { defined } @{$t}[4..7]),
      "$t->[0] $t->[1]?$t->[2] => $t->[4],$t->[5],$t->[6],$t->[7]");
+}
+
+for my $t (@{$T}) {
+  request_test($t);
+}
+
+{
+  no warnings qw(redefine once);
+  local *t::util::data_path = sub { return 't/data-no-default_view'; };
+  delete $util->{config};
+  request_test(['GET', '/', '', {}, 'read',  'no_default', 'list', 0]);
+}
+
+{
+  no warnings qw(redefine once);
+  local *t::util::data_path = sub { return 't/data-no-views'; };
+  delete $util->{config};
+  request_test(['GET', '/', '', {}]);
 }
 
 my $B = [

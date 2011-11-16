@@ -1,7 +1,9 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
-# Last Modified: $Date: 2010-01-04 14:37:33 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: authdecor.pm 349 2010-01-04 14:37:33Z zerojinx $
+# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
+# Id:            $Id: authdecor.pm 413 2011-10-11 12:39:49Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authdecor.pm $
 #
@@ -12,7 +14,7 @@ use base qw(ClearPress::decorator Exporter);
 use ClearPress::authenticator::session;
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 349 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 413 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DOMAIN      => 'mysite.com';
 Readonly::Scalar our $AUTH_COOKIE => 'mysite_sso';
 Readonly::Array  our @EXPORT_OK   => qw($AUTH_COOKIE);
@@ -119,8 +121,10 @@ sub site_header {
     $header .= qq[<li><a id="$id" href="$v"$onclick>$k</a></li>];
   }
 
-  $header .= qq[</ul><br style="clear:both"/></div><!--end siteactions-->
-<div id="d_login_cntr">@{[$self->site_login_form]}</div><!--end d_login_cntr-->\n];
+  $header .= <<"EOT";
+</ul><br style="clear:both"/></div><!--end siteactions-->
+<div id="d_login_cntr">@{[$self->site_login_form]}</div><!--end d_login_cntr-->
+EOT
 
   return $header.q[<div id="main">];
 }
@@ -131,10 +135,13 @@ sub footer {
 
 sub site_login_form {
   my $host = $ENV{HTTP_X_FORWARDED_HOST} || $ENV{HTTP_HOST} || q[];
+
   if($host) {
     $host = "https://$host";
   }
-  return qq[<form class="login_form" method="post" action="$host/login">
+
+  return <<"EOT";
+<form class="login_form" method="post" action="$host/login">
  <dl class="tbl">
   <dt><label for="cred_0">Username</label></dt>
   <dd><input type="text" size="14" name="cred_0" id="cred_0"/></dd>
@@ -142,7 +149,8 @@ sub site_login_form {
   <dd><input type="password" size="14" name="cred_1" id="cred_1"/></dd>
  </dl>
  <p class="buttons"><input type="submit" value="Log in"/></p>
-</form>];
+</form>
+EOT
 }
 
 1;
@@ -154,7 +162,7 @@ ClearPress::authdecor
 
 =head1 VERSION
 
-$Revision: 349 $
+$Revision: 413 $
 
 =head1 SYNOPSIS
 

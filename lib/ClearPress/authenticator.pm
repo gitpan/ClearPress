@@ -1,7 +1,9 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
-# Last Modified: $Date: 2010-09-27 09:38:41 +0100 (Mon, 27 Sep 2010) $
-# Id:            $Id: authenticator.pm 388 2010-09-27 08:38:41Z zerojinx $
+# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
+# Id:            $Id: authenticator.pm 413 2011-10-11 12:39:49Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authenticator.pm $
 #
@@ -11,7 +13,7 @@ use warnings;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$Revision: 388 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 413 $ =~ /(\d+)/smx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -52,7 +54,7 @@ ClearPress::authenticator
 
 =head1 VERSION
 
-$Revision: 388 $
+$Revision: 413 $
 
 =head1 SYNOPSIS
 

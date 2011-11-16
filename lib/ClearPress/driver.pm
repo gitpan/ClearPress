@@ -1,9 +1,11 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2010-01-04 14:37:33 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: driver.pm 349 2010-01-04 14:37:33Z zerojinx $
+# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
+# Id:            $Id: driver.pm 413 2011-10-11 12:39:49Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver.pm $
 #
@@ -17,7 +19,7 @@ use DBI;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = do { my ($r) = q$Revision: 349 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 413 $ =~ /(\d+)/smx; $r; };
 
 sub new {
   my ($class, $ref) = @_;
@@ -125,7 +127,7 @@ ClearPress::driver - database driver abstraction layer
 
 =head1 VERSION
 
-$LastChangedRevision: 349 $
+$LastChangedRevision: 413 $
 
 =head1 SYNOPSIS
 

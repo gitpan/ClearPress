@@ -1,7 +1,9 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
-# Last Modified: $Date: 2010-01-04 12:41:14 +0000 (Mon, 04 Jan 2010) $ $Author: zerojinx $
-# Id:            $Id: 00-critic.t 346 2010-01-04 12:41:14Z zerojinx $
+# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $ $Author: zerojinx $
+# Id:            $Id: 00-critic.t 413 2011-10-11 12:39:49Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/t/00-critic.t,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/t/00-critic.t $
 #
@@ -11,7 +13,7 @@ use warnings;
 use Test::More;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my @r = (q$Revision: 346 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 413 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
 
 if ( not $ENV{TEST_AUTHOR} ) {
   my $msg = 'Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.';
@@ -29,7 +31,7 @@ if($EVAL_ERROR) {
   Test::Perl::Critic->import(
 			     -severity => 1,
 			     -exclude => [qw(tidy
-					     ValuesAndExpressions::ProhibitImplicitNewlines
+                                             PodSpelling
 					     NamingConventions::Capitalization
 					     ValuesAndExpressions::RequireConstantVersion)],
 			    );

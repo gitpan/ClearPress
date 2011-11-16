@@ -1,19 +1,21 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 use strict;
 use warnings;
 use Test::More;
 
 eval {
   require DBD::SQLite;
-  plan tests => 6;
+  plan tests => 8;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
 
-use t::util qw(is_rendered_xml is_rendered_js);
+use t::util qw(is_rendered_js);
 use t::model::derived;
 use t::view::derived;
 use t::view::error;
-use t::request;
+use t::request qw(is_xml);
 
 my $util = t::util->new();
 
@@ -23,7 +25,7 @@ my $util = t::util->new();
 			     REQUEST_METHOD => 'GET',
 			     util           => $util,
 			    });
-  is_rendered_xml($str, 'derived_list.html', 'derived list');
+  is_xml($str, 'derived_list.html', 'derived list');
 }
 
 {
@@ -32,7 +34,7 @@ my $util = t::util->new();
 			     REQUEST_METHOD => 'GET',
 			     util           => $util,
 			    });
-  is_rendered_xml($str, 'derived_list.xml', 'derived list xml');
+  is_xml($str, 'derived_list.xml', 'derived list xml');
 }
 
 {
@@ -41,7 +43,27 @@ my $util = t::util->new();
 			     REQUEST_METHOD => 'GET',
 			     util           => $util,
 			    });
-  is_rendered_xml($str, 'derived_list.ajax', 'derived list ajax');
+  is_xml($str, 'derived_list.ajax', 'derived list ajax');
+}
+
+{
+  my $str = t::request->new({
+			     PATH_INFO      => '/derived',
+			     REQUEST_METHOD => 'GET',
+			     util           => $util,
+			     xhr            => 1,
+			    });
+  is_xml($str, 'derived_list.ajax', 'derived list ajax via xhr header');
+}
+
+{
+  my $str = t::request->new({
+			     PATH_INFO      => '/derived/overridden',
+			     REQUEST_METHOD => 'GET',
+			     util           => $util,
+			     xhr            => 1,
+			    });
+  is_xml($str, 'derived_list_overridden.ajax', 'derived list_overridden ajax via xhr header');
 }
 
 {
@@ -61,7 +83,7 @@ my $util = t::util->new();
 			     cgi_params     => {
 					       },
 			    });
-  is_rendered_xml($str, 'derived_create.html', 'derived create');
+  is_xml($str, 'derived_create.html', 'derived create');
 }
 
 {
@@ -72,5 +94,5 @@ my $util = t::util->new();
 			     cgi_params     => {
 					       },
 			    });
-  is_rendered_xml($str, 'derived_update.html', 'derived update');
+  is_xml($str, 'derived_update.html', 'derived update');
 }

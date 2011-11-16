@@ -4,7 +4,7 @@
       "Roger M Pettett <rpettett@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "perl_5"
    ],
@@ -72,43 +72,43 @@
    "provides" : {
       "ClearPress" : {
          "file" : "lib/ClearPress.pm",
-         "version" : "410"
+         "version" : "414"
       },
       "ClearPress::authdecor" : {
          "file" : "lib/ClearPress/authdecor.pm",
-         "version" : "349"
+         "version" : "413"
       },
       "ClearPress::authenticator" : {
          "file" : "lib/ClearPress/authenticator.pm",
-         "version" : "388"
+         "version" : "413"
       },
       "ClearPress::authenticator::db" : {
          "file" : "lib/ClearPress/authenticator/db.pm",
-         "version" : "388"
+         "version" : "413"
       },
       "ClearPress::authenticator::ldap" : {
          "file" : "lib/ClearPress/authenticator/ldap.pm",
-         "version" : "390"
+         "version" : "413"
       },
       "ClearPress::authenticator::passwd" : {
          "file" : "lib/ClearPress/authenticator/passwd.pm",
-         "version" : "348"
+         "version" : "413"
       },
       "ClearPress::authenticator::session" : {
          "file" : "lib/ClearPress/authenticator/session.pm",
-         "version" : "348"
+         "version" : "413"
       },
       "ClearPress::controller" : {
          "file" : "lib/ClearPress/controller.pm",
-         "version" : "410"
+         "version" : "415"
       },
       "ClearPress::decorator" : {
          "file" : "lib/ClearPress/decorator.pm",
-         "version" : "399"
+         "version" : "413"
       },
       "ClearPress::driver" : {
          "file" : "lib/ClearPress/driver.pm",
-         "version" : "349"
+         "version" : "413"
       },
       "ClearPress::driver::Pg" : {
          "file" : "lib/ClearPress/driver/Pg.pm",
@@ -124,19 +124,19 @@
       },
       "ClearPress::model" : {
          "file" : "lib/ClearPress/model.pm",
-         "version" : "398"
+         "version" : "413"
       },
       "ClearPress::util" : {
          "file" : "lib/ClearPress/util.pm",
-         "version" : "388"
+         "version" : "413"
       },
       "ClearPress::view" : {
          "file" : "lib/ClearPress/view.pm",
-         "version" : "408"
+         "version" : "416"
       },
       "ClearPress::view::error" : {
          "file" : "lib/ClearPress/view/error.pm",
-         "version" : "384"
+         "version" : "413"
       }
    },
    "release_status" : "stable",
@@ -145,5 +145,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "410"
+   "version" : "414"
 }

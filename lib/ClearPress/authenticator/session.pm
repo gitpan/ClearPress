@@ -1,7 +1,9 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
-# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: session.pm 348 2010-01-04 13:02:42Z zerojinx $
+# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
+# Id:            $Id: session.pm 413 2011-10-11 12:39:49Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authenticator/session.pm $
 #
@@ -15,7 +17,7 @@ use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 use YAML::Tiny qw(Load Dump);
 
-our $VERSION = do { my ($r) = q$Revision: 348 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 413 $ =~ /(\d+)/smx; $r; };
 
 Readonly::Scalar our $KEY => q[topsecretkey];
 
@@ -102,7 +104,7 @@ ClearPress::authenticator::session
 
 =head1 VERSION
 
-$LastChangedRevision: 348 $
+$LastChangedRevision: 413 $
 
 =head1 SYNOPSIS
 

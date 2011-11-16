@@ -1,9 +1,11 @@
 #!/usr/bin/perl -T
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2010-01-04 12:41:14 +0000 (Mon, 04 Jan 2010) $
-# Id:            $Id: clearpress 346 2010-01-04 12:41:14Z zerojinx $
+# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
+# Id:            $Id: clearpress 413 2011-10-11 12:39:49Z zerojinx $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/bin/clearpress $
 #
 use strict;
@@ -16,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 346 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 413 $ =~ /(\d+)/smx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
 local $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin /opt/local/bin);
@@ -38,8 +40,10 @@ sub main { ## no critic (complexity)
 	    );
 
   if($opts->{help}) {
-    print qq(Usage Example:
-  $PROGRAM_NAME --new GrandKids 'child->family child(name,birthday:date) family(name,address,city,state,zip)'\n) or croak qq[Error printing: $ERRNO];
+    print <<"EOT" or croak qq[Error printing: $ERRNO];
+Usage Example:
+  $PROGRAM_NAME --new GrandKids 'child->family child(name,birthday:date) family(name,address,city,state,zip)'
+EOT
     return 1;
   }
 
@@ -121,7 +125,7 @@ sub main { ## no critic (complexity)
     #########
     # mysql message
     #
-    print qq(
+    print <<"EOT" or croak qq[Error printing: $ERRNO];
 You now need to configure your database.
 1. Check and/or modify $app/data/config.ini
 2. If necessary create a database, something like this:
@@ -129,18 +133,18 @@ You now need to configure your database.
 3. cat @{[map { "$app/data/schema/$_.mysql \\\n      " } @{$precedence}]} | mysql -uroot $app
 
 Note you may need to create your new schema in order, depending on your foreign key constraints.
-) or croak qq[Error printing: $ERRNO];
+EOT
 
   } else {
     #########
     # SQLite message
     #
-    print qq(
+    print <<"EOT" or croak qq[Error printing: $ERRNO];
 You now need to configure your database.
 1. Check and/or modify $app/data/config.ini
 2. If necessary create a database, something like this:
   cat $app/data/schema/*.SQLite | sqlite3 $app/$app
-) or croak qq[Error printing: $ERRNO];
+EOT
   }
 
   return 1;
@@ -316,7 +320,7 @@ use <% application %>::util;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 346 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 413 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $PORT => 8080;
 
 my $opts = {};
@@ -397,7 +401,7 @@ use <% application %>::view::error;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 346 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 413 $ =~ /(\d+)/smx; $r; };
 
 main();
 0;

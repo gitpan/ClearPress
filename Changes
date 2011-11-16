@@ -6,6 +6,8 @@ TODO:
 - maintenance: Add regression tests
 - performance: Config caching
 
+413 - Correctly process XHR+overridden methods, i.e. '/entity/custom'(+XHR) => entity::list_custom_ajax
+
 410 - Added controller is_valid_view method to support the dynamic addition of views
  
 407 - Removed 'model.logged_in' data poking. Use view.logged_in in templates if you need to

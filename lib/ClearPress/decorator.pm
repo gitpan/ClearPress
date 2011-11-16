@@ -1,9 +1,11 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2011-01-28 14:14:01 +0000 (Fri, 28 Jan 2011) $
-# Id:            $Id: decorator.pm 399 2011-01-28 14:14:01Z zerojinx $
+# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
+# Id:            $Id: decorator.pm 413 2011-10-11 12:39:49Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/decorator.pm $
 #
@@ -14,7 +16,7 @@ use CGI qw(param);
 use base qw(Class::Accessor);
 use Readonly;
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 399 $ =~ /(\d+)/smx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 413 $ =~ /(\d+)/smx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => '0.1',
@@ -109,34 +111,45 @@ sub site_header {
   my ($self) = @_;
   my $cgi    = $self->cgi();
 
-  my $ss = qq(@{[map {
+  my $ss = <<"EOT";
+@{[map {
     qq(    <link rel="stylesheet" type="text/css" href="$_" />);
-  } grep { $_ } @{$self->stylesheet()}]});
+} grep { $_ } @{$self->stylesheet()}]}
+EOT
 
   if($self->style()) {
     $ss .= q(<style type="text/css">). $self->style() .q(</style>);
   }
 
-  my $rss = qq(@{[map {
+  my $rss = <<"EOT";
+@{[map {
     qq(    <link rel="alternate" type="application/rss+xml" title="RSS" href="$_" />\n);
-  } grep { $_ } @{$self->rss()}]});
+} grep { $_ } @{$self->rss()}]}
+EOT
 
-  my $atom = qq(@{[map {
+  my $atom = <<"EOT";
+@{[map {
     qq(    <link rel="alternate" type="application/atom+xml" title="ATOM" href="$_" />\n);
-  } grep { $_ } @{$self->atom()}]});
+  } grep { $_ } @{$self->atom()}]}
+EOT
 
-  my $js = qq(@{[map {
+  my $js = <<"EOT";
+@{[map {
     qq(    <script type="text/javascript" src="@{[$cgi->escapeHTML($_)]}"></script>\n);
-  } grep { $_ } @{$self->jsfile()}]});
+} grep { $_ } @{$self->jsfile()}]}
+EOT
 
-  my $script = qq(@{[map {
+  my $script = <<"EOT";
+@{[map {
     qq(    <script type="text/javascript">$_</script>\n);
-  } grep { $_ } @{$self->script()}]});
+} grep { $_ } @{$self->script()}]}
+EOT
 
   my $onload   = (scalar $self->onload())   ? qq( onload="@{[  join q(;), $self->onload()]}")   : q[];
   my $onunload = (scalar $self->onunload()) ? qq( onunload="@{[join q(;), $self->onunload()]}") : q[];
   my $onresize = (scalar $self->onresize()) ? qq( onresize="@{[join q(;), $self->onresize()]}") : q[];
-  return qq(<?xml version="1.0" encoding="utf-8"?>
+  return <<"EOT";
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb">
   <head>
@@ -147,12 +160,15 @@ sub site_header {
     <meta name="keywords"    content="@{[$self->meta_keywords()    || $self->defaults('meta_keywords')]}" />
     <title>@{[$self->title || 'ClearPress Application']}</title>
 $ss$rss$atom$js$script  </head>
-  <body$onload$onunload$onresize>\n);
+  <body$onload$onunload$onresize>
+EOT
 }
 
 sub footer {
-  return q(  </body>
-</html>);
+  return <<'EOT';
+  </body>
+</html>
+EOT
 }
 
 sub cgi {
