@@ -9,19 +9,27 @@ use Readonly;
 use XML::Simple qw(XMLin);
 use JSON;
 use English qw(-no_match_vars);
+use Digest::SHA qw(sha1_hex);
 
 our @EXPORT_OK = qw(is_rendered_js);
 
 $ENV{dev} = q[test];
 
+sub _tmp_db_name {
+  return sprintf q[%s.db], sha1_hex($PROGRAM_NAME);
+}
+
 sub new {
   my ($class, @args) = @_;
 
-  if(-e 'test.db') {
-    unlink 'test.db';
+  my $db = _tmp_db_name();
+  if(-e $db) {
+    unlink $db;
   }
 
   my $self = $class->SUPER::new(@args);
+  $self->config->setval('test','dbname', $db);
+
   my $drv  = $self->driver();
 
   eval {
@@ -109,8 +117,9 @@ sub DESTROY {
     $self->{driver}->DESTROY();
   }
 
-  if(-e 'test.db') {
-    unlink 'test.db';
+  my $db = _tmp_db_name();
+  if(-e $db) {
+    unlink $db;
   }
   return 1;
 }

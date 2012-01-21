@@ -4,8 +4,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2011-10-28 17:18:11 +0100 (Fri, 28 Oct 2011) $
-# Id:            $Id: view.pm 416 2011-10-28 16:18:11Z zerojinx $
+# Last Modified: $Date: 2012-01-21 11:46:07 +0000 (Sat, 21 Jan 2012) $
+# Id:            $Id: view.pm 423 2012-01-21 11:46:07Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -23,7 +23,7 @@ use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 use utf8;
 
-our $VERSION        = do { my ($r) = q$Revision: 416 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 423 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -34,8 +34,8 @@ sub new {
   $self               ||= {};
   bless $self, $class;
 
-  my $util                    = $self->util();
-  my $username                = $util?$util->username():q[];
+  my $util                    = $self->util;
+  my $username                = $util?$util->username:q[];
   $self->{requestor_username} = $username;
   $self->{logged_in}          = $username?1:0;
   $self->{warnings}           = [];
@@ -43,7 +43,7 @@ sub new {
   $self->{output_finished}    = 0;
   $self->{autoescape}         = 1;
 
-  my $aspect = $self->aspect() || q[];
+  my $aspect = $self->aspect || q[];
 
   $self->{content_type} ||= ($aspect =~ /(?:rss|atom|ajax|xml)$/smx)?'text/xml':q[];
   $self->{content_type} ||= ($aspect =~ /(?:js|json)$/smx)?'application/javascript':q[];
@@ -52,7 +52,7 @@ sub new {
   $self->{content_type} ||= ($aspect =~ /_txt$/smx)?'text/plain':q[];
   $self->{content_type} ||= ($aspect =~ /_xls$/smx)?'application/vnd.ms-excel':q[];
 
-  $self->init();
+  $self->init;
 
   $self->{content_type} ||= 'text/html';
 
@@ -87,10 +87,10 @@ sub _accessor { ## no critic (ProhibitUnusedPrivateSubroutines)
 
 sub authorised {
   my $self      = shift;
-  my $action    = $self->action() || q[];
-  my $aspect    = $self->aspect() || q[];
-  my $util      = $self->util();
-  my $requestor = $util->requestor();
+  my $action    = $self->action || q[];
+  my $aspect    = $self->aspect || q[];
+  my $util      = $self->util;
+  my $requestor = $util->requestor;
 
   if(!$requestor) {
     #########
@@ -121,29 +121,53 @@ sub authorised {
 }
 
 sub template_name {
-  my $self   = shift;
-  my $name = $self->entity_name();
+  my ($self, @args) = @_;
+
+  if(scalar @args) {
+    $self->{template_override} = $args[0];
+  }
+
+  if(exists $self->{template_override}) {
+    return $self->{template_override};
+  }
+
+  my $name = $self->entity_name;
   if(!$name) {
     ($name) = (ref $self) =~ /view::(.*)$/smx;
   }
   $name    ||= 'view';
-  my $method = $self->method_name();
+  my $method = $self->method_name;
 
-  if($method) {
-    $name .= "_$method";
-  }
   $name =~ s/:+/_/smxg;
+  if(!$method) {
+    return $name;
+  }
 
-  return $name;
+  my $util = $self->util;
+  my $tmp  = "${name}/$method";
+  my $path = sprintf q[%s/templates], $util->data_path;
+
+  #########
+  # I do not like this stat. I'd prefer a global mode switch in config.
+  #
+  if(-e "$path/$tmp.tt2") {
+    return $tmp;
+  }
+
+  return "${name}_$method";
 }
 
 sub method_name {
   my $self   = shift;
-  my $aspect = $self->aspect();
-  my $action = $self->action();
+  my $aspect = $self->aspect;
+  my $action = $self->action;
   my $method = $aspect || $action;
-  my $model  = $self->model();
-  my $pk     = $model->primary_key();
+  my $model  = $self->model;
+  my $pk     = $model->primary_key;
+
+  if(!$method) {
+    return q[];
+  }
 
   if($pk               &&
      $method eq 'read' &&
@@ -162,23 +186,23 @@ sub streamed_aspects {
 
 sub render {
   my $self   = shift;
-  my $util   = $self->util();
-  my $aspect = $self->aspect() || q[];
-  my $action = $self->action();
+  my $util   = $self->util;
+  my $aspect = $self->aspect || q[];
+  my $action = $self->action;
 
   if(!$util) {
-    croak q(No util object available);
+    croak q[No util object available];
   }
 
-  my $requestor = $util->requestor();
+  my $requestor = $util->requestor;
 
-  if(!$self->authorised()) {
+  if(!$self->authorised) {
     if(!$requestor) {
-      croak q(Authorisation unavailable for this view.);
+      croak q[Authorisation unavailable for this view.];
     }
-    my $username = $requestor->username();
+    my $username = $requestor->username;
     if(!$username) {
-      croak q(You are not authorised for this view. You need to log in.);
+      croak q[You are not authorised for this view. You need to log in.];
     }
     croak qq[You ($username) are not authorised for this view];
   }
@@ -186,9 +210,9 @@ sub render {
   #########
   # Figure out and call the appropriate action if available
   #
-  my $method = $self->method_name();
+  my $method = $self->method_name;
   if($method !~ /^(?:add|edit|create|read|update|delete|list)/smx) {
-    croak qq(Illegal method: $method);
+    croak qq[Illegal method: $method];
   }
 
   if($self->can($method)) {
@@ -200,32 +224,32 @@ sub render {
     # handle streamed methods
     #
     my $streamed = 0;
-    for my $str_aspect (@{$self->streamed_aspects()}) {
+    for my $str_aspect (@{$self->streamed_aspects}) {
       if($aspect eq $str_aspect) {
 	$streamed = 1;
       }
     }
 
     if($streamed) {
-      $self->output_flush();
+      $self->output_flush;
     }
 
     $self->$method();
 
     if($streamed) {
-      $self->output_end();
+      $self->output_end;
       return q[];
     }
 
   } else {
-    croak qq(Unsupported method: $method);
+    croak qq[Unsupported method: $method];
   }
 
-  my $model   = $self->model();
+  my $model   = $self->model;
   my $actions = my $warnings = q[];
 
-  if($self->decor()) {
-    $actions  = $self->actions();
+  if($self->decor) {
+    $actions  = $self->actions;
     eval {
       $self->process_template('warnings.tt2', {
 					       warnings => $self->warnings,
@@ -242,19 +266,19 @@ sub render {
   #########
   # handle block (non-streamed) methods
   #
-  my $tmpl    = $self->template_name();
-  my $cfg     = $util->config();
+  my $tmpl    = $self->template_name;
+  my $cfg     = $util->config;
   my $content = q[];
 
   $self->process_template("$tmpl.tt2", {}, \$content);
 
-  return $warnings . $actions . $content || q(No data);
+  return $warnings . $actions . $content || q[No data];
 }
 
 sub process_template { ## no critic (Complexity)
   my ($self, $template, $extra_params, $where_to_ref) = @_;
-  my $util        = $self->util();
-  my $cfg         = $util->config();
+  my $util        = $self->util;
+  my $cfg         = $util->config;
   my ($entity)    = (ref $self) =~ /([^:]+)$/smx;
   $entity       ||= q[];
   my $script_name = $ENV{SCRIPT_NAME} || q[];
@@ -277,7 +301,7 @@ sub process_template { ## no critic (Complexity)
 
   my $params   = {
 		  requestor   => $util->requestor,
-		  model       => $self->model(),
+		  model       => $self->model,
 		  view        => $self,
 		  entity      => $entity,
 		  SCRIPT_NAME => $script_name,
@@ -300,7 +324,7 @@ sub process_template { ## no critic (Complexity)
   my $template_cache = $TEMPLATE_CACHE->{$appname};
 
   if(!$template_cache->{$template}) {
-    my $path = sprintf q(%s/templates), $util->data_path();
+    my $path = sprintf q[%s/templates], $util->data_path;
     open my $fh, q[<], "$path/$template" or croak qq[Error opening $template];
     local $RS = undef;
     $template_cache->{$template} = <$fh>;
@@ -310,10 +334,10 @@ sub process_template { ## no critic (Complexity)
   $template = \$template_cache->{$template};
 
   if($where_to_ref) {
-    $self->tt->process($template, $params, $where_to_ref) or croak $self->tt->error();
+    $self->tt->process($template, $params, $where_to_ref) or croak $self->tt->error;
 
   } else {
-    $self->tt->process($template, $params) or croak $self->tt->error();
+    $self->tt->process($template, $params) or croak $self->tt->error;
   }
 
   return 1;
@@ -321,19 +345,19 @@ sub process_template { ## no critic (Complexity)
 
 sub _populate_from_cgi {
   my $self  = shift;
-  my $util  = $self->util();
-  my $model = $self->model();
-  my $cgi   = $util->cgi();
+  my $util  = $self->util;
+  my $model = $self->model;
+  my $cgi   = $util->cgi;
 
   #########
   # Populate model object with parameters posted into CGI
   # by default (in controller.pm) model will only have util & its primary_key.
   #
-  $model->read();
+  $model->read;
 
-  my $pk = $model->primary_key();
+  my $pk = $model->primary_key;
 
-  my @fields = $model->fields();
+  my @fields = $model->fields;
   if($pk) {
     #########
     # don't leave primary key in field list
@@ -346,7 +370,7 @@ sub _populate_from_cgi {
 		      my $p = $cgi->param($_);
 		      utf8::decode($p);
 		      $_ => $p;
-		    } $cgi->param()
+		    } $cgi->param
 	       };
 
   #########
@@ -399,7 +423,7 @@ sub _populate_from_cgi {
     # $v here will always be defined
     # but may be false, e.g. $v=q[] or $v=q[0]
     #
-    if($self->autoescape()) {
+    if($self->autoescape) {
       $v = $cgi->escapeHTML($v);
     }
 
@@ -411,12 +435,12 @@ sub _populate_from_cgi {
 
 sub add {
   my $self = shift;
-  return $self->_populate_from_cgi();
+  return $self->_populate_from_cgi;
 }
 
 sub edit {
   my $self = shift;
-  return $self->_populate_from_cgi();
+  return $self->_populate_from_cgi;
 }
 
 sub list {
@@ -429,38 +453,38 @@ sub read { ## no critic (homonym)
 
 sub delete { ## no critic (homonym)
   my $self  = shift;
-  my $model = $self->model();
+  my $model = $self->model;
 
-  $model->delete() or croak qq(Failed to delete entity: $EVAL_ERROR);
+  $model->delete or croak qq[Failed to delete entity: $EVAL_ERROR];
 
   return 1;
 }
 
 sub update {
   my $self  = shift;
-  my $model = $self->model();
+  my $model = $self->model;
 
   #########
   # Populate model object with parameters posted into CGI
   # by default (in controller.pm) model will only have util & its primary_key.
   #
-  $self->_populate_from_cgi();
+  $self->_populate_from_cgi;
 
-  $model->update() or croak qq(Failed to update entity: $EVAL_ERROR);
+  $model->update or croak qq[Failed to update entity: $EVAL_ERROR];
   return 1;
 }
 
 sub create {
   my $self  = shift;
-  my $model = $self->model();
+  my $model = $self->model;
 
   #########
   # Populate model object with parameters posted into CGI
   # by default (in controller.pm) model will only have util & its primary_key.
   #
-  $self->_populate_from_cgi();
+  $self->_populate_from_cgi;
 
-  $model->create() or croak qq(Failed to create entity: $EVAL_ERROR);
+  $model->create or croak qq[Failed to create entity: $EVAL_ERROR];
 
   return 1;
 }
@@ -489,7 +513,7 @@ sub tt_filters {
 
 sub tt {
   my ($self, $tt) = @_;
-  my $util = $self->util();
+  my $util = $self->util;
 
   if($tt) {
     $util->{tt} = $tt;
@@ -516,12 +540,12 @@ sub tt {
 					  });
 
     my $filters = Template::Filters->new({
-					  FILTERS => $self->tt_filters(),
+					  FILTERS => $self->tt_filters,
 					 });
     $util->{tt} = Template->new({
 				 PLUGIN_BASE  => 'ClearPress::Template::Plugin',
 				 RECURSION    => 1,
-				 INCLUDE_PATH => (sprintf q(%s/templates), $util->data_path()),
+				 INCLUDE_PATH => (sprintf q[%s/templates], $util->data_path),
 				 EVAL_PERL    => 1,
 				 ENCODING     => 'utf8',
 				 LOAD_FILTERS => [ $filters ],
@@ -532,7 +556,7 @@ sub tt {
 
 sub decor {
   my $self = shift;
-  my $aspect = $self->aspect() || q[];
+  my $aspect = $self->aspect || q[];
 
   if($aspect =~ /(?:rss|atom|ajax|xml|json|js|_png|_jpg|_txt)$/smx) {
     return 0;
@@ -554,13 +578,13 @@ sub output_flush {
     carp qq[Error flushing output_buffer: $EVAL_ERROR];
   };
 
-  $self->output_reset();
+  $self->output_reset;
   return 1;
 }
 
 sub output_buffer {
   my ($self, @args) = @_;
-  if(!$self->output_finished()) {
+  if(!$self->output_finished) {
     push @{$self->{output_buffer}}, @args;
     $DEBUG_OUTPUT and carp "output_buffer added (@{[scalar @args]} blobs)";
   }
@@ -580,7 +604,7 @@ sub output_end {
   my $self = shift;
   $DEBUG_OUTPUT and carp "output_end: $self";
   $self->output_finished(1);
-  return $self->output_flush();
+  return $self->output_flush;
 }
 
 sub output_reset {
@@ -602,77 +626,77 @@ sub actions {
 
 sub list_xml {
   my $self = shift;
-  return $self->list();
+  return $self->list;
 }
 
 sub read_xml {
   my $self = shift;
-  return $self->read();
+  return $self->read;
 }
 
 sub create_xml {
   my $self = shift;
-  return $self->create();
+  return $self->create;
 }
 
 sub update_xml {
   my $self = shift;
-  return $self->update();
+  return $self->update;
 }
 
 sub delete_xml {
   my $self = shift;
-  return $self->delete();
+  return $self->delete;
 }
 
 sub list_ajax {
   my $self = shift;
-  return $self->list();
+  return $self->list;
 }
 
 sub read_ajax {
   my $self = shift;
-  return $self->read();
+  return $self->read;
 }
 
 sub create_ajax {
   my $self = shift;
-  return $self->create();
+  return $self->create;
 }
 
 sub update_ajax {
   my $self = shift;
-  return $self->update();
+  return $self->update;
 }
 
 sub delete_ajax {
   my $self = shift;
-  return $self->delete();
+  return $self->delete;
 }
 
 sub list_json {
   my $self = shift;
-  return $self->list();
+  return $self->list;
 }
 
 sub read_json {
   my $self = shift;
-  return $self->read();
+  return $self->read;
 }
 
 sub create_json {
   my $self = shift;
-  return $self->create();
+  return $self->create;
 }
 
 sub update_json {
   my $self = shift;
-  return $self->update();
+  return $self->update;
 }
 
 sub delete_json {
   my $self = shift;
-  return $self->delete();
+  return $self->delete;
 }
 
 1;
@@ -684,21 +708,21 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 416 $
+$Revision: 423 $
 
 =head1 SYNOPSIS
 
   my $oView = ClearPress::view::<subclass>->new({util => $oUtil});
   $oView->model($oModel);
 
-  print $oView->decor()?
-    $oDecorator->header()
+  print $oView->decor?
+    $oDecorator->header
     :
-    q(Content-type: ).$oView->content_type()."\n\n";
+    q[Content-type: ].$oView->content_type."\n\n";
 
-  print $oView->render();
+  print $oView->render;
 
-  print $oView->decor()?$oDecorator->footer():q[];
+  print $oView->decor?$oDecorator->footer:q[];
 
 =head1 DESCRIPTION
 
@@ -718,13 +742,15 @@ View superclass for the ClearPress framework
 
  - useful for API access setting Accept: text/xml
 
-=head2 template_name - the name of the template to load, based on view class and method_name()
+=head2 template_name - the name of the template to load, based on view class and method_name. Can be overridden
 
-  my $sTemplateName = $oView->template_name();
+  my $sTemplateName = $oView->template_name;
+
+  $oView->template_name($sOverriddenName);
 
 =head2 method_name - the name of the method to invoke on the model, based on action and aspect
 
-  my $sMethodName = $oView->method_name();
+  my $sMethodName = $oView->method_name;
 
 =head2 add_warning
 
@@ -732,18 +758,18 @@ View superclass for the ClearPress framework
 
 =head2 warnings - an arrayref of warning strings set for this view
 
-  my $arWarningStrings = $oView->warnings();
+  my $arWarningStrings = $oView->warnings;
 
 =head2 authorised - Verify authorisation for this view
 
-  This should usually take into account $self->action() which suggests
+  This should usually take into account $self->action which suggests
   read or write access.
 
-  my $bIsAuthorised = $oView->authorised();
+  my $bIsAuthorised = $oView->authorised;
 
 =head2 render - generates and returns content for this view
 
-  my $sViewOutput = $oView->render();
+  my $sViewOutput = $oView->render;
 
 =head2 streamed_aspects - an arrayref of aspects which perform streamed output.
 
@@ -761,10 +787,10 @@ View superclass for the ClearPress framework
 
 =head2 create - A default model creation/save method
 
-  $oView->create();
+  $oView->create;
 
-  Populates $oSelf->model() with its expected parameters from the CGI
-  block, then calls $oModel->create();
+  Populates $oSelf->model with its expected parameters from the CGI
+  block, then calls $oModel->create;
 
 =head2 add - stub for single-entity-creation actions
 
@@ -778,9 +804,9 @@ View superclass for the ClearPress framework
 
 =head2 tt - a configured Template (TT2) object
 
-  my $tt = $oView->tt();
+  my $tt = $oView->tt;
 
-=head2 add_tt_filter - add a named template toolkit content filter, usually performed in init()
+=head2 add_tt_filter - add a named template toolkit content filter, usually performed in init
 
   sub init {
     my $self = shift;
@@ -795,42 +821,42 @@ View superclass for the ClearPress framework
 
 =head2 tt_filters - hashref of configured template toolkit filters
 
-  my $hrFilters = $oView->tt_filters();
+  my $hrFilters = $oView->tt_filters;
 
 =head2 util - get/set accessor for utility object
 
   $oView->util($oUtil);
-  my $oUtil = $oView->util();
+  my $oUtil = $oView->util;
 
 =head2 model - get/set accessor for data model object
 
   $oView->model($oModel);
-  my $oModel = $oView->model();
+  my $oModel = $oView->model;
 
 =head2 action - get/set accessor for the action being performed on this view
 
   $oView->action($sAction);
-  my $sAction = $oView->action();
+  my $sAction = $oView->action;
 
 =head2 aspect - get/set accessor for the aspect being performed on this view
 
   $oView->aspect($sAction);
-  my $sAction = $oView->aspect();
+  my $sAction = $oView->aspect;
 
 =head2 content_type - get/set accessor for content mime-type (Content-Type HTTP header)
 
   $oView->content_type($sContentType);
-  my $sContentType = $oView->content_type();
+  my $sContentType = $oView->content_type;
 
 =head2 charset - get/set accessor for content charset (Content-Type header charset) - default UTF-8
 
   $oView->charset($sCharSet);
-  my $sCharSet = $oView->charset();
+  my $sCharSet = $oView->charset;
 
 =head2 decor - get/set accessor for page decoration toggle
 
   $oView->decor($bDecorToggle);
-  my $bDecorToggle = $oView->decor();
+  my $bDecorToggle = $oView->decor;
 
 =head2 entity_name - get/set accessor for the entity_name
 
@@ -839,41 +865,41 @@ View superclass for the ClearPress framework
  application::(model|view)::something::somethingelse .
 
   $oView->entity_name($sEntityName);
-  my $sEntityName = $oView->entity_name();
+  my $sEntityName = $oView->entity_name;
 
 =head2 actions - templated output for available actions
 
-  my $sActionOutput = $oView->actions();
+  my $sActionOutput = $oView->actions;
 
-=head2 list_xml - default passthrough to list() for xml service
+=head2 list_xml - default passthrough to list for xml service
 
-=head2 read_xml - default passthrough to read() for xml service
+=head2 read_xml - default passthrough to read for xml service
 
-=head2 create_xml - default passthrough to create() for xml service
+=head2 create_xml - default passthrough to create for xml service
 
-=head2 update_xml - default passthrough to update() for xml service
+=head2 update_xml - default passthrough to update for xml service
 
-=head2 delete_xml - default passthrough to delete() for xml service
+=head2 delete_xml - default passthrough to delete for xml service
 
-=head2 list_ajax - default passthrough to list() for ajax service
+=head2 list_ajax - default passthrough to list for ajax service
 
-=head2 read_ajax - default passthrough to read() for ajax service
+=head2 read_ajax - default passthrough to read for ajax service
 
-=head2 create_ajax - default passthrough to create() for ajax service
+=head2 create_ajax - default passthrough to create for ajax service
 
-=head2 update_ajax - default passthrough to update() for ajax service
+=head2 update_ajax - default passthrough to update for ajax service
 
-=head2 delete_ajax - default passthrough to delete() for ajax service
+=head2 delete_ajax - default passthrough to delete for ajax service
 
-=head2 list_json - default passthrough to list() for json service
+=head2 list_json - default passthrough to list for json service
 
-=head2 read_json - default passthrough to read() for json service
+=head2 read_json - default passthrough to read for json service
 
-=head2 create_json - default passthrough to create() for json service
+=head2 create_json - default passthrough to create for json service
 
-=head2 update_json - default passthrough to update() for json service
+=head2 update_json - default passthrough to update for json service
 
-=head2 delete_json - default passthrough to delete() for json service
+=head2 delete_json - default passthrough to delete for json service
 
 =head2 init - post-constructor initialisation hook for subclasses
 
@@ -902,7 +928,7 @@ View superclass for the ClearPress framework
 
 =head2 output_end - For streamed output: flag no more output and flush buffer
 
-  $oView->output_end();
+  $oView->output_end;
 
 =head2 output_finished - For streamed output: flag there's no more output
 
@@ -911,11 +937,11 @@ View superclass for the ClearPress framework
 
 =head2 output_flush - For streamed output: flush output buffer to STDOUT
 
-  $oView->output_flush();
+  $oView->output_flush;
 
 =head2 output_reset - clear data pending output
 
-  $oView->output_reset();
+  $oView->output_reset;
 
 =head2 autoescape - turn auto-escaping of input on/off, usually in a subclass
 

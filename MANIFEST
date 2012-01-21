@@ -1,4 +1,5 @@
 Changes
+ClearPress-422.tar.gz
 LICENSE
 MANIFEST
 MANIFEST.SKIP
@@ -123,5 +124,6 @@ t/util.pm
 t/view/derived.pm
 t/view/error.pm
 Build.PL
+spec.header
 META.yml
 META.json

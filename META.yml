@@ -8,6 +8,7 @@ build_requires:
   File::Copy: 2.13
   File::Path: 2.07_02
   File::Spec: 3.2701
+  File::Temp: 0.22
   JSON: 2.12
   Test::More: 0.8
   Test::Trap: 0
@@ -26,7 +27,7 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 414
+    version: 422
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 413
@@ -47,7 +48,7 @@ provides:
     version: 413
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
-    version: 415
+    version: 424
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
     version: 413
@@ -65,13 +66,13 @@ provides:
     version: 405
   ClearPress::model:
     file: lib/ClearPress/model.pm
-    version: 413
+    version: 424
   ClearPress::util:
     file: lib/ClearPress/util.pm
     version: 413
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 416
+    version: 423
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
     version: 413
@@ -107,4 +108,4 @@ requires:
   warnings: 1.05
 resources:
   license: http://dev.perl.org/licenses/
-version: 414
+version: 422

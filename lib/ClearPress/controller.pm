@@ -4,8 +4,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2011-10-11 16:22:56 +0100 (Tue, 11 Oct 2011) $
-# Id:            $Id: controller.pm 415 2011-10-11 15:22:56Z zerojinx $
+# Last Modified: $Date: 2012-01-21 11:50:55 +0000 (Sat, 21 Jan 2012) $
+# Id:            $Id: controller.pm 424 2012-01-21 11:50:55Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
 #
@@ -28,7 +28,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$Revision: 415 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 424 $ =~ /(\d+)/smx; $r; };
 our $CRUD    = {
 		POST   => 'create',
 		GET    => 'read',
@@ -137,9 +137,9 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my ($self, $util) = @_;
   my $method        = $ENV{REQUEST_METHOD} || 'GET';
   my $action        = $CRUD->{uc $method};
-  my $pi            = $ENV{PATH_INFO}      || q();
-  my $accept        = $ENV{HTTP_ACCEPT}    || q();
-  my $qs            = $ENV{QUERY_STRING}   || q();
+  my $pi            = $ENV{PATH_INFO}      || q[];
+  my $accept        = $ENV{HTTP_ACCEPT}    || q[];
+  my $qs            = $ENV{QUERY_STRING}   || q[];
   my $hxrw          = $ENV{HTTP_X_REQUESTED_WITH} || q[];
   my $xhr           = ($hxrw =~ /XMLHttpRequest/smix);
 
@@ -316,18 +316,18 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   #########
   # sanity checks
   #
-  my ($type) = $aspect =~ /^([^_]+)/ssmx; # read|list|add|edit|create|update|delete
-  if($method !~ /^$REST->{$type}$/ssmx) {
+  my ($type) = $aspect =~ /^([^_]+)/smx; # read|list|add|edit|create|update|delete
+  if($method !~ /^$REST->{$type}$/smx) {
     croak qq[Bad request. $aspect ($type) is not a $CRUD->{$method} method];
   }
 
   if(!$id &&
-     $aspect =~ /^(?:delete|update|edit|read)/ssmx) {
+     $aspect =~ /^(?:delete|update|edit|read)/smx) {
     croak qq[Bad request. Cannot $aspect without an id];
   }
 
   if($id &&
-     $aspect =~ /^(?:create|add|list)/ssmx) {
+     $aspect =~ /^(?:create|add|list)/smx) {
     croak qq[Bad request. Cannot $aspect with an id];
   }
 
@@ -615,7 +615,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$Revision: 415 $
+$Revision: 424 $
 
 =head1 SYNOPSIS
 

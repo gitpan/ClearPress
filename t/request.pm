@@ -2,8 +2,8 @@
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
 # Author:        rpettett
-# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
-# Id:            $Id: request.pm 413 2011-10-11 12:39:49Z zerojinx $
+# Last Modified: $Date: 2012-01-21 12:00:38 +0000 (Sat, 21 Jan 2012) $
+# Id:            $Id: request.pm 426 2012-01-21 12:00:38Z zerojinx $
 # Source:        $Source$
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/t/request.pm $
 #
@@ -21,11 +21,10 @@ use English qw(-no_match_vars);
 use Test::More;
 use HTML::PullParser;
 use JSON;
-use Spreadsheet::ParseExcel;
 
 Readonly::Array our @EXPORT_OK => qw(is_xml is_json is_xls is_txt);
 
-our $VERSION = do { my ($r) = q$Revision: 413 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 426 $ =~ /(\d+)/smx; $r; };
 
 sub new {
   my ($class, $ref_in) = @_;
@@ -245,6 +244,7 @@ sub is_txt {
 
 sub is_xls {
   my ($str1, $fn2, $desc) = @_;
+  require Spreadsheet::ParseExcel;
   my $parser = Spreadsheet::ParseExcel->new();
 
   $fn2 = "t/data/rendered/$fn2";
@@ -304,7 +304,7 @@ t::request
 
 =head1 VERSION
 
-$LastChangedRevision: 413 $
+$LastChangedRevision: 426 $
 
 =head1 SYNOPSIS
 

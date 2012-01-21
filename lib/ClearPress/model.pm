@@ -4,8 +4,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
-# Id:            $Id: model.pm 413 2011-10-11 12:39:49Z zerojinx $
+# Last Modified: $Date: 2012-01-21 11:50:55 +0000 (Sat, 21 Jan 2012) $
+# Id:            $Id: model.pm 424 2012-01-21 11:50:55Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
 #
@@ -20,7 +20,7 @@ use Lingua::EN::Inflect qw(PL);
 use POSIX qw(strftime);
 use Readonly;
 
-our $VERSION = do { my ($r) = q$Revision: 413 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 424 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $DBI_CACHE_OVERWRITE => 3;
 
 sub fields { return (); }
@@ -174,8 +174,8 @@ sub gen_getarray {
     1; # sth->execute() does not return true!
 
   } or do {
-    $query =~ s/\s+/\ /ssmxg;
-    local $LIST_SEPARATOR = q(, );
+    $query =~ s/\s+/ /smxg;
+    local $LIST_SEPARATOR = q[, ];
     carp qq[GEN_GETARRAY ERROR\nEVAL_ERROR: $EVAL_ERROR\nCaller: @{[q[].caller]}\nQuery:\n$query\nDBH: @{[$util->dbh]}\nUTIL: $util\nParams: @{[map { (defined $_)?$_:'NULL' } @args]}];
     return;
   };
@@ -746,7 +746,7 @@ ClearPress::model - a base class for the data-model of the ClearPress MVC family
 
 =head1 VERSION
 
-$Revision: 413 $
+$Revision: 424 $
 
 =head1 SYNOPSIS
 

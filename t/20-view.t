@@ -14,10 +14,11 @@ use Test::Trap;
 use Carp;
 use File::Copy qw(copy);
 use File::Path qw(rmtree make_path);
+use File::Temp qw(tempdir);
 
 eval {
   require DBD::SQLite;
-  plan tests => 78;
+  plan tests => 81;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -26,7 +27,7 @@ use_ok('ClearPress::view');
 
 $ClearPress::view::DEBUG_OUTPUT = 0;
 
-my $util = t::util->new();
+my $util = t::util->new;
 
 {
   my $view = ClearPress::view->new({
@@ -36,19 +37,19 @@ my $util = t::util->new();
 }
 
 {
-  my $view = ClearPress::view->new();
+  my $view = ClearPress::view->new;
   isa_ok($view, 'ClearPress::view', 'constructs ok without ref');
 }
 
 {
   $util->username('joe_user');
-  is($util->username(), 'joe_user', 'username set');
+  is($util->username, 'joe_user', 'username set');
   my $view = ClearPress::view->new({
 				    util => $util,
 				   });
   isa_ok($view, 'ClearPress::view', 'constructs ok with ref');
   $util->username(undef);
-  is($util->username(), undef, 'username unset');
+  is($util->username, undef, 'username unset');
 }
 
 {
@@ -68,7 +69,7 @@ my $util = t::util->new();
 				      util   => $util,
 				      aspect => "read$k",
 				     });
-    is($view->content_type(), $types->{$k}, "$k => $types->{$k} content_type");
+    is($view->content_type, $types->{$k}, "$k => $types->{$k} content_type");
   }
 }
 
@@ -76,7 +77,7 @@ my $util = t::util->new();
   my $view = ClearPress::view->new({
 				    util   => $util,
 				   });
-  is($view->decor(), 1, 'decorate when no aspect given');
+  is($view->decor, 1, 'decorate when no aspect given');
 
   my $types = {
 	       _xml  => 0,
@@ -94,7 +95,7 @@ my $util = t::util->new();
 				      util   => $util,
 				      aspect => "read$k",
 				     });
-    is($view->decor(), $types->{$k}, "$k => $types->{$k} decor");
+    is($view->decor, $types->{$k}, "$k => $types->{$k} decor");
   }
 }
 
@@ -117,7 +118,7 @@ my $util = t::util->new();
     is($view->_accessor('key'), 'value', 'accessor get value');
   };
 
-  like($trap->stderr(), qr/deprecated/smx, 'deprecated warn');
+  like($trap->stderr, qr/deprecated/smx, 'deprecated warn');
 }
 
 {
@@ -129,9 +130,9 @@ my $util = t::util->new();
   my $stdout = select $io;
 
   $view->output_buffer("Content-type: text/html\n\n");
-  $view->output_reset();
+  $view->output_reset;
   $view->output_buffer("Content-type: text/plain\n\n");
-  $view->output_end();
+  $view->output_end;
   $view->output_buffer("Content-type: text/plain\n\n");
 
   select $stdout;
@@ -152,9 +153,9 @@ my $util = t::util->new();
 
   trap {
     $view->output_buffer("Content-type: text/html\n\n");
-    $view->output_reset();
+    $view->output_reset;
     $view->output_buffer("Content-type: text/plain\n\n");
-    $view->output_end();
+    $view->output_end;
     $view->output_buffer("Content-type: text/plain\n\n");
   };
   like($trap->stderr, qr/output_/mx, 'output buffer debugging');
@@ -164,31 +165,43 @@ my $util = t::util->new();
 }
 
 {
-  my $model = t::model->new({util=>$util});
+  my $model = t::model->new;
   my $view  = ClearPress::view->new({
 				     util   => $util,
 				     model  => $model,
 				     action => 'list',
-				     aspect => q(),
+				     aspect => q[],
 				    });
 
-  is($view->template_name(), 'view_list', 'view_list template_name');
+  is($view->template_name, 'view_list', 'view_list template_name');
 }
 
 {
-  my $model = t::model->new({util=>$util});
+  my $model = t::model->new;
+  my $view  = ClearPress::view->new({
+				     util   => $util,
+				     model  => $model,
+				     action => 'list',
+				     aspect => q[],
+				    });
+  $view->template_name('some_other');
+  is($view->template_name, 'some_other', 'override template_name');
+}
+
+{
+  my $model = t::model->new;
   my $view  = ClearPress::view->new({
 				     util   => $util,
 				     model  => $model,
 				     action => 'read',
-				     aspect => q(),
+				     aspect => q[],
 				    });
 
-  is($view->template_name(), 'view_list', 'fix read / view_list template_name');
+  is($view->template_name, 'view_list', 'fix read / view_list template_name');
 }
 
 {
-  my $cgi   = CGI->new();
+  my $cgi   = CGI->new;
   $cgi->param('test_field', 'blabla');
   $cgi->param('test_pk',    'two');
 
@@ -205,73 +218,73 @@ my $util = t::util->new();
 				     aspect => q[],
 				    });
 
-  is($view->add(), 1, 'add ok');
+  is($view->add, 1, 'add ok');
 
-  is($model->test_field(), 'blabla', 'test field');
-  is($model->test_pk(), 'one', 'test pk remains unmodified');
+  is($model->test_field, 'blabla', 'test field');
+  is($model->test_pk, 'one', 'test pk remains unmodified');
 
   for my $method (qw(create read update delete)) {
-    is($view->$method(), 1, "$method ok");
+    is($view->$method, 1, "$method ok");
     my $method_xml = "${method}_xml";
-    is($view->$method_xml(), 1, "$method_xml ok");
+    is($view->$method_xml, 1, "$method_xml ok");
   }
 
   $util->cgi(undef);
 }
 
 {
-  my $model = t::model->new({util=>$util});
+  my $model = t::model->new;
   my $view  = ClearPress::view->new({
 				     util   => $util,
 				     model  => $model,
 				     action => 'create',
-				     aspect => q(),
+				     aspect => q[],
 				    });
-  is($view->authorised(), 1, 'always authorised when authentication unsupported');
+  is($view->authorised, 1, 'always authorised when authentication unsupported');
 }
 
 {
-  my $model = t::model->new({util=>$util});
-  my $basic = t::user::basic->new({util=>$util});
+  my $model = t::model->new;
+  my $basic = t::user::basic->new;
   is($util->requestor($basic), $basic, 'requestor set');
   my $view  = ClearPress::view->new({
 				     util   => $util,
 				     model  => $model,
 				     action => 'create',
-				     aspect => q(),
+				     aspect => q[],
 				    });
-  is($view->authorised(), undef, 'basic user cannot create');
+  is($view->authorised, undef, 'basic user cannot create');
 }
 
 {
-  my $model = t::model->new({util=>$util});
-  my $basic = t::user::basic->new({util=>$util});
+  my $model = t::model->new;
+  my $basic = t::user::basic->new;
   is($util->requestor($basic), $basic, 'requestor set');
   my $view  = ClearPress::view->new({
 				     util   => $util,
 				     model  => $model,
 				     action => 'read',
-				     aspect => q(),
+				     aspect => q[],
 				    });
-  is($view->authorised(), 1, 'basic user can read');
+  is($view->authorised, 1, 'basic user can read');
 }
 
 {
-  my $model = t::model->new({util=>$util});
-  my $basic = t::user::basic->new({util=>$util});
+  my $model = t::model->new;
+  my $basic = t::user::basic->new;
   is($util->requestor($basic), $basic, 'requestor set');
   my $view  = ClearPress::view->new({
 				     util   => $util,
 				     model  => $model,
 				     action => 'list',
-				     aspect => q(),
+				     aspect => q[],
 				    });
-  is($view->authorised(), 1, 'basic user can list');
+  is($view->authorised, 1, 'basic user can list');
 }
 
 {
-  my $model = t::model->new({util=>$util});
-  my $basic = t::user::basic->new({util=>$util});
+  my $model = t::model->new;
+  my $basic = t::user::basic->new;
   is($util->requestor($basic), $basic, 'requestor set');
   my $view  = ClearPress::view->new({
 				     util   => $util,
@@ -279,12 +292,12 @@ my $util = t::util->new();
 				     action => 'read',
 				     aspect => q(add),
 				    });
-  is($view->authorised(), undef, 'basic user cannot add');
+  is($view->authorised, undef, 'basic user cannot add');
 }
 
 {
-  my $model = t::model->new({util=>$util});
-  my $basic = t::user::basic->new({util=>$util});
+  my $model = t::model->new;
+  my $basic = t::user::basic->new;
   is($util->requestor($basic), $basic, 'requestor set');
   my $view  = ClearPress::view->new({
 				     util   => $util,
@@ -292,12 +305,12 @@ my $util = t::util->new();
 				     action => 'create',
 				     aspect => q(update),
 				    });
-  is($view->authorised(), undef, 'basic user cannot update');
+  is($view->authorised, undef, 'basic user cannot update');
 }
 
 {
-  my $model = t::model->new({util=>$util});
-  my $basic = t::user::basic->new({util=>$util});
+  my $model = t::model->new;
+  my $basic = t::user::basic->new;
   is($util->requestor($basic), $basic, 'requestor set');
   my $view  = ClearPress::view->new({
 				     util   => $util,
@@ -305,26 +318,26 @@ my $util = t::util->new();
 				     action => 'edit',
 				     aspect => q(delete),
 				    });
-  is($view->authorised(), undef, 'basic user cannot delete');
+  is($view->authorised, undef, 'basic user cannot delete');
 }
 
 {
-  my $model = t::model->new({util=>$util});
-  my $admin = t::user::admin->new({util=>$util});
+  my $model = t::model->new;
+  my $admin = t::user::admin->new;
   is($util->requestor($admin), $admin, 'requestor set');
   my $view  = ClearPress::view->new({
 				     util   => $util,
 				     model  => $model,
 				     action => 'create',
-				     aspect => q(),
+				     aspect => q[],
 				    });
-  is($view->authorised(), 1, 'admin user can create');
+  is($view->authorised, 1, 'admin user can create');
 }
 
 {
   my $pid = $$;
   $util->data_path("/tmp/data$pid");
-  my $model = t::model->new({util=>$util});
+  my $model = t::model->new;
   my $view  = ClearPress::view->new({
 				     util   => $util,
 				     model  => $model,
@@ -348,7 +361,7 @@ my $util = t::util->new();
 {
   my $pid = $$;
   $util->data_path("/tmp/data$pid");
-  my $model = t::model->new({util=>$util});
+  my $model = t::model->new;
   my $view  = ClearPress::view->new({
 				     util   => $util,
 				     model  => $model,
@@ -375,7 +388,7 @@ my $util = t::util->new();
 }
 
 {
-  my $cgi = CGI->new();
+  my $cgi = CGI->new;
   my $xml = qq[<?xml version='1.0'?>\n<model><test_pk>two</test_pk><test_field>bar</test_field></model>];
 
   $cgi->param('XForms:Model', $xml);
@@ -391,13 +404,13 @@ my $util = t::util->new();
 				     action => 'update',
 				     aspect => q[],
 				    });
-  like($view->render(), qr/Updated/smx, 'submit-xml render ok');
-  is($model->test_pk(),    'one', 'key population from param not xml');
-  is($model->test_field(), 'bar', 'field population from xml');
+  like($view->render, qr/Updated/smx, 'submit-xml render ok');
+  is($model->test_pk,    'one', 'key population from param not xml');
+  is($model->test_field, 'bar', 'field population from xml');
 }
 
 {
-  my $cgi = CGI->new();
+  my $cgi = CGI->new;
   my $xml = qq[<?xml version='1.0'?>\n<model><test_pk>two</test_pk><test_field>bar</test_field></model>];
 
   $cgi->param('POSTDATA', $xml);
@@ -413,9 +426,9 @@ my $util = t::util->new();
 				     action => 'update',
 				     aspect => q[],
 				    });
-  like($view->render(), qr/Updated/smx, 'submit-xml render ok');
-  is($model->test_pk(),    'one', 'key population from param not xml');
-  is($model->test_field(), 'bar', 'field population from xml');
+  like($view->render, qr/Updated/smx, 'submit-xml render ok');
+  is($model->test_pk,    'one', 'key population from param not xml');
+  is($model->test_field, 'bar', 'field population from xml');
 }
 
 {
@@ -432,17 +445,48 @@ my $util = t::util->new();
 }
 
 {
-  my $view = ClearPress::view->new();
-  is($view->charset(), 'UTF-8', 'default charset');
+  my $view = ClearPress::view->new;
+  is($view->charset, 'UTF-8', 'default charset');
 }
 
 {
   my $view = ClearPress::view->new({charset => 'iso8859-1'});
-  is($view->charset(), 'iso8859-1', 'constructor charset');
+  is($view->charset, 'iso8859-1', 'constructor charset');
 }
 
 {
-  my $view = ClearPress::view->new();
+  my $view = ClearPress::view->new;
   $view->charset('koir-8');
-  is($view->charset(), 'koir-8', 'accessor charset');
+  is($view->charset, 'koir-8', 'accessor charset');
+}
+
+{
+  my $model = t::model->new;
+  my $view  = ClearPress::view->new({
+				     util   => $util,
+				     model  => $model,
+				     aspect => q[],
+				    });
+
+  is($view->template_name, 'view', 'view template_name (no method)');
+}
+
+{
+  my $tmpdir = tempdir( CLEANUP => 1 );
+  my $model  = t::model->new;
+  my $view   = ClearPress::view->new({
+                                      util   => $util,
+                                      model  => $model,
+                                      action => 'list',
+                                      aspect => q[],
+                                     });
+  no warnings qw(redefine once);
+  local *t::util::data_path = sub { return $tmpdir; };
+  mkdir "$tmpdir/templates";
+  mkdir "$tmpdir/templates/view";
+
+  open my $fh, q[>], "$tmpdir/templates/view/list.tt2";
+  close $fh;
+
+  is($view->template_name, 'view/list', 'view/list template_name in subdirectory');
 }
