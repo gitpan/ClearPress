@@ -15,7 +15,7 @@ use ClearPress::view;
 use ClearPress::controller;
 use ClearPress::util;
 
-our $VERSION = do { my ($r) = q$Revision: 434 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 435 $ =~ /(\d+)/smx; $r; };
 
 1;
 __END__

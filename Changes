@@ -1,8 +1,8 @@
-libclearpress-perl (433) stable; urgency=low
+libclearpress-perl (435) stable; urgency=low
 
   * packaging updates for rpm/deb
 
- -- Roger Pettett <rmp@psyphi.net>  Mon, 2 Apr 2012 21:12:00
+ -- Roger Pettett <rmp@psyphi.net>  Mon, 2 Apr 2012 22:58:00
 
 libclearpress-perl (422) stable; urgency=low
 

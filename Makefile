@@ -32,9 +32,8 @@ clean:	setup
 	[ ! -d rpmbuild ]   || rm -rf rpmbuild
 	[ ! -e spec ]       || rm -f spec
 	[ ! -e tmp ]        || rm -rf tmp
-	touch clearpress.rpm clearpress.deb
-	rm libclearpress*rpm
-	rm libclearpress*deb
+	touch libclearpress.rpm libclearpress.deb
+	rm libclearpress*rpm libclearpress*deb
 
 test:	setup
 	TEST_AUTHOR=1 ./Build test verbose=1
