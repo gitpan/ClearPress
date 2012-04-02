@@ -1,10 +1,10 @@
 Summary: ClearPress Web Framework
-Name: clearpress-RELEASE
+Name: libclearpress-perl
 Version: CLEARPRESSMAJOR
 Release: CLEARPRESSMINOR
 License: GPL
 Group: Applications
-Source: clearpress-RELEASE-CLEARPRESSMAJOR-CLEARPRESSMINOR.tar.gz
+Source: clearpress-CLEARPRESSMAJOR-CLEARPRESSMINOR.tar.gz
 URL: http://clearpress.net/
 Distribution: psyphi.net
 Vendor: psyphi.net
@@ -19,7 +19,7 @@ Simple, lightweight web framework for Perl.
 %build
 tar -xzf *.tar.gz
 cd ClearPress*
-perl Build.PL --prefix=$RPM_BUILD_ROOT$PREFIX
+perl Build.PL --prefix=$RPM_BUILD_ROOTPREFIX
 ./Build
 
 %install

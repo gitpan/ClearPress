@@ -61,6 +61,7 @@ my $builder = Module::Build->new(
 							 'Test::Distribution'  => '0',
 							 'Test::Perl::Critic'  => '0',
 							},
+                                 configure_requires  => { 'Module::Build' => 0.38 },
 				 script_files        => [qw(bin/clearpress)],
 				);
 

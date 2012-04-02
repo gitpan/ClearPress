@@ -18,7 +18,7 @@ use File::Temp qw(tempdir);
 
 eval {
   require DBD::SQLite;
-  plan tests => 81;
+  plan tests => 111;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -489,4 +489,26 @@ my $util = t::util->new;
   close $fh;
 
   is($view->template_name, 'view/list', 'view/list template_name in subdirectory');
+}
+
+{
+  my $model = t::model->new;
+  my $view  = ClearPress::view->new({
+                                     util  => $util,
+                                     model => $model,
+                                    });
+
+  for my $aspect (qw(json xml ajax)) {
+    for my $action (qw(list read create update delete)) {
+      my $method = "ClearPress::view::$action";
+      no strict 'refs';
+      no warnings qw(redefine once);
+      my $triggered = 0;
+      local *{$method} = sub { $triggered = 1; };
+
+      my $call = "${action}_$aspect";
+      ok($view->$call, "$call return value");
+      ok($triggered, "$call triggered $action")
+    }
+  }
 }
