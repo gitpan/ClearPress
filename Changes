@@ -1,3 +1,9 @@
+libclearpress-perl (433) stable; urgency=low
+
+  * packaging updates for rpm/deb
+
+ -- Roger Pettett <rmp@psyphi.net>  Mon, 2 Apr 2012 21:12:00
+
 libclearpress-perl (422) stable; urgency=low
 
   * RT#72491 allow templates in per-view subdirectories, e.g. user/list.tt2

@@ -33,8 +33,8 @@ clean:	setup
 	[ ! -e spec ]       || rm -f spec
 	[ ! -e tmp ]        || rm -rf tmp
 	touch clearpress.rpm clearpress.deb
-	rm clearpress*rpm
-	rm clearpress*deb
+	rm libclearpress*rpm
+	rm libclearpress*deb
 
 test:	setup
 	TEST_AUTHOR=1 ./Build test verbose=1
@@ -56,13 +56,13 @@ rpm:	clean manifest
 	mkdir -p rpmbuild/BUILD rpmbuild/RPMS rpmbuild/SOURCES rpmbuild/SPECS rpmbuild/SRPMS
 	perl Build.PL
 	./Build dist
-	mv ClearPress*gz rpmbuild/SOURCES/clearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).tar.gz
-	cp rpmbuild/SOURCES/clearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).tar.gz rpmbuild/BUILD/
+	mv ClearPress*gz rpmbuild/SOURCES/libclearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).tar.gz
+	cp rpmbuild/SOURCES/libclearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).tar.gz rpmbuild/BUILD/
 	rpmbuild -v --define="_topdir `pwd`/rpmbuild" \
-		    --buildroot `pwd`/rpmbuild/clearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR)-root \
+		    --buildroot `pwd`/rpmbuild/libclearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR)-root \
 		    --target=$(arch)-redhat-linux        \
 		    -ba spec
-	cp rpmbuild/RPMS/*/clearpress*.rpm .
+	cp rpmbuild/RPMS/*/libclearpress*.rpm .
 
 deb:	rpm
-	fakeroot alien  -d clearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).$(arch).rpm
+	fakeroot alien  -d libclearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).$(arch).rpm
