@@ -4,7 +4,7 @@ Version: CLEARPRESSMAJOR
 Release: CLEARPRESSMINOR
 License: GPL
 Group: Applications
-Source: clearpress-CLEARPRESSMAJOR-CLEARPRESSMINOR.tar.gz
+Source: libclearpress-CLEARPRESSMAJOR-CLEARPRESSMINOR.tar.gz
 URL: http://clearpress.net/
 Distribution: psyphi.net
 Vendor: psyphi.net
