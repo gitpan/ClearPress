@@ -126,4 +126,3 @@ test.db
 Build.PL
 spec.header
 META.yml
-META.json
