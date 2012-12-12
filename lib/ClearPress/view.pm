@@ -4,8 +4,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2012-01-21 11:46:07 +0000 (Sat, 21 Jan 2012) $
-# Id:            $Id: view.pm 423 2012-01-21 11:46:07Z zerojinx $
+# Last Modified: $Date: 2012-08-20 14:45:08 +0100 (Mon, 20 Aug 2012) $
+# Id:            $Id: view.pm 442 2012-08-20 13:45:08Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
 # $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
 #
@@ -23,7 +23,7 @@ use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 use utf8;
 
-our $VERSION        = do { my ($r) = q$Revision: 423 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 442 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
@@ -52,6 +52,8 @@ sub new {
   $self->{content_type} ||= ($aspect =~ /_txt$/smx)?'text/plain':q[];
   $self->{content_type} ||= ($aspect =~ /_xls$/smx)?'application/vnd.ms-excel':q[];
 
+  $self->setup_filters;
+
   $self->init;
 
   $self->{content_type} ||= 'text/html';
@@ -59,6 +61,29 @@ sub new {
   $self->{charset}      ||= 'UTF-8';
 
   return $self;
+}
+
+sub setup_filters {
+  my $self = shift;
+  $self->add_tt_filter('js_string', sub {
+                         my $string = shift;
+                         if(!defined $string) {
+                           $string = q[];
+                         }
+                         $string    =~ s/\r/\\r/smxg;
+                         $string    =~ s/\n/\\n/smxg;
+                         $string    =~ s/"/\\"/smxg;
+                         $string    =~ s/'/\\'/smxg;
+                         return $string;
+                       });
+  $self->add_tt_filter('xml_entity', sub {
+                         my $string = shift;
+                         if(!defined $string) {
+                           $string = q[];
+                         }
+                         return encode_entities_numeric($string),
+                       });
+  return 1;
 }
 
 sub init {
@@ -520,25 +545,6 @@ sub tt {
   }
 
   if(!$util->{tt}) {
-    $self->add_tt_filter('js_string', sub {
-			                   my $string = shift;
-					   if(!defined $string) {
-					     $string = q[];
-					   }
-					   $string    =~ s/\r/\\r/smxg;
-					   $string    =~ s/\n/\\n/smxg;
-					   $string    =~ s/"/\\"/smxg;
-					   $string    =~ s/'/\\'/smxg;
-					   return $string;
-					 });
-    $self->add_tt_filter('xml_entity', sub {
-					    my $string = shift;
-					    if(!defined $string) {
-					      $string = q[];
-					    }
-					    return encode_entities_numeric($string),
-					  });
-
     my $filters = Template::Filters->new({
 					  FILTERS => $self->tt_filters,
 					 });
@@ -708,7 +714,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 423 $
+$Revision: 442 $
 
 =head1 SYNOPSIS
 
@@ -735,6 +741,8 @@ View superclass for the ClearPress framework
   my $oView = ClearPress::view::<subclass>->new({util => $oUtil, ...});
 
 =head2 init - additional post-constructor hook
+
+=head2 setup_filters - adds default tt_filters, called by ->new()
 
 =head2 determine_aspect - URI processing
 

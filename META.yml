@@ -5,7 +5,7 @@ author:
 build_requires:
   CPAN: 1.9205
   Cwd: 3.2701
-  File::Copy: 2.13
+  File::Copy: 2.09
   File::Path: 2.07_02
   File::Spec: 3.2701
   File::Temp: 0.22
@@ -17,7 +17,8 @@ build_requires:
   XML::TreeBuilder: 3.09
 configure_requires:
   Module::Build: 0.38
-generated_by: 'Module::Build version 0.3603'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +27,7 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 441
+    version: 443
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 413
@@ -71,7 +72,7 @@ provides:
     version: 413
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: 423
+    version: 442
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
     version: 413
@@ -107,4 +108,4 @@ requires:
   warnings: 1.05
 resources:
   license: http://dev.perl.org/licenses/
-version: 441
+version: 443

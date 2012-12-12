@@ -1,3 +1,9 @@
+libclearpress-perl (442) stable; urgency=low
+
+  * new setup_filters method called during new() but before init()
+
+ -- Roger Pettett <rmp@psyphi.net>  Wed, 4 Apr 2012 14:25:00
+
 libclearpress-perl (438) stable; urgency=low
 
   * packaging updates

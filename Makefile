@@ -55,13 +55,13 @@ rpm:	clean manifest
 	mkdir -p rpmbuild/BUILD rpmbuild/RPMS rpmbuild/SOURCES rpmbuild/SPECS rpmbuild/SRPMS
 	perl Build.PL
 	./Build dist
-	mv ClearPress*gz rpmbuild/SOURCES/libclearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).tar.gz
-	cp rpmbuild/SOURCES/libclearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).tar.gz rpmbuild/BUILD/
+	mv ClearPress*gz rpmbuild/SOURCES/libclearpress-perl-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).tar.gz
+	cp rpmbuild/SOURCES/libclearpress-perl-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).tar.gz rpmbuild/BUILD/
 	rpmbuild -v --define="_topdir `pwd`/rpmbuild" \
-		    --buildroot `pwd`/rpmbuild/libclearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR)-root \
+		    --buildroot `pwd`/rpmbuild/libclearpress-perl-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR)-root \
 		    --target=$(arch)-redhat-linux        \
 		    -ba spec
 	cp rpmbuild/RPMS/*/libclearpress*.rpm .
 
 deb:	rpm
-	fakeroot alien  -d libclearpress-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).$(arch).rpm
+	fakeroot alien  -d libclearpress-perl-$(CLEARPRESSMAJOR)-$(CLEARPRESSMINOR).$(arch).rpm
