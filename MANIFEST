@@ -49,7 +49,10 @@ lib/ClearPress/util.pm
 lib/ClearPress/view.pm
 lib/ClearPress/view/error.pm
 LICENSE
+Makefile
 MANIFEST			This list of files
+META.json
+META.yml
 README
 spec.header
 t/00-critic.t
@@ -122,5 +125,3 @@ t/user/basic.pm
 t/util.pm
 t/view/derived.pm
 t/view/error.pm
-META.yml
-META.json
