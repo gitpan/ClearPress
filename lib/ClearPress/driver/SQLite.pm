@@ -5,7 +5,7 @@
 # Last Modified: $Date: 2011-05-04 10:57:27 +0100 (Wed, 04 May 2011) $
 # Id:            $Id: SQLite.pm 405 2011-05-04 09:57:27Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/SQLite.pm $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/driver/SQLite.pm $
 #
 package ClearPress::driver::SQLite;
 use strict;

@@ -5,7 +5,7 @@
 # Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
 # Id:            $Id: Pg.pm 348 2010-01-04 13:02:42Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/driver/Pg.pm $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/driver/Pg.pm $
 #
 package ClearPress::driver::Pg;
 use strict;

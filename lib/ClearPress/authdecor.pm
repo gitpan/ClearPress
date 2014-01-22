@@ -5,7 +5,7 @@
 # Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
 # Id:            $Id: authdecor.pm 413 2011-10-11 12:39:49Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/authdecor.pm $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/authdecor.pm $
 #
 package ClearPress::authdecor;
 use strict;

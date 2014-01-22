@@ -4,9 +4,9 @@
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
-# Id:            $Id: clearpress 413 2011-10-11 12:39:49Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/bin/clearpress $
+# Last Modified: $Date: 2013-12-24 15:38:52 +0000 (Tue, 24 Dec 2013) $
+# Id:            $Id: clearpress 449 2013-12-24 15:38:52Z zerojinx $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/bin/clearpress $
 #
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 413 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 449 $ =~ /(\d+)/smx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
 local $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin /opt/local/bin);
@@ -238,18 +238,20 @@ sub process_template {
 }
 
 sub _sorter {
-  my $a_deps = $a->{has_a} || [];
-  my $b_deps = $b->{has_a} || [];
+  my $a_deps = [@{$a->{has_a}||[]}];#, @{$a->{has_many}||[]}];
+  my $b_deps = [@{$b->{has_a}||[]}];#, @{$b->{has_many}||[]}];
 
   if(scalar grep { $_ eq $b->{name} } @{$a_deps}) {
+#warn qq[$b->{name} present in a_deps];
     return 1;
   }
 
   if(scalar grep { $_ eq $a->{name} } @{$b_deps}) {
+#warn qq[$a->{name} present in b_deps];
     return -1; ## no critic (ProhibitMagicNumbers)
   }
 
-  return (scalar @{$a_deps} <=> scalar @{$b_deps});
+  return (scalar @{$a_deps} <=> scalar @{$b_deps} || $a cmp $b);
 }
 
 __END__
@@ -320,7 +322,7 @@ use <% application %>::util;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 413 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 449 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $PORT => 8080;
 
 my $opts = {};
@@ -358,11 +360,11 @@ sub handle_request {
 					  });
   print "HTTP/1.0 200 OK\n";
 
-  my ($fn) = "htdocs$ENV{REQUEST_URI}" =~ m|([a-z\d_/\.\-%]+)|mix;
-  $fn      =~ s|\.\./||smxg;
+  my ($fn) = "htdocs$ENV{REQUEST_URI}" =~ m{([[:lower:]\d_/.\-%]+)}mix;
+  $fn      =~ s{[.][.]/}{}smxg;
 
   if(-f $fn) {
-    my ($ext) = $fn =~ /\.([^\.]+)$/smx;
+    my ($ext) = $fn =~ m{[.]([^.]+)$}smx;
 
     my $type  = $EXTN->{lc $ext} || 'application/octet-stream';
     print qq(Content-type: $type\n\n);
@@ -401,7 +403,7 @@ use <% application %>::view::error;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 413 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 449 $ =~ /(\d+)/smx; $r; };
 
 main();
 0;

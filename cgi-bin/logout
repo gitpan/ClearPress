@@ -4,7 +4,7 @@
 # Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
 # Id:            $Id: logout 348 2010-01-04 13:02:42Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/cgi-bin/logout $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/cgi-bin/logout $
 #
 use strict;
 use warnings;

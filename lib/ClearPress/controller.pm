@@ -4,10 +4,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2012-01-21 11:50:55 +0000 (Sat, 21 Jan 2012) $
-# Id:            $Id: controller.pm 424 2012-01-21 11:50:55Z zerojinx $
+# Last Modified: $Date: 2014-01-22 09:56:19 +0000 (Wed, 22 Jan 2014) $
+# Id:            $Id: controller.pm 452 2014-01-22 09:56:19Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/controller.pm $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/controller.pm $
 #
 # method id action  aspect  result CRUD
 # =====================================
@@ -28,12 +28,14 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$Revision: 424 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 452 $ =~ /(\d+)/smx; $r; };
 our $CRUD    = {
 		POST   => 'create',
 		GET    => 'read',
 		PUT    => 'update',
 		DELETE => 'delete',
+                HEAD   => 'null',
+                TRACE  => 'null',
 	       };
 our $REST   = {
 	       create => 'POST',
@@ -43,6 +45,7 @@ our $REST   = {
 	       add    => 'GET',
 	       edit   => 'GET',
 	       list   => 'GET',
+               null   => 'HEAD|TRACE'
 	      };
 sub accept_extensions {
   return [
@@ -433,6 +436,11 @@ sub handler {
 
   my $decor = $viewobject->decor();
 
+  #########
+  # let the view have the decorator in case it wants to modify headers
+  #
+  $viewobject->decorator($decorator);
+
   if($decor) {
     if($viewobject->charset && $decorator->can('charset')) {
       $decorator->charset($viewobject->charset);
@@ -615,7 +623,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$Revision: 424 $
+$Revision: 452 $
 
 =head1 SYNOPSIS
 

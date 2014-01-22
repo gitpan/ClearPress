@@ -4,7 +4,7 @@
       "Roger M Pettett <rpettett@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "Module::Build version 0.4203",
    "license" : [
       "perl_5"
    ],
@@ -55,6 +55,7 @@
             "DBI" : "1.51",
             "English" : "1.01",
             "HTML::Entities" : "1.35",
+            "HTTP::Server::Simple" : "0.44",
             "IO::Scalar" : "2.110",
             "Lingua::EN::Inflect" : "1.89",
             "MIME::Base64" : "3.07",
@@ -73,7 +74,7 @@
    "provides" : {
       "ClearPress" : {
          "file" : "lib/ClearPress.pm",
-         "version" : "443"
+         "version" : "452"
       },
       "ClearPress::authdecor" : {
          "file" : "lib/ClearPress/authdecor.pm",
@@ -101,7 +102,7 @@
       },
       "ClearPress::controller" : {
          "file" : "lib/ClearPress/controller.pm",
-         "version" : "424"
+         "version" : "452"
       },
       "ClearPress::decorator" : {
          "file" : "lib/ClearPress/decorator.pm",
@@ -129,11 +130,11 @@
       },
       "ClearPress::util" : {
          "file" : "lib/ClearPress/util.pm",
-         "version" : "413"
+         "version" : "445"
       },
       "ClearPress::view" : {
          "file" : "lib/ClearPress/view.pm",
-         "version" : "442"
+         "version" : "452"
       },
       "ClearPress::view::error" : {
          "file" : "lib/ClearPress/view/error.pm",
@@ -146,5 +147,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "443"
+   "version" : "452"
 }

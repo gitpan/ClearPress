@@ -7,7 +7,7 @@
 # Last Modified: $Date: 2012-01-21 11:50:55 +0000 (Sat, 21 Jan 2012) $
 # Id:            $Id: model.pm 424 2012-01-21 11:50:55Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/model.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/model.pm $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/model.pm $
 #
 package ClearPress::model;
 use strict;

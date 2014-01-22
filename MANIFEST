@@ -1,13 +1,9 @@
-Changes
-LICENSE
-MANIFEST
-MANIFEST.SKIP
-Makefile
-README
 bin/clearpress
+Build.PL
 cgi-bin/application
 cgi-bin/login
 cgi-bin/logout
+Changes
 examples/GrandKids/bin/GrandKids
 examples/GrandKids/cgi-bin/GrandKids
 examples/GrandKids/config.layout
@@ -45,13 +41,17 @@ lib/ClearPress/authenticator/session.pm
 lib/ClearPress/controller.pm
 lib/ClearPress/decorator.pm
 lib/ClearPress/driver.pm
+lib/ClearPress/driver/mysql.pm
 lib/ClearPress/driver/Pg.pm
 lib/ClearPress/driver/SQLite.pm
-lib/ClearPress/driver/mysql.pm
 lib/ClearPress/model.pm
 lib/ClearPress/util.pm
 lib/ClearPress/view.pm
 lib/ClearPress/view/error.pm
+LICENSE
+MANIFEST			This list of files
+README
+spec.header
 t/00-critic.t
 t/00-distribution.t
 t/00-pod.t
@@ -76,7 +76,6 @@ t/60-authenticator-ldap.t
 t/60-authenticator-passwd.t
 t/60-authenticator-session.t
 t/60-authenticator.t
-t/Net/LDAP.pm
 t/data-no-default_view/config.ini
 t/data-no-views/config.ini
 t/data/config.ini
@@ -116,13 +115,12 @@ t/model/derived_child.pm
 t/model/derived_parent.pm
 t/model/derived_status.pm
 t/model/status.pm
+t/Net/LDAP.pm
 t/request.pm
 t/user/admin.pm
 t/user/basic.pm
 t/util.pm
 t/view/derived.pm
 t/view/error.pm
-Build.PL
-spec.header
 META.yml
 META.json

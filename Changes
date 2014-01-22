@@ -1,3 +1,11 @@
+libclearpress-perl (451) stable; urgency=low
+
+  * adjusted JSON encoding
+  * experimentation with pipe flushing
+  * pass in decorator to view object just before rendering in case the view wishes to reset headers and resend (e.g. authentication cookies)
+
+ -- Roger Pettett <rmp@psyphi.net>  Wed, 22 Jan 2014 09:54:00
+
 libclearpress-perl (442) stable; urgency=low
 
   * new setup_filters method called during new() but before init()

@@ -5,7 +5,7 @@
 # Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $ $Author: zerojinx $
 # Id:            $Id: 00-distribution.t 413 2011-10-11 12:39:49Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/t/00-distribution.t,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/t/00-distribution.t $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/t/00-distribution.t $
 #
 package distribution;
 use strict;

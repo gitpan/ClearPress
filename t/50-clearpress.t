@@ -38,9 +38,9 @@ eval {
 			},
 	    'kid'    => {
 			 'name'     => 'kid',
-			 'has_a' => [
-				     'family'
-				    ]
+			 'has_a'    => [
+                                        'family'
+                                       ]
 			},
 	   };
   my $received = [map { $_->{name} }
@@ -127,13 +127,15 @@ eval {
   my $received = [map { $_->{name} }
 		  sort _sorter
 		  values %{$in}];
+#  use Data::Dumper; diag Dumper($received);
   is_deeply($received,
 	    $expected);
 
-  my $expected2 = [qw(category user course course_user)];
+  my $expected2 = [qw(user category course course_user)];
   my $received2 = [map { $_->{name} }
 		   sort _sorter
 		   reverse values %{$in}];
+#  use Data::Dumper; diag Dumper($received);
   is_deeply($received2,
 	    $expected2);
 }

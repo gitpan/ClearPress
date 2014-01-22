@@ -5,7 +5,7 @@
 # Last Modified: $Date: 2011-10-11 14:19:40 +0100 (Tue, 11 Oct 2011) $ $Author: zerojinx $
 # Id:            $Id: ClearPress.pm 414 2011-10-11 13:19:40Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress.pm $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress.pm $
 #
 package ClearPress;
 use strict;
@@ -15,7 +15,7 @@ use ClearPress::view;
 use ClearPress::controller;
 use ClearPress::util;
 
-our $VERSION = do { my ($r) = q$Revision: 443 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 452 $ =~ /(\d+)/smx; $r; };
 
 1;
 __END__

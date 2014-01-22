@@ -5,7 +5,7 @@
 # Last Modified: $Date: 2012-01-21 12:00:38 +0000 (Sat, 21 Jan 2012) $
 # Id:            $Id: request.pm 426 2012-01-21 12:00:38Z zerojinx $
 # Source:        $Source$
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/t/request.pm $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/t/request.pm $
 #
 package t::request;
 use strict;

@@ -60,7 +60,7 @@ my $util = t::util->new();
 					   util   => $util,
 					  });
   trap {
-    is($view->render(), q[{"error":"Error: test & @ \' ; \""}]);
+    is($view->render(), q[{"error":"Error: test & @ ' ; \""}]);
   };
   like($trap->stderr(), qr/Serving\ error/mix, 'warn to console');
 }

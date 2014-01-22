@@ -4,10 +4,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2012-08-20 14:45:08 +0100 (Mon, 20 Aug 2012) $
-# Id:            $Id: view.pm 442 2012-08-20 13:45:08Z zerojinx $
+# Last Modified: $Date: 2014-01-22 09:56:19 +0000 (Wed, 22 Jan 2014) $
+# Id:            $Id: view.pm 452 2014-01-22 09:56:19Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/view.pm,v $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/view.pm $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/view.pm $
 #
 package ClearPress::view;
 use strict;
@@ -23,11 +23,11 @@ use HTML::Entities qw(encode_entities_numeric);
 use XML::Simple qw(XMLin);
 use utf8;
 
-our $VERSION        = do { my ($r) = q$Revision: 442 $ =~ /(\d+)/smx; $r; };
+our $VERSION        = do { my ($r) = q$Revision: 452 $ =~ /(\d+)/smx; $r; };
 our $DEBUG_OUTPUT   = 0;
 our $TEMPLATE_CACHE = {};
 
-__PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape charset));
+__PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape charset decorator));
 
 sub new {
   my ($class, $self)    = @_;
@@ -73,7 +73,7 @@ sub setup_filters {
                          $string    =~ s/\r/\\r/smxg;
                          $string    =~ s/\n/\\n/smxg;
                          $string    =~ s/"/\\"/smxg;
-                         $string    =~ s/'/\\'/smxg;
+#                         $string    =~ s/'/\\'/smxg;
                          return $string;
                        });
   $self->add_tt_filter('xml_entity', sub {
@@ -714,7 +714,7 @@ ClearPress::view - MVC view superclass
 
 =head1 VERSION
 
-$Revision: 442 $
+$Revision: 452 $
 
 =head1 SYNOPSIS
 
@@ -959,6 +959,11 @@ View superclass for the ClearPress framework
  or override the subroutine:
 
  sub autoescape { return 0; }
+
+=head2 decorator - get/set accessor for decorator object for cases where a view needs to reset & resend the decorated header. Set by the controller during $view->render()
+
+ $oView->decorator($oDecorator);
+ my $oDecorator = $oView->decorator();
 
 =head1 DIAGNOSTICS
 

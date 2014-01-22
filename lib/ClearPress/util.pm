@@ -4,10 +4,10 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
+# Last Modified: $Date: 2012-12-12 23:38:31 +0000 (Wed, 12 Dec 2012) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 413 2011-10-11 12:39:49Z zerojinx $
-# $HeadURL: https://clearpress.svn.sourceforge.net/svnroot/clearpress/trunk/lib/ClearPress/util.pm $
+# Id:            $Id: util.pm 445 2012-12-12 23:38:31Z zerojinx $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
@@ -20,7 +20,7 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$Revision: 413 $ =~ /(\d+)/smx; $r; };
+our $VERSION              = do { my ($r) = q$Revision: 445 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
 
@@ -123,15 +123,6 @@ sub quote {
   return $self->dbh->quote($str);
 }
 
-sub _accessor { ## no critic (ProhibitUnusedPrivateSubroutines)
-  my ($self, $field, $val) = @_;
-  carp q[_accessor is deprecated. Use __PACKAGE__->mk_accessors(...) instead];
-  if(defined $val) {
-    $self->{$field} = $val;
-  }
-  return $self->{$field};
-}
-
 sub driver {
   my ($self, @args) = @_;
 
@@ -226,7 +217,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$Revision: 413 $
+$Revision: 445 $
 
 =head1 SYNOPSIS
 
