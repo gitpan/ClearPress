@@ -4,8 +4,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-03-28
-# Last Modified: $Date: 2014-01-22 09:56:19 +0000 (Wed, 22 Jan 2014) $
-# Id:            $Id: controller.pm 452 2014-01-22 09:56:19Z zerojinx $
+# Last Modified: $Date: 2014-02-04 16:06:38 +0000 (Tue, 04 Feb 2014) $
+# Id:            $Id: controller.pm 456 2014-02-04 16:06:38Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/controller.pm,v $
 # $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/controller.pm $
 #
@@ -28,7 +28,7 @@ use ClearPress::decorator;
 use ClearPress::view::error;
 use CGI;
 
-our $VERSION = do { my ($r) = q$Revision: 452 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$Revision: 456 $ =~ /(\d+)/smx; $r; };
 our $CRUD    = {
 		POST   => 'create',
 		GET    => 'read',
@@ -146,7 +146,7 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
   my $hxrw          = $ENV{HTTP_X_REQUESTED_WITH} || q[];
   my $xhr           = ($hxrw =~ /XMLHttpRequest/smix);
 
-  if($xhr && $pi !~ /(?:ajax|json|xml)$/smx) {
+  if($xhr && $pi !~ m{(?:ajax|json|js|xml)(?:/[^/]*?)?$}smx) {
     if($pi =~ /[;]/smx) {
       $pi .= q[_ajax];
     } else {
@@ -623,7 +623,7 @@ ClearPress::controller - Application controller
 
 =head1 VERSION
 
-$Revision: 452 $
+$Revision: 456 $
 
 =head1 SYNOPSIS
 

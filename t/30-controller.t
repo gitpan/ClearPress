@@ -9,7 +9,7 @@ use Test::Trap;
 
 eval {
   require DBD::SQLite;
-  plan tests => 74;
+  plan tests => 76;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -100,6 +100,13 @@ my $T = [
                                                     HTTP_X_REQUESTED_WITH => 'XmlHttpRequest',
                                                    }, 'read', 'thing12', 'list_txt_ajax', 0],
 	 ['GET', '/testmap/test.xml',          '', {}, 'read', 'testmap', 'list_test_xml', 0],
+
+         ['GET', '/thing/valid_flowcell/12.js', '', {
+                                                     HTTP_X_REQUESTED_WITH => 'XmlHttpRequest',
+                                                    }, 'read', 'thing', 'read_valid_flowcell_json', 12],
+         ['GET', '/thing/valid_flowcell_json/12', '', {
+                                                     HTTP_X_REQUESTED_WITH => 'XmlHttpRequest',
+                                                    }, 'read', 'thing', 'read_valid_flowcell_json', 12],
 	];
 
 {

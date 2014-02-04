@@ -27,7 +27,7 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: 454
+    version: 457
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
     version: 413
@@ -48,7 +48,7 @@ provides:
     version: 413
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
-    version: 452
+    version: 456
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
     version: 413
@@ -109,4 +109,4 @@ requires:
   warnings: 1.05
 resources:
   license: http://dev.perl.org/licenses/
-version: 454
+version: 457

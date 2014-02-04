@@ -123,15 +123,15 @@ eval {
 			   }
 	    };
 
-  my $expected = [qw(user category course course_user)];
+  my $expected = [qw(category user course course_user)];
   my $received = [map { $_->{name} }
 		  sort _sorter
 		  values %{$in}];
-#  use Data::Dumper; diag Dumper($received);
+#  use Data::Dumper; diag Dumper($received, $expected);
   is_deeply($received,
 	    $expected);
 
-  my $expected2 = [qw(user category course course_user)];
+  my $expected2 = [qw(category user course course_user)];
   my $received2 = [map { $_->{name} }
 		   sort _sorter
 		   reverse values %{$in}];

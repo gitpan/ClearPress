@@ -1,3 +1,10 @@
+libclearpress-perl (457) stable; urgency=low
+
+  * tweak support for compound json XHR "read" requests
+  * repaired dependency sorting - sort by name not memory address
+
+ -- Roger Pettett <rmp@psyphi.net>  Wed, 4 Feb 2014 16:07:00
+
 libclearpress-perl (451) stable; urgency=low
 
   * adjusted JSON encoding

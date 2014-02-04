@@ -4,8 +4,8 @@
 #########
 # Author:        rpettett@cpan.org
 # Created:       2007-06-21
-# Last Modified: $Date: 2013-12-24 15:38:52 +0000 (Tue, 24 Dec 2013) $
-# Id:            $Id: clearpress 449 2013-12-24 15:38:52Z zerojinx $
+# Last Modified: $Date: 2014-02-04 16:04:41 +0000 (Tue, 04 Feb 2014) $
+# Id:            $Id: clearpress 455 2014-02-04 16:04:41Z zerojinx $
 # $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/bin/clearpress $
 #
 use strict;
@@ -18,7 +18,7 @@ use Lingua::EN::Inflect qw(PL);
 use lib qw(blib/lib lib);
 use ClearPress;
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 449 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 455 $ =~ /(\d+)/smx; $r; };
 our $ASPECTS = [qw(read list add create edit update)];
 
 local $ENV{PATH} = join q(:), qw(/bin /usr/bin /usr/local/bin /opt/local/bin);
@@ -242,16 +242,14 @@ sub _sorter {
   my $b_deps = [@{$b->{has_a}||[]}];#, @{$b->{has_many}||[]}];
 
   if(scalar grep { $_ eq $b->{name} } @{$a_deps}) {
-#warn qq[$b->{name} present in a_deps];
     return 1;
   }
 
   if(scalar grep { $_ eq $a->{name} } @{$b_deps}) {
-#warn qq[$a->{name} present in b_deps];
     return -1; ## no critic (ProhibitMagicNumbers)
   }
 
-  return (scalar @{$a_deps} <=> scalar @{$b_deps} || $a cmp $b);
+  return (scalar @{$a_deps} <=> scalar @{$b_deps} || $a->{name} cmp $b->{name});
 }
 
 __END__
@@ -322,7 +320,7 @@ use <% application %>::util;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 449 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 455 $ =~ /(\d+)/smx; $r; };
 Readonly::Scalar our $PORT => 8080;
 
 my $opts = {};
@@ -403,7 +401,7 @@ use <% application %>::view::error;
 use <% application %>::view::<% view %>;
 use <% application %>::model::<% view %>;<% END %>
 
-our $VERSION = do { my ($r) = q$LastChangedRevision: 449 $ =~ /(\d+)/smx; $r; };
+our $VERSION = do { my ($r) = q$LastChangedRevision: 455 $ =~ /(\d+)/smx; $r; };
 
 main();
 0;
