@@ -4,7 +4,7 @@
       "Roger M Pettett <rpettett@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4203",
+   "generated_by" : "Module::Build version 0.421",
    "license" : [
       "perl_5"
    ],
@@ -48,7 +48,6 @@
             "CGI" : "3.20",
             "Carp" : "1.02",
             "Class::Accessor" : "0.31",
-            "Class::Singleton" : "1.4",
             "Config::IniFiles" : "2.38",
             "Crypt::Blowfish" : "2.10",
             "Crypt::CBC" : "2.30",
@@ -56,6 +55,7 @@
             "English" : "1.01",
             "HTML::Entities" : "1.35",
             "HTTP::Server::Simple" : "0.44",
+            "IO::Capture" : "0.05",
             "IO::Scalar" : "2.110",
             "Lingua::EN::Inflect" : "1.89",
             "MIME::Base64" : "3.07",
@@ -74,7 +74,7 @@
    "provides" : {
       "ClearPress" : {
          "file" : "lib/ClearPress.pm",
-         "version" : "457"
+         "version" : "458"
       },
       "ClearPress::authdecor" : {
          "file" : "lib/ClearPress/authdecor.pm",
@@ -130,7 +130,7 @@
       },
       "ClearPress::util" : {
          "file" : "lib/ClearPress/util.pm",
-         "version" : "445"
+         "version" : "460"
       },
       "ClearPress::view" : {
          "file" : "lib/ClearPress/view.pm",
@@ -147,5 +147,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "457"
+   "version" : "458"
 }

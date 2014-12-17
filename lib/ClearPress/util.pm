@@ -4,15 +4,15 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2006-10-31
-# Last Modified: $Date: 2012-12-12 23:38:31 +0000 (Wed, 12 Dec 2012) $
+# Last Modified: $Date: 2014-12-16 23:58:30 +0000 (Tue, 16 Dec 2014) $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 445 2012-12-12 23:38:31Z zerojinx $
+# Id:            $Id: util.pm 460 2014-12-16 23:58:30Z zerojinx $
 # $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/util.pm $
 #
 package ClearPress::util;
 use strict;
 use warnings;
-use base qw(Class::Accessor Class::Singleton);
+use base qw(Class::Accessor);
 use Config::IniFiles;
 use Carp;
 use POSIX qw(strftime);
@@ -20,15 +20,21 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 
-our $VERSION              = do { my ($r) = q$Revision: 445 $ =~ /(\d+)/smx; $r; };
+our $VERSION              = do { my ($r) = q$Revision: 460 $ =~ /(\d+)/smx; $r; };
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
+my  $INSTANCES = {};
 
 __PACKAGE__->mk_accessors(qw(transactions username requestor profiler session));
 
 sub new {
   my ($class, $ref) = @_;
-  my $self = $class->instance($ref);
+
+  my $self = {};
+
+  if(exists $INSTANCES->{$class}) {
+    $self = $INSTANCES->{$class};
+  }
 
   if($ref && ref $ref eq 'HASH') {
     while(my ($k, $v) = each %{$ref}) {
@@ -36,19 +42,13 @@ sub new {
     }
   }
 
-  return $self;
-}
-
-sub _new_instance { ## no critic (ProhibitUnusedPrivateSubroutines)
-  my ($class, $ref) = @_;
-  $ref ||= {};
-
-  if(!exists $ref->{transactions}) {
-    $ref->{transactions} = $DEFAULT_TRANSACTIONS;
+  if(!exists $self->{transactions}) {
+    $self->{transactions} = $DEFAULT_TRANSACTIONS;
   }
 
-  my $self = bless $ref, $class;
-  return $self;
+  $INSTANCES->{$class} = bless $self, $class;
+
+  return $INSTANCES->{$class};
 }
 
 sub cgi {
@@ -164,8 +164,12 @@ sub cleanup {
   #
   my $class = ref $self || $self;
 
-  no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
-  ${"$class\::_instance"} = undef;
+  delete $INSTANCES->{$class};
+
+  if(exists $self->{dbh}) {
+    $self->{dbh}->disconnect();
+  }
+
   return 1;
 }
 
@@ -207,6 +211,11 @@ sub dbport {
   return $self->db_credentials->{dbport};
 }
 
+END {
+    # dereferences and causes orderly destruction of all instances
+    undef $INSTANCES;
+}
+
 1;
 
 __END__
@@ -217,7 +226,7 @@ ClearPress::util - A database handle and utility object
 
 =head1 VERSION
 
-$Revision: 445 $
+$Revision: 460 $
 
 =head1 SYNOPSIS
 
@@ -355,8 +364,6 @@ $Revision: 445 $
 =item POSIX
 
 =item English
-
-=item Class::Singleton
 
 =back
 

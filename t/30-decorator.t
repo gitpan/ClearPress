@@ -56,7 +56,7 @@ use_ok('ClearPress::decorator');
 					script => q[foo.init({mode:"textareas",theme:"simple"});],
 				       });
 
-  is_deeply($dec->script(), [qw(foo.init({mode:"textareas",theme:"simple"});)], 'returns given array for jsfile()');
+  is_deeply($dec->script(), [q[foo.init({mode:"textareas",theme:"simple"});]], 'returns given array for jsfile()');
 }
 
 {

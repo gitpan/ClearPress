@@ -150,7 +150,7 @@ sub request_test {
 
   is((join q[,], @{$ref}),
      (join q[,], grep { defined } @{$t}[4..7]),
-     "$t->[0] $t->[1]?$t->[2] => $t->[4],$t->[5],$t->[6],$t->[7]");
+     "$t->[0] $t->[1]?$t->[2] => @{[join q[, ], grep {defined} @{$t}[4..7]]}");
 }
 
 for my $t (@{$T}) {

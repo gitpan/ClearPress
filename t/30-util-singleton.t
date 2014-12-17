@@ -57,7 +57,6 @@ trap {
   my $util1 = ClearPress::util->new();
   $util1->cleanup();
   my $util2 = ClearPress::util->new();
-
   isnt($util1, $util2, 'utils differ after cleanup');
 };
 

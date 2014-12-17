@@ -5,6 +5,7 @@ use warnings;
 use Test::More tests => 16;
 use lib qw(t);
 use English qw(-no_match_vars);
+use IO::Capture::Stderr;
 
 our $PKG = q[ClearPress::authenticator::ldap];
 use_ok($PKG);
@@ -58,6 +59,7 @@ use_ok($PKG);
 }
 
 {
+  no warnings qw(once);
   my $ldap = $PKG->new;
   eval {
     local $Net::LDAP::CONSTRUCTOR_FAIL = 1;
@@ -89,6 +91,8 @@ use_ok($PKG);
 	      password => 'pass',
 	     };
   my $ldap = $PKG->new;
+  my $cap = IO::Capture::Stderr->new;
+  $cap->start;
   my $state;
   eval {
     local $Net::LDAP::BIND_CODE  = 1;
@@ -96,6 +100,6 @@ use_ok($PKG);
 
     $state = $ldap->authen_credentials($ref);
   };
-
+  $cap->stop;
   is($state, undef, 'authentication fail');
 }
