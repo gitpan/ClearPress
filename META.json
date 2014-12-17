@@ -74,7 +74,7 @@
    "provides" : {
       "ClearPress" : {
          "file" : "lib/ClearPress.pm",
-         "version" : "458"
+         "version" : "460"
       },
       "ClearPress::authdecor" : {
          "file" : "lib/ClearPress/authdecor.pm",
@@ -106,7 +106,7 @@
       },
       "ClearPress::decorator" : {
          "file" : "lib/ClearPress/decorator.pm",
-         "version" : "413"
+         "version" : "462"
       },
       "ClearPress::driver" : {
          "file" : "lib/ClearPress/driver.pm",
@@ -147,5 +147,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "458"
+   "version" : "460"
 }

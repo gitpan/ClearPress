@@ -4,8 +4,8 @@
 # Author:        rmp
 # Maintainer:    $Author: zerojinx $
 # Created:       2007-06-07
-# Last Modified: $Date: 2011-10-11 13:39:49 +0100 (Tue, 11 Oct 2011) $
-# Id:            $Id: decorator.pm 413 2011-10-11 12:39:49Z zerojinx $
+# Last Modified: $Date: 2014-12-17 10:29:08 +0000 (Wed, 17 Dec 2014) $
+# Id:            $Id: decorator.pm 462 2014-12-17 10:29:08Z zerojinx $
 # Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/decorator.pm,v $
 # $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/decorator.pm $
 #
@@ -16,7 +16,7 @@ use CGI qw(param);
 use base qw(Class::Accessor);
 use Readonly;
 
-our $VERSION  = do { my ($r) = q$LastChangedRevision: 413 $ =~ /(\d+)/smx; $r; };
+our $VERSION  = do { my ($r) = q$LastChangedRevision: 462 $ =~ /(\d+)/smx; $r; };
 our $DEFAULTS = {
 		 'meta_content_type' => 'text/html',
 		 'meta_version'      => '0.1',
@@ -55,7 +55,8 @@ sub get {
     }
 
     if($ARRAY_FIELDS->{$field} == $PROCESS_COMMA_YES) {
-      return [map { split /,/smx, $_ } @{$val}];
+      return [map { split /,/smx } @{$val}];
+
     } else {
       return $val;
     }
